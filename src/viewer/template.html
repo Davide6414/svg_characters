@@ -289,7 +289,8 @@
   const variants = DATA.presets.map(makeVariant);
   // i capi disponibili per il gruppo della sagoma attuale
   const outfitOf = (v) => DATA.clothes[v.body.group] ?? { tops: [], bottoms: [] };
-  const ALL_TOPS = Object.values(DATA.clothes).flatMap(c => c.tops), ALL_BOTTOMS = Object.values(DATA.clothes).flatMap(c => c.bottoms);
+  const uniq = (items) => [...new Map(items.map(i => [i.id, i])).values()];
+  const ALL_TOPS = uniq(Object.values(DATA.clothes).flatMap(c => c.tops)), ALL_BOTTOMS = uniq(Object.values(DATA.clothes).flatMap(c => c.bottoms));
 
   // Cambiando sagoma o stile, i colori che non hai modificato (uguali al default di prima) seguono il nuovo default.
   const follow = (v, before, after) => {

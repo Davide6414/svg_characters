@@ -56,21 +56,33 @@ for (const [group, lists] of Object.entries(manifest.clothes ?? {})) {
       const svg = await read(`src/clothes/${group}/${folder}/${id}.svg`);
       const content = svg.match(/<g id="garment">\n([\s\S]*)\n  <\/g>\s*<\/svg>/)?.[1];
       if (!content) throw new Error(`src/clothes/${group}/${folder}/${id}.svg: gruppo <g id="garment"> non trovato`);
-      clothes[group].items.push({ id, kind, ...(await readJson(`src/clothes/${group}/${folder}/${id}.json`)), content });
+      clothes[group].items.push({ id, kind, group, ref, ...(await readJson(`src/clothes/${group}/${folder}/${id}.json`)), content });
     }
   }
 }
-const outfit = (group, kind) => (clothes[group]?.items ?? []).filter((g) => g.kind === kind);
 
 // Adattamento: thin-plate spline dai punti di riferimento del corpo di riferimento a quelli della sagoma.
 // Le coordinate vengono riscritte (lo spessore del contorno resta uguale); la rigidità tiene la deformazione dolce.
 const FIT_STIFFNESS = 0.02;
+// Capi di un gruppo: i suoi, più quelli di un altro gruppo se il manifest lo dice (`clothesFrom`, es. femmina: maschio).
+// Ogni capo si adatta partendo dal corpo di riferimento su cui è stato disegnato (`ref`). Gli id sono unici fra i gruppi.
+const allIds = Object.values(clothes).flatMap((c) => c.items.map((g) => `${g.kind}-${g.id}`));
+if (new Set(allIds).size !== allIds.length) throw new Error('src/clothes: id di capo ripetuto fra gruppi diversi');
+function wardrobe(group) {
+  const own = clothes[group]?.items ?? [];
+  const from = clothes[manifest.clothesFrom?.[group]]?.items ?? [];
+  return [...own, ...from];
+}
 function clothesFor(body) {
-  const c = clothes[body.group];
-  if (!c) return [];
-  const names = Object.keys(c.ref.landmarks).filter((n) => n in body.landmarks);
-  const f = makeTps(names.map((n) => c.ref.landmarks[n]), names.map((n) => body.landmarks[n]), FIT_STIFFNESS);
-  return c.items.map((g) => ({ ...g, content: mapCircles(mapPaths(g.content, f), f) }));
+  const fits = new Map();
+  const fit = (ref) => {
+    if (!fits.has(ref)) {
+      const names = Object.keys(ref.landmarks).filter((n) => n in body.landmarks);
+      fits.set(ref, makeTps(names.map((n) => ref.landmarks[n]), names.map((n) => body.landmarks[n]), FIT_STIFFNESS));
+    }
+    return fits.get(ref);
+  };
+  return wardrobe(body.group).map((g) => { const f = fit(g.ref); return { ...g, content: mapCircles(mapPaths(g.content, f), f) }; });
 }
 for (const b of bodies) b.clothes = clothesFor(b);
 
@@ -164,8 +176,8 @@ const data = {
   groups: manifest.groups,
   hair: hair.map(({ id, name, color }) => ({ id, name, color })),
   bodies: bodies.map(({ id, group, name, svg }) => ({ id, group, name, svg })),
-  clothes: Object.fromEntries(Object.entries(clothes).map(([group, c]) => [group, Object.fromEntries(Object.keys(KINDS).map((folder) =>
-    [folder, c.items.filter((g) => g.kind === KINDS[folder]).map(({ id, name }) => ({ id, name }))]))])),
+  clothes: Object.fromEntries(manifest.groups.filter((g) => wardrobe(g.id).length).map((g) => [g.id, Object.fromEntries(Object.keys(KINDS).map((folder) =>
+    [folder, wardrobe(g.id).filter((i) => i.kind === KINDS[folder]).map(({ id, name }) => ({ id, name }))]))])),
   presets: manifest.presets,
 };
 const template = await read('src/viewer/template.html');

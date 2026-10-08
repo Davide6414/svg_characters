@@ -16,6 +16,7 @@ src/                        ← QUI si lavora: tutto ciò che si modifica a mano
   hair/                     spettinati · coda · chignon · ciuffo-scuro · ciuffo-castano   (.svg + .json)
   clothes/
     maschio/                reference.json = punti di riferimento del corpo su cui sono disegnati i vestiti
+                            (le femmine indossano gli stessi capi: `clothesFrom` nel manifest)
       tops/                 felpa · giacca · polo · maglione · camicia           (.svg + .json)
       bottoms/              jeans · chino · jogger · cargo · larghi              (.svg + .json)
   viewer/template.html      il visualizzatore
@@ -51,10 +52,14 @@ visibile uno solo per tipo, gli altri sono nascosti con variabili CSS.
 vengono scalati in x (da orecchio a fronte) e in y (da cima a linea degli occhi), usando i punti `head` del suo `.json`.
 
 **Adattamento dei vestiti.** Ogni capo è disegnato su un corpo di riferimento (`src/clothes/<gruppo>/reference.json`).
-Ogni sagoma ha nel suo `.json` 18 punti di riferimento (collo, e gli angoli del riquadro di busto, braccia e
-pantaloni). `lib/fit.mjs` costruisce la deformazione morbida che porta i punti del corpo di riferimento su quelli
+Ogni sagoma ha nel suo `.json` 22 punti di riferimento (collo, angoli del riquadro di busto, braccia e pantaloni, e
+il pugno di ciascun braccio, che tiene le cuffie allineate al polso). `lib/fit.mjs` costruisce la deformazione morbida che porta i punti del corpo di riferimento su quelli
 della sagoma e la applica al capo: maniche, cuffie, orli e tasche seguono quindi le proporzioni di ciascun corpo.
 In entrambi i casi le coordinate vengono riscritte, quindi lo spessore del contorno resta uguale ovunque.
+
+**Gruppi diversi, stessi capi.** Con `clothesFrom` nel manifest un gruppo può indossare anche i capi disegnati per un
+altro (oggi `"femmina": "maschio"`): ogni capo si adatta partendo dal corpo di riferimento su cui è stato disegnato, e
+un gruppo può avere i suoi capi più quelli presi da un altro. Gli id dei capi sono unici fra i gruppi.
 
 ## Struttura dell'SVG di una sagoma
 
@@ -106,7 +111,9 @@ Si sceglie un capo per tipo con `--show-top-<id>` e `--show-bottom-<id>` (`inlin
 | dettagli | `--shirt-accent` | `--pants-accent` | cerniera, cordini |
 | sotto | `--shirt-under` | — | la maglietta sotto un capo aperto |
 
-Un capo ha solo i ruoli che gli servono (la polo non ha dettagli, la camicia non ha bordi). Per le femmine non ci sono ancora capi: hanno solo la versione base.
+Un capo ha solo i ruoli che gli servono (la polo non ha dettagli, la camicia non ha bordi).
+
+**Femmine.** Non ci sono ancora capi disegnati apposta per le sagome femminili: indossano gli stessi capi dei maschi (felpa, giacca, polo, maglione, camicia, jeans, chino, jogger, cargo e pantaloni larghi sono in buona parte unisex), adattati ai loro corpi. Sono dritti: seguono le proporzioni generali (altezza, larghezza, lunghezza di braccia e gambe) ma non la vita e il busto. Per vestiti pensati per le femmine (maglie aderenti, gonne, abiti) servono i loro fogli, disegnati su una sagoma femminile: vedi in fondo.
 
 ## Animazione idle
 
@@ -123,7 +130,7 @@ Con `prefers-reduced-motion` l'SVG resta fermo. Nel visualizzatore c'è l'interr
 
 ## Visualizzatore
 
-Ci sono dieci personaggi di partenza (i preset del manifest), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono quelli del gruppo della sagoma: se dai a un personaggio una sagoma di un gruppo senza capi, maglia e pantaloni tornano alla versione base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
+Ci sono dieci personaggi di partenza (i preset del manifest), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono quelli del gruppo della sagoma (le femmine indossano i capi dei maschi); se dai a un personaggio una sagoma di un gruppo che non ha il capo scelto, maglia e pantaloni tornano alla versione base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
 
 I colori di partenza sono i default scritti nel CSS di ogni SVG, senza doppioni altrove. Il bottone *Scarica SVG* scrive i valori scelti direttamente nel file (e tiene solo i capelli, la maglia e i pantaloni scelti), quindi il risultato si apre anche in Illustrator, Inkscape o Figma (che ignorano `var()`).
 
@@ -131,5 +138,5 @@ I colori di partenza sono i default scritti nel CSS di ogni SVG, senza doppioni 
 
 - **Sagoma**: tracciarla con `tools/trace_bodies.py` (o scrivere a mano `src/bodies/<gruppo>/<nome>.svg` + `.json` con la stessa struttura, compresi i punti `head` e `landmarks`), poi aggiungerla a `bodies` e a `presets` in `src/manifest.json`. Un gruppo nuovo (per esempio *Anziani*) è una cartella in più, più una voce in `groups`.
 - **Stile di capelli**: `tools/trace_hair.py` o a mano in `src/hair/<id>.svg` + `.json`, poi l'id in `hair` nel manifest.
-- **Vestiti**: `tools/trace_clothes.py` da due fogli (pantaloni e maglie disegnati sullo stesso corpo), poi i capi in `clothes.<gruppo>` nel manifest e, se si vuole, in un preset (`top`, `bottom`). Per un gruppo nuovo (le femmine) servono i suoi fogli: il corpo di riferimento è la prima figura del foglio dei pantaloni.
+- **Vestiti**: `tools/trace_clothes.py` da due fogli (pantaloni e maglie disegnati sullo stesso corpo), poi i capi in `clothes.<gruppo>` nel manifest e, se si vuole, in un preset (`top`, `bottom`). Per i capi femminili: `tools/trace_clothes.py --group femmina --out src/clothes/femmina …` con i due fogli (pantaloni e maglie) disegnati su un corpo femminile, poi `clothes.femmina` nel manifest (con `clothesFrom` restano disponibili anche i capi dei maschi; cambiare gli id se coincidono). Il corpo di riferimento è la prima figura del foglio dei pantaloni.
 - Poi `node build.mjs`.

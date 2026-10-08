@@ -10,6 +10,7 @@
     "femmina/bambina", "femmina/ragazza", "femmina/slanciata", "femmina/adulta", "femmina/robusta"
   ],
   "hair": ["spettinati", "coda", "chignon", "ciuffo-scuro", "ciuffo-castano"],
+  "clothesFrom": {"femmina": "maschio"},
   "clothes": {
     "maschio": {
       "tops": ["felpa", "giacca", "polo", "maglione", "camicia"],
@@ -23,9 +24,9 @@
     {"body": "maschio/adulto", "hair": "ciuffo-scuro", "top": "maglione", "bottom": "cargo"},
     {"body": "maschio/robusto", "hair": "ciuffo-castano", "top": "camicia", "bottom": "larghi"},
     {"body": "femmina/bambina", "hair": "coda"},
-    {"body": "femmina/ragazza", "hair": "chignon"},
-    {"body": "femmina/slanciata", "hair": "coda"},
-    {"body": "femmina/adulta", "hair": "chignon"},
-    {"body": "femmina/robusta", "hair": "ciuffo-castano"}
+    {"body": "femmina/ragazza", "hair": "chignon", "top": "maglione", "bottom": "chino"},
+    {"body": "femmina/slanciata", "hair": "coda", "bottom": "cargo"},
+    {"body": "femmina/adulta", "hair": "chignon", "top": "giacca", "bottom": "jeans"},
+    {"body": "femmina/robusta", "hair": "ciuffo-castano", "top": "felpa", "bottom": "jogger"}
   ]
 }

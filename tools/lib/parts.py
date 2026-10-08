@@ -205,7 +205,7 @@ def landmarks(cells, cls, to_xy):
     """Punti di riferimento del corpo, nelle coordinate finali: collo (sinistro e destro, un poco sopra la
     maglia) e gli angoli del riquadro di busto, braccia e pantaloni. Servono per adattare i vestiti: i vestiti
     sono disegnati su un corpo di riferimento e vengono deformati perché questi punti coincidano con quelli di
-    ogni sagoma. `cells` deve avere i pantaloni prima dell'estensione sotto le scarpe."""
+    ogni sagoma. Il pugno (riga di massima larghezza del braccio) tiene allineate le cuffie al polso. `cells` deve avere i pantaloni prima dell'estensione sotto le scarpe."""
     def box(prefix, mask):
         ys, xs = np.nonzero(mask)
         u0, u1, v0, v1 = xs.min(), xs.max() + 1, ys.min(), ys.max() + 1
@@ -220,9 +220,23 @@ def landmarks(cells, cls, to_xy):
     cols = np.nonzero(head[row])[0]
     out['neck-l'] = to_xy(cols.min(), row)
     out['neck-r'] = to_xy(cols.max() + 1, row)
+    def fist(prefix, mask):
+        """Il pugno: riga di massima larghezza nella metà bassa del braccio, con i suoi estremi a sinistra e a destra.
+        Aggancia le cuffie dei vestiti al polso anche quando braccia e mani hanno proporzioni diverse."""
+        ys, xs = np.nonzero(mask)
+        v0, v1 = ys.min(), ys.max() + 1
+        widths = np.array([mask[v].sum() for v in range(v0, v1)], float)
+        smooth = np.convolve(widths, np.ones(2 * K + 1) / (2 * K + 1), mode='same')
+        low = int(len(smooth) * 0.45)
+        v = v0 + low + int(np.argmax(smooth[low:]))
+        cols = np.nonzero(mask[v])[0]
+        return {f'{prefix}-fl': to_xy(cols.min(), v), f'{prefix}-fr': to_xy(cols.max() + 1, v)}
+
     out.update(box('torso', cells[by_role['torso']]))
     out.update(box('armL', cells[by_role['arm-left']]))
+    out.update(fist('armL', cells[by_role['arm-left']]))
     out.update(box('armR', cells[by_role['arm-right']]))
+    out.update(fist('armR', cells[by_role['arm-right']]))
     out.update(box('pants', cells[by_role['pants']]))
     return {k: [round(float(v[0]), 1), round(float(v[1]), 1)] for k, v in out.items()}
 

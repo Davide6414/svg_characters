@@ -19,7 +19,7 @@ python3 tools/trace_bodies.py reference/sagome-femminili.webp --out src/bodies/f
 ```
 
 Per ogni figura (da sinistra a destra) scrive `<nome>.svg` (solo geometria, vedi il README principale) e
-`<nome>.json` (nome visualizzato, punti di riferimento della testa, 18 punti di riferimento del corpo per adattare i
+`<nome>.json` (nome visualizzato, punti di riferimento della testa, 22 punti di riferimento del corpo per adattare i
 vestiti, colori di pantaloni e scarpe).
 
 Cosa si aspetta il foglio: figure affiancate su sfondo chiaro, nella stessa posa e con lo stesso disegno (testa con
