@@ -116,11 +116,10 @@
   #toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 10px; transition: .2s }
   #toast.show { opacity: 1; transform: translate(-50%, 0) }
 
-  /* visibilità delle parti: pilotata da variabili CSS ereditate dall'istanza <use> */
+  /* visibilità delle parti: pilotata da variabili CSS ereditate dall'istanza <use>
+     (maglia e pantaloni, e i capi che li sostituiscono, sono in src/style.css) */
   #head { display: var(--show-head, inline) }
-  #torso { display: var(--show-torso, inline) }
   #arm-left, #arm-right { display: var(--show-arms, inline) }
-  #pants { display: var(--show-pants, inline) }
   #shoes { display: var(--show-shoes, inline) }
 </style>
 </head>
@@ -167,6 +166,14 @@
       <div class="parts" id="hair-styles" role="radiogroup" aria-label="Stile dei capelli"></div>
     </section>
     <section>
+      <h2>Maglia</h2>
+      <div class="parts" id="top-list" role="radiogroup" aria-label="Maglia"></div>
+    </section>
+    <section>
+      <h2>Pantaloni</h2>
+      <div class="parts" id="bottom-list" role="radiogroup" aria-label="Pantaloni"></div>
+    </section>
+    <section>
       <h2>Colori · <span id="variant-name"></span></h2>
       <div class="colors" id="colors"></div>
     </section>
@@ -209,12 +216,20 @@
   const XML_HEAD = '<?xml version="1.0" encoding="UTF-8"?>\n';
 
   // ---- dati --------------------------------------------------------------
-  // sel: selettore che dice se la sagoma ha quella parte (per esempio la punta della scarpa non c'è in tutte)
+  // sel: selettore che dice se il personaggio ha quella parte (per esempio la punta della scarpa non c'è in tutte);
+  // può essere una funzione del personaggio (i ruoli secondari dipendono dal capo scelto)
+  const topRole = (role) => (v) => v.top !== 'base' && `#top-${v.top} .c-${role}`;
+  const bottomRole = (role) => (v) => v.bottom !== 'base' && `#bottom-${v.bottom} .c-${role}`;
   const COLOR_FIELDS = [
     { key: 'skin',       label: 'Pelle',                css: '--skin', sel: '.c-skin' },
     { key: 'hair',       label: 'Capelli',              css: '--hair', sel: '[class*="c-hair-"]' },
     { key: 'shirt',      label: 'Maglia',               css: '--shirt', sel: '.c-shirt' },
+    { key: 'shirtTrim',  label: 'Maglia · bordi',       css: '--shirt-trim', sel: topRole('trim') },
+    { key: 'shirtAccent', label: 'Maglia · dettagli',   css: '--shirt-accent', sel: topRole('accent') },
+    { key: 'shirtUnder', label: 'Maglietta sotto',      css: '--shirt-under', sel: topRole('under') },
     { key: 'pants',      label: 'Pantaloni',            css: '--pants', sel: '.c-pants' },
+    { key: 'pantsTrim',  label: 'Pantaloni · bordi',    css: '--pants-trim', sel: bottomRole('trim') },
+    { key: 'pantsAccent', label: 'Pantaloni · dettagli', css: '--pants-accent', sel: bottomRole('accent') },
     { key: 'shoeUpperL', label: 'Scarpa sinistra',      css: '--shoe-upper-l', sel: '.c-upper-l' },
     { key: 'shoeUpperR', label: 'Scarpa destra',        css: '--shoe-upper-r', sel: '.c-upper-r' },
     { key: 'shoeToe',    label: 'Punta scarpa dx',      css: '--shoe-toe', sel: '.c-toe' },
@@ -249,17 +264,32 @@
   const ASPECT = bodies.reduce((t, b) => t + b.h, 0) / bodies.reduce((t, b) => t + b.w, 0);
 
   // I colori di partenza sono i default scritti nel CSS di ogni SVG, quindi non vanno ripetuti qui.
+  // Maglia e pantaloni hanno i colori del capo scelto ("base" = quelli della sagoma).
   const cssDefault = (css, prop, scope = '') =>
     css.match(new RegExp(`${scope}[^}]*?var\\(\\s*${prop}\\s*,\\s*(#[0-9a-fA-F]{6})`))?.[1].toLowerCase();
-  const defaultColors = (body, hairId) => Object.fromEntries(COLOR_FIELDS.map(f => [f.key,
-    f.key === 'hair' ? cssDefault(body.css, f.css, `\\.c-hair-${hairId}\\s*\\{`) : cssDefault(body.css, f.css)]));
+  const NEUTRAL = '#888888';       // per i ruoli che il capo non ha (non si vedono)
+  const scopeOf = (v, f) => {
+    if (f.key === 'hair') return `\\.c-hair-${v.hair}\\s*\\{`;
+    const [, kind, role] = f.key.match(/^(shirt|pants)(Trim|Accent|Under)?$/) ?? [];
+    if (!kind) return '';
+    const item = kind === 'shirt' ? v.top : v.bottom, r = (role ?? 'Main').toLowerCase();
+    if (item === 'base') return `\\.c-${kind}\\s*\\{`;
+    return `#${kind === 'shirt' ? 'top' : 'bottom'}-${item} \\.c-${r}\\s*\\{`;
+  };
+  const defaultColors = (v) => Object.fromEntries(COLOR_FIELDS.map(f => [f.key, cssDefault(v.body.css, f.css, scopeOf(v, f)) ?? NEUTRAL]));
 
-  // Un personaggio = sagoma + stile di capelli + colori. Parte da un preset del manifest; `home` è il gruppo
-  // del preset: resta lì (nei filtri e nelle righe) anche se poi gli dai la sagoma di un altro gruppo.
-  const makeVariant = (preset) => ({
-    body: bodyById[preset.body], hair: preset.hair, colors: defaultColors(bodyById[preset.body], preset.hair), home: bodyById[preset.body].group,
-  });
+  // Un personaggio = sagoma + capelli + maglia + pantaloni + colori. Parte da un preset del manifest; `home` è il
+  // gruppo del preset: resta lì (nei filtri e nelle righe) anche se poi gli dai la sagoma di un altro gruppo.
+  const makeVariant = (preset) => {
+    const body = bodyById[preset.body];
+    const v = { body, hair: preset.hair, top: preset.top ?? 'base', bottom: preset.bottom ?? 'base', home: body.group };
+    v.colors = defaultColors(v);
+    return v;
+  };
   const variants = DATA.presets.map(makeVariant);
+  // i capi disponibili per il gruppo della sagoma attuale
+  const outfitOf = (v) => DATA.clothes[v.body.group] ?? { tops: [], bottoms: [] };
+  const ALL_TOPS = Object.values(DATA.clothes).flatMap(c => c.tops), ALL_BOTTOMS = Object.values(DATA.clothes).flatMap(c => c.bottoms);
 
   // Cambiando sagoma o stile, i colori che non hai modificato (uguali al default di prima) seguono il nuovo default.
   const follow = (v, before, after) => {
@@ -300,8 +330,11 @@
   const cssVars = (v, index = 0, animated = state.idle) => {
     const vars = { '--line-w': state.lineW };
     for (const f of COLOR_FIELDS) vars[f.css] = v.colors[f.key];
-    for (const p of PARTS) vars[`--show-${p.key}`] = state.parts[p.key] ? 'inline' : 'none';
+    for (const p of PARTS) vars[`--show-${p.key}`] = state.parts[p.key] ? 'inline' : 'none';   // torso e pants: vedi sotto
     for (const h of HAIR) vars[`--show-hair-${h.id}`] = v.hair === h.id ? 'inline' : 'none';
+    // maglia e pantaloni: la scelta (o la sagoma base) si vede solo se la parte è attiva
+    for (const id of ['base', ...ALL_TOPS.map(t => t.id)]) vars[`--show-top-${id}`] = state.parts.torso && v.top === id ? 'inline' : 'none';
+    for (const id of ['base', ...ALL_BOTTOMS.map(t => t.id)]) vars[`--show-bottom-${id}`] = state.parts.pants && v.bottom === id ? 'inline' : 'none';
     vars['--idle-n'] = animated ? 'infinite' : '0';
     vars['--idle-delay'] = `${-index * 0.7}s`; // sfasa le figure: non respirano tutte all'unisono
     return vars;
@@ -361,10 +394,12 @@
       `<button type="button" data-group="${g.id}" aria-pressed="${g.id === state.group}">${g.name}</button>`).join('');
   }
 
+  const hasPart = (v, f) => { const sel = typeof f.sel === 'function' ? f.sel(v) : f.sel; return !!sel && !!v.body.source.querySelector(sel); };
+
   function renderColorRows() {
     const v = variants[state.selected];
     $('variant-name').textContent = v.body.name;
-    $('colors').innerHTML = COLOR_FIELDS.filter(f => v.body.source.querySelector(f.sel)).map(f => `
+    $('colors').innerHTML = COLOR_FIELDS.filter(f => hasPart(v, f)).map(f => `
       <div class="color">
         <input type="color" id="c-${f.key}" value="${v.colors[f.key]}" aria-label="${f.label}">
         <label for="c-${f.key}">${f.label}</label>
@@ -383,6 +418,15 @@
       `<label><input type="radio" name="hair-style" value="${h.id}" ${h.id === current ? 'checked' : ''}>${h.name}</label>`).join('');
   }
 
+  function renderOutfit() {
+    const v = variants[state.selected], c = outfitOf(v);
+    const list = (kind, items, base, current) => `${[{ id: 'base', name: base }, ...items].map(i =>
+      `<label><input type="radio" name="${kind}" value="${i.id}" ${i.id === current ? 'checked' : ''}>${i.name}</label>`).join('')}${
+      items.length ? '' : '<p class="hint">Per questo gruppo non ci sono ancora capi.</p>'}`;
+    $('top-list').innerHTML = list('top', c.tops, 'Maglietta', v.top);
+    $('bottom-list').innerHTML = list('bottom', c.bottoms, 'Base', v.bottom);
+  }
+
   function renderBodies() {
     const current = variants[state.selected].body.id;
     $('body-list').innerHTML = DATA.groups.map(g => `<div><h3>${g.name}</h3><div class="parts">${
@@ -395,6 +439,7 @@
     state.selected = i;
     renderBodies();
     renderHairStyles();
+    renderOutfit();
     renderColorRows();
     renderStage();
   }
@@ -420,8 +465,14 @@
       if (state.parts[p.key]) continue;
       for (const id of hidden[p.key]) root.querySelector(`#${id}`)?.remove();
     }
-    // degli stili di capelli resta solo quello scelto (Illustrator e Figma non rispettano display:none)
+    // di capelli, maglie e pantaloni resta solo ciò che è scelto (Illustrator e Figma non rispettano display:none)
     for (const h of HAIR) if (h.id !== v.hair) root.querySelector(`#hair-${h.id}`)?.remove();
+    for (const t of ALL_TOPS) if (t.id !== v.top) root.querySelector(`#top-${t.id}`)?.remove();
+    for (const b of ALL_BOTTOMS) if (b.id !== v.bottom) root.querySelector(`#bottom-${b.id}`)?.remove();
+    if (v.top !== 'base') root.querySelector('#torso')?.remove();       // la maglietta base sta sotto un altro capo: non serve
+    if (v.bottom !== 'base') root.querySelector('#pants')?.remove();
+    if (!state.parts.torso) root.querySelector(`#top-${v.top}`)?.remove();
+    if (!state.parts.pants) root.querySelector(`#bottom-${v.bottom}`)?.remove();
     return XML_HEAD + new XMLSerializer().serializeToString(root);
   }
   const fileStem = () => `personaggio-${variants[state.selected].body.id.replace('/', '-')}`;
@@ -544,26 +595,42 @@
     refresh();
   });
 
-  // sagoma: nuova sagoma, stessi capelli e colori (quelli non toccati seguono i default della nuova sagoma)
+  // Cambiando sagoma, capelli, maglia o pantaloni i colori che non hai modificato (uguali al default di prima)
+  // seguono il nuovo default; quelli che hai scelto restano.
+  const change = (mutate) => {
+    const v = variants[state.selected];
+    const before = defaultColors(v);
+    mutate(v);
+    // un capo che il gruppo della nuova sagoma non ha torna alla versione base
+    const c = outfitOf(v);
+    if (!c.tops.some(t => t.id === v.top)) v.top = 'base';
+    if (!c.bottoms.some(b => b.id === v.bottom)) v.bottom = 'base';
+    follow(v, before, defaultColors(v));
+  };
+
   $('body-list').addEventListener('change', (e) => {
     if (e.target.name !== 'body') return;
-    const v = variants[state.selected];
-    const before = defaultColors(v.body, v.hair);
-    v.body = bodyById[e.target.value];
-    follow(v, before, defaultColors(v.body, v.hair));
+    change(v => { v.body = bodyById[e.target.value]; });
+    renderOutfit();
     renderColorRows();
     renderStage();
   });
 
   $('hair-styles').addEventListener('change', (e) => {
     if (e.target.name !== 'hair-style') return;
-    const v = variants[state.selected];
-    const before = defaultColors(v.body, v.hair);
-    v.hair = e.target.value;
-    follow(v, before, defaultColors(v.body, v.hair));
+    change(v => { v.hair = e.target.value; });
     renderColorRows();
     refresh();
   });
+
+  for (const kind of ['top', 'bottom']) {
+    $(`${kind}-list`).addEventListener('change', (e) => {
+      if (e.target.name !== kind) return;
+      change(v => { v[kind] = e.target.value; });
+      renderColorRows();
+      refresh();
+    });
+  }
 
   $('reset').addEventListener('click', () => {
     variants[state.selected] = makeVariant(DATA.presets[state.selected]);

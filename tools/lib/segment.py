@@ -9,6 +9,7 @@ from .geom import label_components, upsample, erode
 
 K = 2          # fattore di sovracampionamento dei bitmap
 DARK = 34      # soglia di luminanza del contorno (separa il nero dei riempimenti, ≈ 44-56, dal tratto, < 25)
+EYE_ZONE = 0.35         # gli occhi stanno nel 35% superiore della figura
 SHOE_ZONE = 60           # px dal fondo della figura: le regioni delle scarpe hanno il baricentro qui dentro
 SOLE_THICKNESS = 14.0    # px: spessore tipico della suola (se manca una suola pulita di riferimento)
 
@@ -16,9 +17,9 @@ SOLE_THICKNESS = 14.0    # px: spessore tipico della suola (se manca una suola p
 class Seg:
     """Risultato della segmentazione di una figura."""
 
-    def __init__(self, box, lum, rgb, dark, lab, n_lab, eyes):
+    def __init__(self, box, lum, rgb, dark, lab, n_lab, eyes, dots=()):
         self.box, self.lum, self.rgb, self.dark = box, lum, rgb, dark
-        self.lab, self.n_lab, self.eyes = lab, n_lab, eyes
+        self.lab, self.n_lab, self.eyes, self.dots = lab, n_lab, eyes, list(dots)
         self.sizes = np.bincount(lab.ravel(), minlength=n_lab + 1)
         self.border = set(np.unique(np.r_[lab[0], lab[-1], lab[:, 0], lab[:, -1]]).tolist()) - {0}
 
@@ -28,25 +29,39 @@ class Seg:
 
 
 def _eyes_and_fill(dark, box):
-    """Separa gli occhi (e le macchie) dalla rete del contorno: restituisce (maschera scura senza occhi, occhi)."""
-    x0, y0 = box[:2]
+    """Separa gli occhi dalla rete del contorno: restituisce (maschera scura senza occhi, occhi, puntini).
+
+    Occhi = macchie scure staccate dalla rete, allungate, nella parte alta della figura: vengono riempite (non devono
+    bucare la regione della testa) e registrate. Le macchie minuscole si riempiono e si registrano come puntini
+    (bottoni, rivetti; sulle sagome sono solo sporco e si ignorano). Le altre macchie
+    staccate (per esempio le pieghe di un pantalone) restano scure: sono linee interne."""
+    x0, y0, x1, y1 = box
     dl, nd = label_components(dark, conn=8)
     sizes = np.bincount(dl.ravel(), minlength=nd + 1)
     net = int(np.argmax(sizes[1:])) + 1
-    eyes = []
+    eyes, dots = [], []
     for i in range(1, nd + 1):
         if i == net:
             continue
         m = dl == i
         area = sizes[i] / (K * K)
-        if area >= 120:
+        if area < 120:
             ys, xs = np.nonzero(m)
-            cov = np.cov(np.vstack([xs, ys]) / K)
-            eyes.append(dict(cx=float(xs.mean() / K + x0), cy=float(ys.mean() / K + y0), area=float(area),
-                             rx=float(2 * np.sqrt(cov[0, 0])), ry=float(2 * np.sqrt(cov[1, 1]))))
-        dark = dark & ~m       # le riempiamo: non devono bucare la regione che le contiene
+            if area >= 12:                      # solo i puntini tondi: i frammenti di una linea sono allungati
+                ev = np.linalg.eigvalsh(np.cov(np.vstack([xs, ys]) / K))
+                if ev[1] <= 2.2 * max(ev[0], 1e-6):
+                    dots.append(dict(cx=float(xs.mean() / K + x0), cy=float(ys.mean() / K + y0), r=float(np.sqrt(area / np.pi))))
+            dark = dark & ~m
+            continue
+        ys, xs = np.nonzero(m)
+        cov = np.cov(np.vstack([xs, ys]) / K)
+        rx, ry = 2 * np.sqrt(cov[0, 0]), 2 * np.sqrt(cov[1, 1])
+        cy = ys.mean() / K + y0
+        if cy < y0 + EYE_ZONE * (y1 - y0) and ry > 1.5 * rx:
+            eyes.append(dict(cx=float(xs.mean() / K + x0), cy=float(cy), area=float(area), rx=float(rx), ry=float(ry)))
+            dark = dark & ~m
     eyes.sort(key=lambda e: e['cx'])
-    return dark, eyes
+    return dark, eyes, dots
 
 
 def _otsu(values):
@@ -124,7 +139,7 @@ def segment(sheet, box):
     x0, y0, x1, y1 = box
     lum = upsample(sheet.lum[y0:y1, x0:x1], K)
     rgb = np.stack([upsample(sheet.rgb[y0:y1, x0:x1, c], K) for c in range(3)], -1)
-    dark, eyes = _eyes_and_fill(lum <= DARK, box)
+    dark, eyes, dots = _eyes_and_fill(lum <= DARK, box)
     lab, n = label_components(~dark, conn=4)
     lab, dark = _split_merged_shoes(lab, dark, lum, box)
     # rinumera 1..n senza buchi
@@ -132,4 +147,4 @@ def segment(sheet, box):
     remap = np.zeros(lab.max() + 1, np.int32)
     remap[ids] = np.arange(1, len(ids) + 1)
     lab = remap[lab]
-    return Seg(box, lum, rgb, dark, lab, len(ids), eyes)
+    return Seg(box, lum, rgb, dark, lab, len(ids), eyes, dots)

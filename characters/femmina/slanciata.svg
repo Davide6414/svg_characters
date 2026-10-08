@@ -16,6 +16,7 @@
     .c-lace     { fill: var(--shoe-lace, #f4f3f3) }
     .c-sole     { fill: var(--shoe-sole, #fcfbfc) }
     .c-eye      { fill: var(--eye, #1a1613) }
+    .c-dot      { fill: var(--outline, #15100c) }
     .c-hair-spettinati { fill: var(--hair, #462e21) }
     .c-hair-coda { fill: var(--hair, #683a26) }
     .c-hair-chignon { fill: var(--hair, #39241c) }
@@ -30,6 +31,13 @@
     #hair-chignon { display: var(--show-hair-chignon, none) }
     #hair-ciuffo-scuro { display: var(--show-hair-ciuffo-scuro, none) }
     #hair-ciuffo-castano { display: var(--show-hair-ciuffo-castano, none) }
+
+    /* Vestiti: uno per tipo alla volta (default: base + base). Il visualizzatore sceglie con
+       --show-top-NOME / --show-bottom-NOME (inline | none); "base" è la maglietta e i pantaloni della sagoma.
+       Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under. */
+
+    #torso { display: var(--show-top-base, inline) }
+    #pants { display: var(--show-bottom-base, inline) }
 
     /* Idle: respiro (busto e braccia si allungano di ~1%, la testa segue con un leggero ritardo)
        + battito di ciglia. Solo transform, ancorati alla base di ogni gruppo.

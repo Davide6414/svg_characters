@@ -74,7 +74,7 @@ def write_body(out_dir, name, title, body):
     os.makedirs(out_dir, exist_ok=True)
     with open(os.path.join(out_dir, name + '.svg'), 'w', encoding='utf8') as f:
         f.write(body_svg(body, title))
-    meta = dict(name=title, head={k: round(v, 1) for k, v in body['head'].items()}, colors=body['colors'])
+    meta = dict(name=title, head={k: round(v, 1) for k, v in body['head'].items()}, landmarks=body['landmarks'], colors=body['colors'])
     with open(os.path.join(out_dir, name + '.json'), 'w', encoding='utf8') as f:
         json.dump(meta, f, ensure_ascii=False, indent=2)
         f.write('\n')

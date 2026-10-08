@@ -13,12 +13,19 @@
 .c-lace     { fill: var(--shoe-lace, {{shoe-lace}}) }
 .c-sole     { fill: var(--shoe-sole, {{shoe-sole}}) }
 .c-eye      { fill: var(--eye, #1a1613) }
+.c-dot      { fill: var(--outline, #15100c) }
 {{hair-fills}}
 
 /* Capelli: uno stile alla volta (default: {{hair-default}}). Il visualizzatore sceglie lo stile con
    --show-hair-NOME (inline | none) e può nascondere tutto con --show-hair. */
 #hair { display: var(--show-hair, inline) }
 {{hair-show}}
+
+/* Vestiti: uno per tipo alla volta (default: {{outfit-default}}). Il visualizzatore sceglie con
+   --show-top-NOME / --show-bottom-NOME (inline | none); "base" è la maglietta e i pantaloni della sagoma.
+   Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under. */
+{{clothes-fills}}
+{{clothes-show}}
 
 /* Idle: respiro (busto e braccia si allungano di ~1%, la testa segue con un leggero ritardo)
    + battito di ciglia. Solo transform, ancorati alla base di ogni gruppo.

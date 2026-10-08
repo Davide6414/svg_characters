@@ -1,25 +1,31 @@
 {
-  "palette": { "skin": "#fec39c", "shirt": "#f5f1ee" },
-  "hairFrame": { "L": 74.5, "R": 242, "T": 250, "eyeY": 357 },
+  "palette": {"skin": "#fec39c", "shirt": "#f5f1ee"},
+  "hairFrame": {"L": 74.5, "R": 242, "T": 250, "eyeY": 357},
   "groups": [
-    { "id": "maschio", "name": "Maschio" },
-    { "id": "femmina", "name": "Femmina" }
+    {"id": "maschio", "name": "Maschio"},
+    {"id": "femmina", "name": "Femmina"}
   ],
   "bodies": [
     "maschio/bambino", "maschio/ragazzo", "maschio/slanciato", "maschio/adulto", "maschio/robusto",
     "femmina/bambina", "femmina/ragazza", "femmina/slanciata", "femmina/adulta", "femmina/robusta"
   ],
   "hair": ["spettinati", "coda", "chignon", "ciuffo-scuro", "ciuffo-castano"],
+  "clothes": {
+    "maschio": {
+      "tops": ["felpa", "giacca", "polo", "maglione", "camicia"],
+      "bottoms": ["jeans", "chino", "jogger", "cargo", "larghi"]
+    }
+  },
   "presets": [
-    { "body": "maschio/bambino", "hair": "spettinati" },
-    { "body": "maschio/ragazzo", "hair": "coda" },
-    { "body": "maschio/slanciato", "hair": "chignon" },
-    { "body": "maschio/adulto", "hair": "ciuffo-scuro" },
-    { "body": "maschio/robusto", "hair": "ciuffo-castano" },
-    { "body": "femmina/bambina", "hair": "coda" },
-    { "body": "femmina/ragazza", "hair": "chignon" },
-    { "body": "femmina/slanciata", "hair": "coda" },
-    { "body": "femmina/adulta", "hair": "chignon" },
-    { "body": "femmina/robusta", "hair": "ciuffo-castano" }
+    {"body": "maschio/bambino", "hair": "spettinati", "top": "felpa", "bottom": "jeans"},
+    {"body": "maschio/ragazzo", "hair": "coda", "top": "giacca", "bottom": "chino"},
+    {"body": "maschio/slanciato", "hair": "chignon", "top": "polo", "bottom": "jogger"},
+    {"body": "maschio/adulto", "hair": "ciuffo-scuro", "top": "maglione", "bottom": "cargo"},
+    {"body": "maschio/robusto", "hair": "ciuffo-castano", "top": "camicia", "bottom": "larghi"},
+    {"body": "femmina/bambina", "hair": "coda"},
+    {"body": "femmina/ragazza", "hair": "chignon"},
+    {"body": "femmina/slanciata", "hair": "coda"},
+    {"body": "femmina/adulta", "hair": "chignon"},
+    {"body": "femmina/robusta", "hair": "ciuffo-castano"}
   ]
 }

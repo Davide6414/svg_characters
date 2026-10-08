@@ -117,9 +117,10 @@ def _minmax_in_disk(g, r):
     return mn, mx
 
 
-def find_seams(seg, g, cls, to_xy, minlen=9.0):
+def find_seams(seg, g, allowed, to_xy, minlen=9.0):
     """Fessure scure dentro una stessa regione (orecchio, cuciture delle maniche, cucitura dei pantaloni…):
-    pixel scuri che hanno una sola regione intorno. Restituisce le linee, già estese fino al contorno."""
+    pixel scuri che hanno una sola regione intorno. `allowed` = etichette delle regioni da considerare.
+    Restituisce le linee (con l'etichetta della regione), già estese fino al contorno."""
     dark = seg.dark
     h, w = dark.shape
     mn, mx = _minmax_in_disk(g, SEAM_RADIUS * K)
@@ -131,9 +132,12 @@ def find_seams(seg, g, cls, to_xy, minlen=9.0):
     out = []
     for pts in skeleton_lines(cand, minlen * K):
         label = int(np.bincount([int(g[int(y), int(x)]) for x, y in pts]).argmax())
-        part = cls.get(label)
-        if part not in ('head', 'torso', 'pants', 'arm-left', 'arm-right'):
+        if label not in allowed:
             continue
+        pm = np.zeros_like(dark)                  # spessore del tratto: area scura intorno alla linea / lunghezza
+        for x, y in pts:
+            pm[int(y), int(x)] = True
+        thick = float((dilate(pm, 3 * K) & cand).sum() / len(pts) / K)
         pts = list(pts)
         for end in (0, -1):                      # estende le estremità vicine al contorno
             a = np.array(pts[end])
@@ -152,14 +156,13 @@ def find_seams(seg, g, cls, to_xy, minlen=9.0):
                     break
             if hit is not None:
                 pts.insert(0, tuple(hit)) if end == 0 else pts.append(tuple(hit))
-        out.append(dict(d=catmull_d(rdp(pts, 1.1 * K), to_xy), part=part, kind='seam', length=len(pts) / K))
+        out.append(dict(d=catmull_d(rdp(pts, 1.1 * K), to_xy), label=label, kind='seam', length=len(pts) / K, thick=thick))
     return out
 
 
-def find_folds(seg, g, cls, to_xy, contrast=20, minlen=9.0, sigma=6.0):
-    """Pieghe sottili all'orlo dei pantaloni: troppo chiare per la soglia del contorno, ma più scure
-    dell'intorno. Restituisce linee (part='pants')."""
-    pid = next(i for i, c in cls.items() if c == 'pants')
+def find_folds(seg, g, pid, to_xy, contrast=20, minlen=9.0, sigma=6.0):
+    """Pieghe sottili all'orlo dei pantaloni (regione `pid`): troppo chiare per la soglia del contorno, ma più
+    scure dell'intorno."""
     interior = erode((g == pid) & ~seg.dark, 3.5 * K)
     blur = np.array(Image.fromarray(np.clip(seg.lum, 0, 255).astype(np.uint8))
                     .filter(ImageFilter.GaussianBlur(sigma * K))).astype(np.float32)
@@ -169,7 +172,7 @@ def find_folds(seg, g, cls, to_xy, contrast=20, minlen=9.0, sigma=6.0):
         if len(c) >= 14 * K:
             for y, x in c:
                 mask[y, x] = True
-    return [dict(d=catmull_d(rdp(l, 1.1 * K), to_xy), part='pants', kind='fold', length=len(l) / K)
+    return [dict(d=catmull_d(rdp(l, 1.1 * K), to_xy), label=pid, kind='fold', length=len(l) / K)
             for l in skeleton_lines(mask, minlen * K)]
 
 
@@ -197,6 +200,33 @@ def default_colors(parts):
     }
 
 
+# ---------------------------------------------------------------- punti di riferimento
+def landmarks(cells, cls, to_xy):
+    """Punti di riferimento del corpo, nelle coordinate finali: collo (sinistro e destro, un poco sopra la
+    maglia) e gli angoli del riquadro di busto, braccia e pantaloni. Servono per adattare i vestiti: i vestiti
+    sono disegnati su un corpo di riferimento e vengono deformati perché questi punti coincidano con quelli di
+    ogni sagoma. `cells` deve avere i pantaloni prima dell'estensione sotto le scarpe."""
+    def box(prefix, mask):
+        ys, xs = np.nonzero(mask)
+        u0, u1, v0, v1 = xs.min(), xs.max() + 1, ys.min(), ys.max() + 1
+        return {f'{prefix}-tl': to_xy(u0, v0), f'{prefix}-tr': to_xy(u1, v0),
+                f'{prefix}-bl': to_xy(u0, v1), f'{prefix}-br': to_xy(u1, v1)}
+
+    by_role = {c: i for i, c in cls.items() if c in ('head', 'torso', 'arm-left', 'arm-right', 'pants')}
+    out = {}
+    head = cells[by_role['head']]
+    ys, xs = np.nonzero(head)
+    row = ys.max() - 8 * K                       # il collo, poco sopra la fine della testa
+    cols = np.nonzero(head[row])[0]
+    out['neck-l'] = to_xy(cols.min(), row)
+    out['neck-r'] = to_xy(cols.max() + 1, row)
+    out.update(box('torso', cells[by_role['torso']]))
+    out.update(box('armL', cells[by_role['arm-left']]))
+    out.update(box('armR', cells[by_role['arm-right']]))
+    out.update(box('pants', cells[by_role['pants']]))
+    return {k: [round(float(v[0]), 1), round(float(v[1]), 1)] for k, v in out.items()}
+
+
 # ---------------------------------------------------------------- tutto insieme
 def trace_body(sheet, box, ground=GROUND, verbose=False):
     """Traccia la figura in `box`. Le coordinate restano quelle del foglio, spostate in verticale in modo che
@@ -211,6 +241,8 @@ def trace_body(sheet, box, ground=GROUND, verbose=False):
     bottom = max(np.nonzero(cells[i])[0].max() for i, c in cls.items() if c == 'sole') / K + y0
     dy = bottom - ground
     to_xy = lambda u, v: (x0 + u / K, y0 + v / K - dy)
+
+    marks = landmarks(cells, cls, to_xy)
 
     # i pantaloni scendono sotto le scarpe
     shoe_cells = np.zeros_like(seg.dark)
@@ -233,7 +265,10 @@ def trace_body(sheet, box, ground=GROUND, verbose=False):
         if verbose:
             print(f'  regione {i:2d} {c:13s} area {info[i]["area"]:6.0f}')
 
-    seams = find_seams(seg, g, cls, to_xy) + find_folds(seg, g, cls, to_xy)
+    body_labels = {i for i, c in cls.items() if c in ('head', 'torso', 'pants', 'arm-left', 'arm-right')}
+    seams = find_seams(seg, g, body_labels, to_xy) + find_folds(seg, g, pid, to_xy)
+    for s in seams:
+        s['part'] = cls[s['label']]
     # la cucitura interna dei pantaloni è piena come il contorno; le altre linee sono sottili
     longest_pants = max([s for s in seams if s['part'] == 'pants' and s['kind'] == 'seam'], key=lambda s: s['length'], default=None)
     for s in seams:
@@ -247,4 +282,4 @@ def trace_body(sheet, box, ground=GROUND, verbose=False):
     head = dict(L=float(X.min() - 2.5), R=float(X[Y < ey + 45].max() + 2.5), T=float(Y.min() - 2.5), eyeY=float(ey),
                 eyeX=float((eyes[0]['cx'] + eyes[1]['cx']) / 2))
     return dict(box=list(box), ground_shift=float(dy), parts=parts, seams=seams, eyes=eyes, head=head,
-                colors=default_colors(parts))
+                landmarks=marks, colors=default_colors(parts))
