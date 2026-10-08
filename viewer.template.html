@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Personaggio base · Visualizzatore SVG</title>
+<title>Personaggi · Visualizzatore SVG</title>
 <style>
   :root {
     color-scheme: light dark;
@@ -118,8 +118,8 @@
 </head>
 <body>
 <header class="top">
-  <h1>Personaggio base</h1>
-  <p>Shape base in SVG, ricolorabile per parti. Le 5 varianti arrivano dall'immagine di riferimento, i 5 stili di capelli da quella dei capelli.</p>
+  <h1>Personaggi</h1>
+  <p>Cinque sagome in SVG (bambino, ragazzo, slanciato, adulto, robusto), ricolorabili per parti e con 5 stili di capelli. Stesse scala e linea del suolo per tutte, così le altezze si confrontano.</p>
 </header>
 
 <main class="layout">
@@ -189,26 +189,26 @@
 <svg id="defs-host" width="0" height="0" style="position:absolute" aria-hidden="true"></svg>
 
 <script>
-  // Sorgente: character.svg (incorporato da build.mjs)
-  const CHARACTER_SVG = "__CHARACTER_SVG__";
+  // Sorgenti: characters/*.svg (incorporati da build.mjs), nell'ordine dei tasti 1–5
+  const CHARACTERS = "__CHARACTERS__";
 
   const SVG_NS = 'http://www.w3.org/2000/svg';
   const XML_HEAD = '<?xml version="1.0" encoding="UTF-8"?>\n';
 
   // ---- dati --------------------------------------------------------------
   const COLOR_FIELDS = [
-    { key: 'skin',       label: 'Pelle',                css: '--skin' },
-    { key: 'hair',       label: 'Capelli',              css: '--hair' },
-    { key: 'shirt',      label: 'Maglia',               css: '--shirt' },
-    { key: 'pants',      label: 'Pantaloni',            css: '--pants' },
-    { key: 'shoeUpperL', label: 'Scarpa sinistra',      css: '--shoe-upper-l' },
-    { key: 'shoeUpperR', label: 'Scarpa destra',        css: '--shoe-upper-r' },
-    { key: 'shoeToe',    label: 'Punta scarpa dx',      css: '--shoe-toe' },
-    { key: 'shoeTongue', label: 'Linguetta scarpa sx',  css: '--shoe-tongue' },
-    { key: 'shoeLace',   label: 'Lacci scarpa dx',      css: '--shoe-lace' },
-    { key: 'shoeSole',   label: 'Suola',                css: '--shoe-sole' },
-    { key: 'outline',    label: 'Contorno',             css: '--outline' },
-    { key: 'eye',        label: 'Occhi',                css: '--eye' },
+    { key: 'skin',       label: 'Pelle',                css: '--skin', sel: '.c-skin' },
+    { key: 'hair',       label: 'Capelli',              css: '--hair', sel: '[class*="c-hair-"]' },
+    { key: 'shirt',      label: 'Maglia',               css: '--shirt', sel: '.c-shirt' },
+    { key: 'pants',      label: 'Pantaloni',            css: '--pants', sel: '.c-pants' },
+    { key: 'shoeUpperL', label: 'Scarpa sinistra',      css: '--shoe-upper-l', sel: '.c-upper-l' },
+    { key: 'shoeUpperR', label: 'Scarpa destra',        css: '--shoe-upper-r', sel: '.c-upper-r' },
+    { key: 'shoeToe',    label: 'Punta scarpa dx',      css: '--shoe-toe', sel: '.c-toe' },
+    { key: 'shoeTongue', label: 'Linguetta scarpa sx',  css: '--shoe-tongue', sel: '.c-tongue' },
+    { key: 'shoeLace',   label: 'Lacci scarpa dx',      css: '--shoe-lace', sel: '.c-lace' },
+    { key: 'shoeSole',   label: 'Suola',                css: '--shoe-sole', sel: '.c-sole' },
+    { key: 'outline',    label: 'Contorno',             css: '--outline', sel: '.c-stroke' },
+    { key: 'eye',        label: 'Occhi',                css: '--eye', sel: '.c-eye' },
   ];
 
   const HAIR_STYLES = [
@@ -228,19 +228,33 @@
     { key: 'shoes', label: 'Scarpe' },
   ];
 
-  const WHITE = '#f5ede7';
-  const BASE = { skin: '#fec79e', shirt: '#f2ece7', outline: '#15100c', eye: '#1a1613', shoeLace: WHITE, shoeSole: '#f5efea' };
-  // hairStyle: quale dei 5 stili di capelli (1–5) ha la variante; ogni variante parte con quello
-  // e col colore del suo omonimo nell'immagine dei capelli, ma si può cambiare dal pannello.
-  const PRESETS = [
-    { id: 'jeans',    name: 'Jeans blu',      hairStyle: 1, colors: { ...BASE, hair: '#452d20', pants: '#5d6779', shoeUpperL: '#322b27', shoeUpperR: '#322b27', shoeToe: WHITE,     shoeTongue: WHITE } },
-    { id: 'marrone',  name: 'Marrone',        hairStyle: 2, colors: { ...BASE, hair: '#673a25', pants: '#62564e', shoeUpperL: '#f5efea', shoeUpperR: '#a7a2a0', shoeToe: WHITE,     shoeTongue: WHITE } },
-    { id: 'oliva',    name: 'Oliva',          hairStyle: 3, colors: { ...BASE, hair: '#39231b', pants: '#6e6652', shoeUpperL: '#38302b', shoeUpperR: '#38302b', shoeToe: '#38302b', shoeTongue: '#38302b' } },
-    { id: 'antracite', name: 'Antracite',     hairStyle: 4, colors: { ...BASE, hair: '#352a25', pants: '#453d39', shoeUpperL: '#2f2926', shoeUpperR: '#3a322e', shoeToe: WHITE,     shoeTongue: '#2f2926' } },
-    { id: 'grigio',   name: 'Grigio ardesia', hairStyle: 5, colors: { ...BASE, hair: '#5c3423', pants: '#68717a', shoeUpperL: '#f5efea', shoeUpperR: '#a29d9a', shoeToe: WHITE,     shoeTongue: WHITE } },
-  ];
+  // Ogni personaggio è un file di characters/ (sagoma + 5 stili di capelli). I colori di partenza sono i
+  // default scritti nel CSS del suo SVG, quindi non vanno ripetuti qui. Ogni variante parte con lo stile
+  // di capelli del suo numero (1–5), ma stile e colori si cambiano dal pannello.
+  const cssDefault = (css, prop, scope = '') =>
+    css.match(new RegExp(`${scope}[^}]*?var\\(\\s*${prop}\\s*,\\s*(#[0-9a-fA-F]{6})`))?.[1].toLowerCase();
+  const defaultColors = (char, hairStyle) => {
+    const colors = {};
+    for (const f of COLOR_FIELDS) {
+      colors[f.key] = f.key === 'hair'
+        ? cssDefault(char.css, f.css, `\\.c-hair-${hairStyle}\\s*\\{`)
+        : cssDefault(char.css, f.css);
+    }
+    return colors;
+  };
 
-  const variants = PRESETS.map(p => ({ ...p, colors: { ...p.colors } }));
+  const characters = CHARACTERS.map(({ id, svg }) => {
+    const source = new DOMParser().parseFromString(svg, 'image/svg+xml').documentElement;
+    const viewBox = source.getAttribute('viewBox');
+    const [, , w, h] = viewBox.split(/\s+/).map(Number);
+    return { id, svg, source, viewBox, w, h, css: source.querySelector('style').textContent, name: source.querySelector('title').textContent };
+  });
+  // proporzione media dei riquadri (le figure affiancate si dimensionano su questa)
+  const ASPECT = characters.reduce((t, c) => t + c.h, 0) / characters.reduce((t, c) => t + c.w, 0);
+
+  const variants = characters.map((char, i) => ({
+    id: char.id, name: char.name, char, hairStyle: i + 1, colors: defaultColors(char, i + 1),
+  }));
   const state = {
     selected: 0,
     view: 'single',
@@ -251,21 +265,20 @@
     parts: Object.fromEntries(PARTS.map(p => [p.key, true])),
   };
 
-  // ---- SVG sorgente → <symbol> riusabile --------------------------------
-  const source = new DOMParser().parseFromString(CHARACTER_SVG, 'image/svg+xml').documentElement;
-  const VIEWBOX = source.getAttribute('viewBox');
-  const [, , VB_W, VB_H] = VIEWBOX.split(/\s+/).map(Number);
+  // ---- SVG sorgente → <symbol> riusabile (uno per personaggio) ------------
   {
     const defs = document.createElementNS(SVG_NS, 'defs');
-    const style = document.createElementNS(SVG_NS, 'style');
-    style.textContent = source.querySelector('style').textContent;
-    const symbol = document.createElementNS(SVG_NS, 'symbol');
-    symbol.id = 'character';
-    symbol.setAttribute('viewBox', VIEWBOX);
-    for (const node of source.children) {
-      if (node.localName !== 'style' && node.localName !== 'title') symbol.appendChild(document.importNode(node, true));
+    for (const c of characters) {
+      const style = document.createElementNS(SVG_NS, 'style');
+      style.textContent = c.css;
+      const symbol = document.createElementNS(SVG_NS, 'symbol');
+      symbol.id = `character-${c.id}`;
+      symbol.setAttribute('viewBox', c.viewBox); // l'<svg> che lo usa ha viewBox 0 0 w h: l'origine dei file è diversa da 0
+      for (const node of c.source.children) {
+        if (node.localName !== 'style' && node.localName !== 'title') symbol.appendChild(document.importNode(node, true));
+      }
+      defs.append(style, symbol);
     }
-    defs.append(style, symbol);
     document.getElementById('defs-host').append(defs);
   }
 
@@ -282,7 +295,7 @@
   };
   const styleAttr = (v, index) => Object.entries(cssVars(v, index, state.idle)).map(([k, val]) => `${k}:${val}`).join(';');
   const figureSvg = (v, i) =>
-    `<svg viewBox="${VIEWBOX}" data-i="${i}" style="${styleAttr(v, i)}" role="img" aria-label="${v.name}"><use href="#character"/></svg>`;
+    `<svg viewBox="0 0 ${v.char.w} ${v.char.h}" data-i="${i}" style="${styleAttr(v, i)}" role="img" aria-label="${v.name}"><use href="#character-${v.id}"/></svg>`;
 
   let toastTimer;
   function toast(msg) {
@@ -318,7 +331,7 @@
     const stage = $('stage');
     stage.dataset.bg = state.bg;
     stage.style.setProperty('--zoom', state.zoom / 100);
-    stage.style.setProperty('--ar', VB_H / VB_W);
+    stage.style.setProperty('--ar', ASPECT);
     for (const svg of document.querySelectorAll('#figures svg, #variants svg')) {
       const i = +svg.dataset.i;
       svg.setAttribute('style', styleAttr(variants[i], i));
@@ -328,7 +341,8 @@
   function renderColorRows() {
     const v = variants[state.selected];
     $('variant-name').textContent = v.name;
-    $('colors').innerHTML = COLOR_FIELDS.map(f => `
+    // solo le parti che la sagoma ha davvero (per esempio la punta della scarpa non c'è in tutte)
+    $('colors').innerHTML = COLOR_FIELDS.filter(f => v.char.source.querySelector(f.sel)).map(f => `
       <div class="color">
         <input type="color" id="c-${f.key}" value="${v.colors[f.key]}" aria-label="${f.label}">
         <label for="c-${f.key}">${f.label}</label>
@@ -360,7 +374,7 @@
   function buildExportSvg(animated = state.idle) {
     const v = variants[state.selected];
     const vars = cssVars(v, 0, animated);
-    const doc = new DOMParser().parseFromString(CHARACTER_SVG, 'image/svg+xml');
+    const doc = new DOMParser().parseFromString(v.char.svg, 'image/svg+xml');
     const root = doc.documentElement;
     const style = root.querySelector('style');
     style.textContent = style.textContent
@@ -369,7 +383,7 @@
       .replace(/var\((--[\w-]+),\s*([^)]+)\)/g, (_, name, fallback) => vars[name] ?? fallback.trim())
       .replace(/calc\(([\d.]+) \* ([\d.]+)\)/g, (_, a, b) => String(+(a * b).toFixed(2)))
       .replace(/calc\((-?[\d.]+)s \+ ([\d.]+)s\)/g, (_, a, b) => `${+(+a + +b).toFixed(2)}s`);
-    root.querySelector('title').textContent = `Personaggio base – ${v.name}`;
+    root.querySelector('title').textContent = `Personaggio – ${v.name}`;
     const hidden = { head: ['head'], hair: ['hair'], torso: ['torso'], arms: ['arm-left', 'arm-right'], pants: ['pants'], shoes: ['shoes'] };
     for (const p of PARTS) {
       if (state.parts[p.key]) continue;
@@ -389,15 +403,15 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  async function svgToPngBlob(svgText, scale) {
+  async function svgToPngBlob(svgText, scale, width, height) {
     const url = URL.createObjectURL(new Blob([svgText], { type: 'image/svg+xml' }));
     try {
       const img = new Image();
       img.src = url;
       await img.decode();
       const canvas = document.createElement('canvas');
-      canvas.width = VB_W * scale;
-      canvas.height = VB_H * scale;
+      canvas.width = width * scale;
+      canvas.height = height * scale;
       canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
       return await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
     } finally {
@@ -495,8 +509,8 @@
   });
 
   $('reset').addEventListener('click', () => {
-    variants[state.selected].colors = { ...PRESETS[state.selected].colors };
-    variants[state.selected].hairStyle = PRESETS[state.selected].hairStyle;
+    variants[state.selected].hairStyle = state.selected + 1;
+    variants[state.selected].colors = defaultColors(variants[state.selected].char, state.selected + 1);
     renderColorRows();
     renderHairStyles();
     refresh();
@@ -510,7 +524,8 @@
   $('dl-png').addEventListener('click', async () => {
     try {
       // il PNG è un fotogramma: si esporta sempre la posa base, senza animazione
-      download(await svgToPngBlob(buildExportSvg(false), 3), `personaggio-${variants[state.selected].id}.png`);
+      const { w, h } = variants[state.selected].char;
+      download(await svgToPngBlob(buildExportSvg(false), 3, w, h), `personaggio-${variants[state.selected].id}.png`);
     } catch {
       toast('Export PNG non riuscito');
     }
