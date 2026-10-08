@@ -1,0 +1,19 @@
+{
+  "name": "Robusto",
+  "head": {
+    "L": 1208.0,
+    "R": 1382.5,
+    "T": 252.0,
+    "eyeY": 360.9,
+    "eyeX": 1339.1
+  },
+  "colors": {
+    "pants": "#69747c",
+    "shoe-upper-l": "#f5f1ee",
+    "shoe-upper-r": "#958d8a",
+    "shoe-toe": "#f6f3f0",
+    "shoe-tongue": "#f6f4f2",
+    "shoe-lace": "#f5f1ef",
+    "shoe-sole": "#f6f2ef"
+  }
+}

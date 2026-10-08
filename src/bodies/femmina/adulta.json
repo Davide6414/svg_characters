@@ -1,0 +1,19 @@
+{
+  "name": "Adulta",
+  "head": {
+    "L": 888.5,
+    "R": 1064.5,
+    "T": 200.5,
+    "eyeY": 308.5,
+    "eyeX": 1020.9
+  },
+  "colors": {
+    "pants": "#423f3c",
+    "shoe-upper-l": "#34312e",
+    "shoe-upper-r": "#35312e",
+    "shoe-toe": "#fcfcfb",
+    "shoe-tongue": "#57544f",
+    "shoe-lace": "#f8f8f8",
+    "shoe-sole": "#fcfbfc"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Robusta",
+  "head": {
+    "L": 1213.0,
+    "R": 1391.5,
+    "T": 252.0,
+    "eyeY": 361.9,
+    "eyeX": 1347.8
+  },
+  "colors": {
+    "pants": "#6b737d",
+    "shoe-upper-l": "#eeebe8",
+    "shoe-upper-r": "#b1aba8",
+    "shoe-toe": "#fbfbfb",
+    "shoe-tongue": "#f8f7f7",
+    "shoe-lace": "#f9f9f9",
+    "shoe-sole": "#fdfcfd"
+  }
+}

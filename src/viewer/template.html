@@ -56,16 +56,24 @@
   .figures { display: flex; align-items: flex-end; justify-content: center; gap: clamp(8px, 2vw, 28px); margin: auto }
   .figures svg { display: block; width: auto; overflow: visible }
   .figures.single svg { height: calc(min(560px, 66vh) * var(--zoom)) }
-  /* 5 figure in fila: altezza limitata dalla larghezza del palco (--ar = altezza/larghezza del viewBox, impostata da JS; 150px = spazi e margini) */
-  .figures.all svg { height: calc(min(400px, 48vh, (100cqw - 150px) / 5 * var(--ar, 2.2)) * var(--zoom)) }
+  /* figure affiancate: una riga per gruppo. L'altezza è limitata dalla larghezza del palco e dal numero di righe
+     (--ar = altezza/larghezza del riquadro, --cols e --rows impostate da JS; 30px a colonna = spazi e margini) */
+  .figures.all { flex-direction: column; align-items: center; gap: 14px }
+  .figures.all svg { height: calc(min(400px, 48vh / var(--rows, 1), (100cqw - 30px * var(--cols, 5)) / var(--cols, 5) * var(--ar, 2.2)) * var(--zoom)) }
+  .group { display: grid; justify-items: center; gap: 4px }
+  .group-label { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--cap, #55514b) }
+  .row { display: flex; align-items: flex-end; justify-content: center; gap: clamp(8px, 2vw, 28px) }
   .fig { border: 0; background: none; padding: 6px 4px 8px; border-radius: 12px; display: grid; justify-items: center; gap: 6px; color: var(--cap, #55514b) }
   .fig span { font-size: 13px }
   .fig[aria-pressed="true"] { background: rgba(58, 91, 217, .12); box-shadow: inset 0 0 0 2px var(--accent); color: inherit }
   .fig:hover { background: rgba(128, 128, 128, .12) }
 
   /* varianti */
-  .variants { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap }
+  .variants { display: grid; gap: 12px; margin-top: 12px }
   .variants[hidden] { display: none }
+  .vgroup h3, .bodies h3 { margin: 0 0 6px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted) }
+  .vrow { display: flex; gap: 10px; flex-wrap: wrap }
+  .bodies { display: grid; gap: 10px }
   .variant { flex: 1 1 110px; max-width: 170px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px 6px 8px; display: grid; justify-items: center; gap: 4px }
   .variant svg { height: 96px; width: auto }
   .variant span { font-size: 13px; color: var(--muted) }
@@ -119,7 +127,7 @@
 <body>
 <header class="top">
   <h1>Personaggi</h1>
-  <p>Cinque sagome in SVG (bambino, ragazzo, slanciato, adulto, robusto), ricolorabili per parti e con 5 stili di capelli. Stesse scala e linea del suolo per tutte, così le altezze si confrontano.</p>
+  <p>Sagome maschili e femminili in SVG, ricolorabili per parti e combinabili con 5 stili di capelli. Stessa scala e stessa linea del suolo per tutte, così le altezze si confrontano.</p>
 </header>
 
 <main class="layout">
@@ -129,6 +137,7 @@
         <button type="button" data-view="single" aria-pressed="true">Singolo</button>
         <button type="button" data-view="all" aria-pressed="false">Affiancati</button>
       </div>
+      <div class="seg" role="group" aria-label="Gruppo" id="group-seg"></div>
       <div class="seg" role="group" aria-label="Sfondo" id="bg-seg">
         <button type="button" data-bg="white" aria-pressed="true"><i class="sw" data-bg="white"></i>Bianco</button>
         <button type="button" data-bg="check" aria-pressed="false"><i class="sw" data-bg="check"></i>Quadretti</button>
@@ -150,12 +159,16 @@
 
   <aside class="panel card" aria-label="Personalizzazione">
     <section>
-      <h2>Colori · <span id="variant-name"></span></h2>
-      <div class="colors" id="colors"></div>
+      <h2>Sagoma</h2>
+      <div class="bodies" id="body-list" role="radiogroup" aria-label="Sagoma"></div>
     </section>
     <section>
       <h2>Capelli · stile</h2>
       <div class="parts" id="hair-styles" role="radiogroup" aria-label="Stile dei capelli"></div>
+    </section>
+    <section>
+      <h2>Colori · <span id="variant-name"></span></h2>
+      <div class="colors" id="colors"></div>
     </section>
     <section>
       <h2>Contorno</h2>
@@ -178,9 +191,9 @@
         <button type="button" class="btn primary" id="dl-svg">Scarica SVG</button>
         <button type="button" class="btn" id="dl-png">Scarica PNG</button>
         <button type="button" class="btn" id="copy-svg">Copia SVG</button>
-        <button type="button" class="btn" id="reset">Ripristina variante</button>
+        <button type="button" class="btn" id="reset">Ripristina personaggio</button>
       </div>
-      <p class="hint">Tasti <kbd>1</kbd>–<kbd>5</kbd> o <kbd>←</kbd> <kbd>→</kbd> per cambiare variante. L'export applica colori, stile dei capelli, spessore e parti visibili correnti; l'SVG resta animato se l'idle è attivo, il PNG è sempre un fotogramma fermo.</p>
+      <p class="hint">Tasti <kbd>1</kbd>–<kbd>9</kbd>, <kbd>0</kbd> o <kbd>←</kbd> <kbd>→</kbd> per cambiare personaggio. Sagoma, capelli e colori si combinano a piacere: i colori che non hai toccato seguono la sagoma e lo stile scelti. L'export applica sagoma, colori, stile dei capelli, spessore e parti visibili correnti; l'SVG resta animato se l'idle è attivo, il PNG è sempre un fotogramma fermo.</p>
     </section>
   </aside>
 </main>
@@ -189,13 +202,14 @@
 <svg id="defs-host" width="0" height="0" style="position:absolute" aria-hidden="true"></svg>
 
 <script>
-  // Sorgenti: characters/*.svg (incorporati da build.mjs), nell'ordine dei tasti 1–5
-  const CHARACTERS = "__CHARACTERS__";
+  // Dati incorporati da build.mjs (src/manifest.json + SVG composti): gruppi, stili di capelli, sagome, preset
+  const DATA = "__DATA__";
 
   const SVG_NS = 'http://www.w3.org/2000/svg';
   const XML_HEAD = '<?xml version="1.0" encoding="UTF-8"?>\n';
 
   // ---- dati --------------------------------------------------------------
+  // sel: selettore che dice se la sagoma ha quella parte (per esempio la punta della scarpa non c'è in tutte)
   const COLOR_FIELDS = [
     { key: 'skin',       label: 'Pelle',                css: '--skin', sel: '.c-skin' },
     { key: 'hair',       label: 'Capelli',              css: '--hair', sel: '[class*="c-hair-"]' },
@@ -211,14 +225,6 @@
     { key: 'eye',        label: 'Occhi',                css: '--eye', sel: '.c-eye' },
   ];
 
-  const HAIR_STYLES = [
-    { n: 1, label: 'Spettinati' },
-    { n: 2, label: 'Coda e frangia' },
-    { n: 3, label: 'Chignon' },
-    { n: 4, label: 'Ciuffo scuro' },
-    { n: 5, label: 'Ciuffo castano' },
-  ];
-
   const PARTS = [
     { key: 'head',  label: 'Testa' },
     { key: 'hair',  label: 'Capelli' },
@@ -228,35 +234,41 @@
     { key: 'shoes', label: 'Scarpe' },
   ];
 
-  // Ogni personaggio è un file di characters/ (sagoma + 5 stili di capelli). I colori di partenza sono i
-  // default scritti nel CSS del suo SVG, quindi non vanno ripetuti qui. Ogni variante parte con lo stile
-  // di capelli del suo numero (1–5), ma stile e colori si cambiano dal pannello.
-  const cssDefault = (css, prop, scope = '') =>
-    css.match(new RegExp(`${scope}[^}]*?var\\(\\s*${prop}\\s*,\\s*(#[0-9a-fA-F]{6})`))?.[1].toLowerCase();
-  const defaultColors = (char, hairStyle) => {
-    const colors = {};
-    for (const f of COLOR_FIELDS) {
-      colors[f.key] = f.key === 'hair'
-        ? cssDefault(char.css, f.css, `\\.c-hair-${hairStyle}\\s*\\{`)
-        : cssDefault(char.css, f.css);
-    }
-    return colors;
-  };
+  const HAIR = DATA.hair;
 
-  const characters = CHARACTERS.map(({ id, svg }) => {
+  // Sagome: ogni SVG composto ha già tutti gli stili di capelli, adattati alla sua testa.
+  const bodies = DATA.bodies.map(({ id, group, name, svg }) => {
     const source = new DOMParser().parseFromString(svg, 'image/svg+xml').documentElement;
     const viewBox = source.getAttribute('viewBox');
     const [, , w, h] = viewBox.split(/\s+/).map(Number);
-    return { id, svg, source, viewBox, w, h, css: source.querySelector('style').textContent, name: source.querySelector('title').textContent };
+    return { id, group, name, svg, source, viewBox, w, h, css: source.querySelector('style').textContent,
+             symbol: `character-${id.replace('/', '-')}` };
   });
+  const bodyById = Object.fromEntries(bodies.map(b => [b.id, b]));
   // proporzione media dei riquadri (le figure affiancate si dimensionano su questa)
-  const ASPECT = characters.reduce((t, c) => t + c.h, 0) / characters.reduce((t, c) => t + c.w, 0);
+  const ASPECT = bodies.reduce((t, b) => t + b.h, 0) / bodies.reduce((t, b) => t + b.w, 0);
 
-  const variants = characters.map((char, i) => ({
-    id: char.id, name: char.name, char, hairStyle: i + 1, colors: defaultColors(char, i + 1),
-  }));
+  // I colori di partenza sono i default scritti nel CSS di ogni SVG, quindi non vanno ripetuti qui.
+  const cssDefault = (css, prop, scope = '') =>
+    css.match(new RegExp(`${scope}[^}]*?var\\(\\s*${prop}\\s*,\\s*(#[0-9a-fA-F]{6})`))?.[1].toLowerCase();
+  const defaultColors = (body, hairId) => Object.fromEntries(COLOR_FIELDS.map(f => [f.key,
+    f.key === 'hair' ? cssDefault(body.css, f.css, `\\.c-hair-${hairId}\\s*\\{`) : cssDefault(body.css, f.css)]));
+
+  // Un personaggio = sagoma + stile di capelli + colori. Parte da un preset del manifest; `home` è il gruppo
+  // del preset: resta lì (nei filtri e nelle righe) anche se poi gli dai la sagoma di un altro gruppo.
+  const makeVariant = (preset) => ({
+    body: bodyById[preset.body], hair: preset.hair, colors: defaultColors(bodyById[preset.body], preset.hair), home: bodyById[preset.body].group,
+  });
+  const variants = DATA.presets.map(makeVariant);
+
+  // Cambiando sagoma o stile, i colori che non hai modificato (uguali al default di prima) seguono il nuovo default.
+  const follow = (v, before, after) => {
+    for (const key of Object.keys(v.colors)) if (v.colors[key] === before[key]) v.colors[key] = after[key];
+  };
+
   const state = {
     selected: 0,
+    group: 'all',
     view: 'single',
     bg: 'white',
     zoom: 100,
@@ -264,17 +276,18 @@
     idle: !matchMedia('(prefers-reduced-motion: reduce)').matches,
     parts: Object.fromEntries(PARTS.map(p => [p.key, true])),
   };
+  const visible = () => variants.map((_, i) => i).filter(i => state.group === 'all' || variants[i].home === state.group);
 
-  // ---- SVG sorgente → <symbol> riusabile (uno per personaggio) ------------
+  // ---- SVG sorgente → <symbol> riusabile (uno per sagoma) -------------------
   {
     const defs = document.createElementNS(SVG_NS, 'defs');
-    for (const c of characters) {
+    for (const b of bodies) {
       const style = document.createElementNS(SVG_NS, 'style');
-      style.textContent = c.css;
+      style.textContent = b.css;
       const symbol = document.createElementNS(SVG_NS, 'symbol');
-      symbol.id = `character-${c.id}`;
-      symbol.setAttribute('viewBox', c.viewBox); // l'<svg> che lo usa ha viewBox 0 0 w h: l'origine dei file è diversa da 0
-      for (const node of c.source.children) {
+      symbol.id = b.symbol;
+      symbol.setAttribute('viewBox', b.viewBox); // l'<svg> che lo usa ha viewBox 0 0 w h: l'origine dei file non è 0
+      for (const node of b.source.children) {
         if (node.localName !== 'style' && node.localName !== 'title') symbol.appendChild(document.importNode(node, true));
       }
       defs.append(style, symbol);
@@ -288,14 +301,15 @@
     const vars = { '--line-w': state.lineW };
     for (const f of COLOR_FIELDS) vars[f.css] = v.colors[f.key];
     for (const p of PARTS) vars[`--show-${p.key}`] = state.parts[p.key] ? 'inline' : 'none';
-    for (const s of HAIR_STYLES) vars[`--show-hair-${s.n}`] = v.hairStyle === s.n ? 'inline' : 'none';
+    for (const h of HAIR) vars[`--show-hair-${h.id}`] = v.hair === h.id ? 'inline' : 'none';
     vars['--idle-n'] = animated ? 'infinite' : '0';
     vars['--idle-delay'] = `${-index * 0.7}s`; // sfasa le figure: non respirano tutte all'unisono
     return vars;
   };
   const styleAttr = (v, index) => Object.entries(cssVars(v, index, state.idle)).map(([k, val]) => `${k}:${val}`).join(';');
   const figureSvg = (v, i) =>
-    `<svg viewBox="0 0 ${v.char.w} ${v.char.h}" data-i="${i}" style="${styleAttr(v, i)}" role="img" aria-label="${v.name}"><use href="#character-${v.id}"/></svg>`;
+    `<svg viewBox="0 0 ${v.body.w} ${v.body.h}" data-i="${i}" style="${styleAttr(v, i)}" role="img" aria-label="${v.body.name}"><use href="#${v.body.symbol}"/></svg>`;
+  const groupsOf = (idx) => DATA.groups.filter(g => idx.some(i => variants[i].home === g.id));
 
   let toastTimer;
   function toast(msg) {
@@ -307,21 +321,25 @@
   }
 
   // ---- rendering ---------------------------------------------------------
-  // Ricostruisce le figure (cambio di vista o di variante)…
+  // Ricostruisce le figure (cambio di vista, gruppo, sagoma o personaggio)…
   function renderStage() {
+    const idx = visible(), groups = groupsOf(idx);
+    const inGroup = (g) => idx.filter(i => variants[i].home === g.id);
     const figures = $('figures');
     figures.className = `figures ${state.view}`;
+    $('stage').style.setProperty('--cols', Math.max(...groups.map(g => inGroup(g).length)));
+    $('stage').style.setProperty('--rows', groups.length);
     if (state.view === 'single') {
       figures.innerHTML = figureSvg(variants[state.selected], state.selected);
     } else {
-      figures.innerHTML = variants.map((v, i) =>
-        `<button type="button" class="fig" data-i="${i}" aria-pressed="${i === state.selected}">${figureSvg(v, i)}<span>${v.name}</span></button>`
-      ).join('');
+      figures.innerHTML = groups.map(g => `<div class="group">${groups.length > 1 ? `<span class="group-label">${g.name}</span>` : ''}<div class="row">${
+        inGroup(g).map(i => `<button type="button" class="fig" data-i="${i}" aria-pressed="${i === state.selected}">${figureSvg(variants[i], i)}<span>${variants[i].body.name}</span></button>`).join('')
+      }</div></div>`).join('');
     }
     $('variants').hidden = state.view === 'all';
-    $('variants').innerHTML = variants.map((v, i) =>
-      `<button type="button" class="variant" data-i="${i}" aria-pressed="${i === state.selected}">${figureSvg(v, i)}<span>${v.name}</span></button>`
-    ).join('');
+    $('variants').innerHTML = groups.map(g => `<div class="vgroup"><h3>${g.name}</h3><div class="vrow">${
+      inGroup(g).map(i => `<button type="button" class="variant" data-i="${i}" aria-pressed="${i === state.selected}">${figureSvg(variants[i], i)}<span>${variants[i].body.name}</span></button>`).join('')
+    }</div></div>`).join('');
     refresh();
   }
 
@@ -338,11 +356,15 @@
     }
   }
 
+  function renderGroupSeg() {
+    $('group-seg').innerHTML = [{ id: 'all', name: 'Tutti' }, ...DATA.groups].map(g =>
+      `<button type="button" data-group="${g.id}" aria-pressed="${g.id === state.group}">${g.name}</button>`).join('');
+  }
+
   function renderColorRows() {
     const v = variants[state.selected];
-    $('variant-name').textContent = v.name;
-    // solo le parti che la sagoma ha davvero (per esempio la punta della scarpa non c'è in tutte)
-    $('colors').innerHTML = COLOR_FIELDS.filter(f => v.char.source.querySelector(f.sel)).map(f => `
+    $('variant-name').textContent = v.body.name;
+    $('colors').innerHTML = COLOR_FIELDS.filter(f => v.body.source.querySelector(f.sel)).map(f => `
       <div class="color">
         <input type="color" id="c-${f.key}" value="${v.colors[f.key]}" aria-label="${f.label}">
         <label for="c-${f.key}">${f.label}</label>
@@ -356,15 +378,24 @@
   }
 
   function renderHairStyles() {
-    const current = variants[state.selected].hairStyle;
-    $('hair-styles').innerHTML = HAIR_STYLES.map(s =>
-      `<label><input type="radio" name="hair-style" value="${s.n}" ${s.n === current ? 'checked' : ''}>${s.label}</label>`).join('');
+    const current = variants[state.selected].hair;
+    $('hair-styles').innerHTML = HAIR.map(h =>
+      `<label><input type="radio" name="hair-style" value="${h.id}" ${h.id === current ? 'checked' : ''}>${h.name}</label>`).join('');
+  }
+
+  function renderBodies() {
+    const current = variants[state.selected].body.id;
+    $('body-list').innerHTML = DATA.groups.map(g => `<div><h3>${g.name}</h3><div class="parts">${
+      bodies.filter(b => b.group === g.id).map(b =>
+        `<label><input type="radio" name="body" value="${b.id}" ${b.id === current ? 'checked' : ''}>${b.name}</label>`).join('')
+    }</div></div>`).join('');
   }
 
   function select(i) {
-    state.selected = (i + variants.length) % variants.length;
-    renderColorRows();
+    state.selected = i;
+    renderBodies();
     renderHairStyles();
+    renderColorRows();
     renderStage();
   }
 
@@ -374,7 +405,7 @@
   function buildExportSvg(animated = state.idle) {
     const v = variants[state.selected];
     const vars = cssVars(v, 0, animated);
-    const doc = new DOMParser().parseFromString(v.char.svg, 'image/svg+xml');
+    const doc = new DOMParser().parseFromString(v.body.svg, 'image/svg+xml');
     const root = doc.documentElement;
     const style = root.querySelector('style');
     style.textContent = style.textContent
@@ -383,16 +414,17 @@
       .replace(/var\((--[\w-]+),\s*([^)]+)\)/g, (_, name, fallback) => vars[name] ?? fallback.trim())
       .replace(/calc\(([\d.]+) \* ([\d.]+)\)/g, (_, a, b) => String(+(a * b).toFixed(2)))
       .replace(/calc\((-?[\d.]+)s \+ ([\d.]+)s\)/g, (_, a, b) => `${+(+a + +b).toFixed(2)}s`);
-    root.querySelector('title').textContent = `Personaggio – ${v.name}`;
+    root.querySelector('title').textContent = `Personaggio – ${v.body.name}`;
     const hidden = { head: ['head'], hair: ['hair'], torso: ['torso'], arms: ['arm-left', 'arm-right'], pants: ['pants'], shoes: ['shoes'] };
     for (const p of PARTS) {
       if (state.parts[p.key]) continue;
       for (const id of hidden[p.key]) root.querySelector(`#${id}`)?.remove();
     }
     // degli stili di capelli resta solo quello scelto (Illustrator e Figma non rispettano display:none)
-    for (const s of HAIR_STYLES) if (s.n !== v.hairStyle) root.querySelector(`#hair-${s.n}`)?.remove();
+    for (const h of HAIR) if (h.id !== v.hair) root.querySelector(`#hair-${h.id}`)?.remove();
     return XML_HEAD + new XMLSerializer().serializeToString(root);
   }
+  const fileStem = () => `personaggio-${variants[state.selected].body.id.replace('/', '-')}`;
 
   function download(blob, filename) {
     const url = URL.createObjectURL(blob);
@@ -442,6 +474,16 @@
     state.view = b.dataset.view;
     setPressed($('view-seg'), 'view', state.view);
     renderStage();
+  });
+
+  $('group-seg').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-group]');
+    if (!b) return;
+    state.group = b.dataset.group;
+    setPressed($('group-seg'), 'group', state.group);
+    const idx = visible();
+    if (idx.includes(state.selected)) renderStage();
+    else select(idx[0]);
   });
 
   $('bg-seg').addEventListener('click', (e) => {
@@ -502,30 +544,42 @@
     refresh();
   });
 
+  // sagoma: nuova sagoma, stessi capelli e colori (quelli non toccati seguono i default della nuova sagoma)
+  $('body-list').addEventListener('change', (e) => {
+    if (e.target.name !== 'body') return;
+    const v = variants[state.selected];
+    const before = defaultColors(v.body, v.hair);
+    v.body = bodyById[e.target.value];
+    follow(v, before, defaultColors(v.body, v.hair));
+    renderColorRows();
+    renderStage();
+  });
+
   $('hair-styles').addEventListener('change', (e) => {
     if (e.target.name !== 'hair-style') return;
-    variants[state.selected].hairStyle = +e.target.value;
+    const v = variants[state.selected];
+    const before = defaultColors(v.body, v.hair);
+    v.hair = e.target.value;
+    follow(v, before, defaultColors(v.body, v.hair));
+    renderColorRows();
     refresh();
   });
 
   $('reset').addEventListener('click', () => {
-    variants[state.selected].hairStyle = state.selected + 1;
-    variants[state.selected].colors = defaultColors(variants[state.selected].char, state.selected + 1);
-    renderColorRows();
-    renderHairStyles();
-    refresh();
-    toast('Variante ripristinata');
+    variants[state.selected] = makeVariant(DATA.presets[state.selected]);
+    select(state.selected);
+    toast('Personaggio ripristinato');
   });
 
   $('dl-svg').addEventListener('click', () => {
-    download(new Blob([buildExportSvg()], { type: 'image/svg+xml' }), `personaggio-${variants[state.selected].id}.svg`);
+    download(new Blob([buildExportSvg()], { type: 'image/svg+xml' }), `${fileStem()}.svg`);
   });
 
   $('dl-png').addEventListener('click', async () => {
     try {
       // il PNG è un fotogramma: si esporta sempre la posa base, senza animazione
-      const { w, h } = variants[state.selected].char;
-      download(await svgToPngBlob(buildExportSvg(false), 3, w, h), `personaggio-${variants[state.selected].id}.png`);
+      const { w, h } = variants[state.selected].body;
+      download(await svgToPngBlob(buildExportSvg(false), 3, w, h), `${fileStem()}.png`);
     } catch {
       toast('Export PNG non riuscito');
     }
@@ -538,12 +592,18 @@
 
   document.addEventListener('keydown', (e) => {
     if (e.target.matches('input[type="text"], textarea') || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (/^[1-9]$/.test(e.key) && +e.key <= variants.length) select(+e.key - 1);
-    else if (e.key === 'ArrowRight' && !e.target.matches('input[type="range"]')) select(state.selected + 1);
-    else if (e.key === 'ArrowLeft' && !e.target.matches('input[type="range"]')) select(state.selected - 1);
+    const idx = visible(), pos = idx.indexOf(state.selected);
+    const slider = e.target.matches('input[type="range"]');
+    if (/^[0-9]$/.test(e.key)) {
+      const n = e.key === '0' ? 10 : +e.key;       // 1–9 e 0 (= decimo) fra i personaggi visibili
+      if (n <= idx.length) select(idx[n - 1]);
+    }
+    else if (e.key === 'ArrowRight' && !slider) select(idx[(pos + 1) % idx.length]);
+    else if (e.key === 'ArrowLeft' && !slider) select(idx[(pos - 1 + idx.length) % idx.length]);
   });
 
   // ---- avvio -------------------------------------------------------------
+  renderGroupSeg();
   renderParts();
   $('idle').checked = state.idle;
   select(0);

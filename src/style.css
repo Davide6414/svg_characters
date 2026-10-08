@@ -1,0 +1,44 @@
+/* Ogni colore è una variabile CSS con un valore di default: il file funziona da solo
+   e il visualizzatore può ricolorare le parti sovrascrivendo le variabili. */
+.c-stroke   { stroke: var(--outline, #15100c); stroke-width: var(--line-w, 5.4); stroke-linecap: round; stroke-linejoin: round }
+.c-fine     { stroke-width: calc(var(--line-w, 5.4) * 0.75) }
+.c-open     { fill: none }
+.c-skin     { fill: var(--skin, {{skin}}) }
+.c-shirt    { fill: var(--shirt, {{shirt}}) }
+.c-pants    { fill: var(--pants, {{pants}}) }
+.c-upper-l  { fill: var(--shoe-upper-l, {{shoe-upper-l}}) }
+.c-upper-r  { fill: var(--shoe-upper-r, {{shoe-upper-r}}) }
+.c-toe      { fill: var(--shoe-toe, {{shoe-toe}}) }
+.c-tongue   { fill: var(--shoe-tongue, {{shoe-tongue}}) }
+.c-lace     { fill: var(--shoe-lace, {{shoe-lace}}) }
+.c-sole     { fill: var(--shoe-sole, {{shoe-sole}}) }
+.c-eye      { fill: var(--eye, #1a1613) }
+{{hair-fills}}
+
+/* Capelli: uno stile alla volta (default: {{hair-default}}). Il visualizzatore sceglie lo stile con
+   --show-hair-NOME (inline | none) e può nascondere tutto con --show-hair. */
+#hair { display: var(--show-hair, inline) }
+{{hair-show}}
+
+/* Idle: respiro (busto e braccia si allungano di ~1%, la testa segue con un leggero ritardo)
+   + battito di ciglia. Solo transform, ancorati alla base di ogni gruppo.
+   --idle-n = 0 spegne tutto; --idle-delay sfasa più istanze tra loro. */
+.c-idle-torso, .c-idle-arm, .c-idle-head, .c-blink {
+  transform-box: fill-box;
+  animation-duration: 1.9s;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+  animation-iteration-count: var(--idle-n, infinite);
+  animation-delay: var(--idle-delay, 0s);
+}
+.c-idle-torso { transform-origin: 50% 100%; animation-name: idle-breathe }
+.c-idle-arm   { transform-origin: 50% 100%; animation-name: idle-arms }
+.c-idle-head  { transform-origin: 50% 100%; animation-name: idle-head; animation-delay: calc(var(--idle-delay, 0s) + 0.14s) }
+.c-blink      { transform-origin: 50% 50%; animation-name: idle-blink; animation-duration: 4.6s; animation-direction: normal; animation-timing-function: linear }
+@keyframes idle-breathe { from { transform: scaleY(1) }   to { transform: scaleY(1.014) } }
+@keyframes idle-arms    { from { transform: scaleY(1) }   to { transform: scaleY(1.01) } }
+@keyframes idle-head    { from { transform: translateY(0) rotate(0deg) } to { transform: translateY(-2px) rotate(-0.5deg) } }
+@keyframes idle-blink   { 0%, 90%, 100% { transform: scaleY(1) } 94% { transform: scaleY(0.08) } }
+@media (prefers-reduced-motion: reduce) {
+  .c-idle-torso, .c-idle-arm, .c-idle-head, .c-blink { animation-iteration-count: var(--idle-n, 0) }
+}

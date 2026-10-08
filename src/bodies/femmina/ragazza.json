@@ -1,0 +1,19 @@
+{
+  "name": "Ragazza",
+  "head": {
+    "L": 334.0,
+    "R": 501.0,
+    "T": 305.5,
+    "eyeY": 407.9,
+    "eyeX": 458.8
+  },
+  "colors": {
+    "pants": "#625851",
+    "shoe-upper-l": "#eae8e6",
+    "shoe-upper-r": "#c7c2c0",
+    "shoe-toe": "#fafafa",
+    "shoe-tongue": "#f5f5f6",
+    "shoe-lace": "#f8f8f8",
+    "shoe-sole": "#fbfbfb"
+  }
+}

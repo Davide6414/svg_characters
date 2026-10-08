@@ -1,0 +1,19 @@
+{
+  "name": "Slanciata",
+  "head": {
+    "L": 605.0,
+    "R": 775.5,
+    "T": 205.0,
+    "eyeY": 308.4,
+    "eyeX": 733.7
+  },
+  "colors": {
+    "pants": "#6a6154",
+    "shoe-upper-l": "#2c2a27",
+    "shoe-upper-r": "#2e2b28",
+    "shoe-toe": "#2f2e2b",
+    "shoe-tongue": "#f5f4f4",
+    "shoe-lace": "#f4f3f3",
+    "shoe-sole": "#fcfbfc"
+  }
+}

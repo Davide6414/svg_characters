@@ -1,0 +1,19 @@
+{
+  "name": "Slanciato",
+  "head": {
+    "L": 615.5,
+    "R": 779.5,
+    "T": 218.0,
+    "eyeY": 317.7,
+    "eyeX": 737.0
+  },
+  "colors": {
+    "pants": "#6b6452",
+    "shoe-upper-l": "#35312e",
+    "shoe-upper-r": "#34302d",
+    "shoe-toe": "#34302d",
+    "shoe-tongue": "#35312e",
+    "shoe-lace": "#f4f2f0",
+    "shoe-sole": "#f6f1ef"
+  }
+}

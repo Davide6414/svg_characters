@@ -1,0 +1,19 @@
+{
+  "name": "Adulto",
+  "head": {
+    "L": 893.5,
+    "R": 1063.5,
+    "T": 221.0,
+    "eyeY": 326.2,
+    "eyeX": 1018.5
+  },
+  "colors": {
+    "pants": "#423e3b",
+    "shoe-upper-l": "#383430",
+    "shoe-upper-r": "#35312e",
+    "shoe-toe": "#f6f2f0",
+    "shoe-tongue": "#363230",
+    "shoe-lace": "#f8f5f4",
+    "shoe-sole": "#f6f2ef"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Ragazzo",
+  "head": {
+    "L": 340.5,
+    "R": 509.5,
+    "T": 325.5,
+    "eyeY": 428.5,
+    "eyeX": 464.9
+  },
+  "colors": {
+    "pants": "#60544d",
+    "shoe-upper-l": "#f5f2ef",
+    "shoe-upper-r": "#a7a09d",
+    "shoe-toe": "#f6f4f1",
+    "shoe-tongue": "#f1f1ef",
+    "shoe-lace": "#f5f1ee",
+    "shoe-sole": "#f5f2ef"
+  }
+}

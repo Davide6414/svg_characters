@@ -1,0 +1,19 @@
+{
+  "name": "Bambino",
+  "head": {
+    "L": 68.0,
+    "R": 248.0,
+    "T": 487.5,
+    "eyeY": 590.8,
+    "eyeX": 200.4
+  },
+  "colors": {
+    "pants": "#576371",
+    "shoe-upper-l": "#332e2a",
+    "shoe-upper-r": "#37322d",
+    "shoe-toe": "#2f2b25",
+    "shoe-tongue": "#f5f3f0",
+    "shoe-lace": "#f7f6f6",
+    "shoe-sole": "#f4f0ed"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Bambina",
+  "head": {
+    "L": 65.5,
+    "R": 238.0,
+    "T": 483.0,
+    "eyeY": 584.1,
+    "eyeX": 193.7
+  },
+  "colors": {
+    "pants": "#656c77",
+    "shoe-upper-l": "#2e2c28",
+    "shoe-upper-r": "#32302d",
+    "shoe-toe": "#32302d",
+    "shoe-tongue": "#eaedec",
+    "shoe-lace": "#f9fafa",
+    "shoe-sole": "#fbfafa"
+  }
+}

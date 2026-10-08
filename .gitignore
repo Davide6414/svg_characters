@@ -5,3 +5,7 @@
 node_modules/
 .DS_Store
 Thumbs.db
+
+# Python (strumenti di tracciatura)
+__pycache__/
+*.pyc
