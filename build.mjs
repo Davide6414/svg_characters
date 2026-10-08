@@ -94,12 +94,15 @@ for (const b of bodies) b.clothes = clothesFor(b);
 // I capelli sono disegnati sulla testa di riferimento (hairFrame): per ogni sagoma si scalano in x
 // (da orecchio a fronte) e in y (da cima a linea degli occhi) per far combaciare la testa. Le coordinate
 // vengono riscritte, così lo spessore del contorno resta uguale ovunque.
+// Uno stile può valere solo per alcune età (`ages` nel suo .json; le età delle sagome sono in `ages` del manifest):
+// le acconciature da anziani non si danno ai bambini.
 const F = manifest.hairFrame;
+const ageOf = (id) => Object.entries(manifest.ages ?? {}).find(([, ids]) => ids.includes(id))?.[0];
 function hairFor(body) {
   const { L, R, T, eyeY } = body.head;
   const sx = (R - L) / (F.R - F.L), sy = (eyeY - T) / (F.eyeY - F.T);
   const f = (x, y) => [L + sx * (x - F.L), T + sy * (y - F.T)];
-  return hair.map((h) => ({ ...h, group: mapPaths(h.group, f) }));
+  return hair.filter((h) => !h.ages || h.ages.includes(ageOf(body.id))).map((h) => ({ ...h, group: mapPaths(h.group, f) }));
 }
 for (const b of bodies) b.hair = hairFor(b);
 
@@ -148,7 +151,8 @@ function css(body, defaultHair, defaults, preset) {
 
 function compose(body) {
   const preset = manifest.presets.find((p) => p.body === body.id);
-  const defaultHair = preset?.hair ?? manifest.hair[0];
+  const defaultHair = preset?.hair ?? body.hair[0].id;
+  if (!body.hair.some((h) => h.id === defaultHair)) throw new Error(`preset di ${body.id}: lo stile ${defaultHair} non vale per questa sagoma`);
   const defaults = { top: preset?.top ?? 'base', bottom: preset?.bottom ?? 'base' };
   const group = (kind) => body.clothes.filter((g) => g.kind === kind).map((g) => `  <!-- ${g.name} -->\n  <g id="${kind}-${g.id}">\n${g.content}\n  </g>`).join('\n');
   const underlay = [...body.clothes.filter((g) => g.kind === 'bottom'), ...body.clothes.filter((g) => g.kind === 'top')].filter((g) => g.under).map((g) => `  <!-- ${g.name}: parti sotto i pantaloni -->\n  <g id="${g.kind}-${g.id}-under">\n${g.under}\n  </g>`).join('\n');
@@ -182,7 +186,7 @@ for (const b of bodies) {
 const data = {
   groups: manifest.groups,
   hair: hair.map(({ id, name, color }) => ({ id, name, color })),
-  bodies: bodies.map(({ id, group, name, svg }) => ({ id, group, name, svg })),
+  bodies: bodies.map(({ id, group, name, svg, hair: hs }) => ({ id, group, name, svg, hair: hs.map((h) => h.id) })),
   clothes: Object.fromEntries(manifest.groups.filter((g) => wardrobe(g.id).length).map((g) => [g.id, Object.fromEntries(Object.keys(KINDS).map((folder) =>
     [folder, wardrobe(g.id).filter((i) => i.kind === KINDS[folder]).map(({ id, name, replaces }) => ({ id, name, replaces: replaces ?? [] }))]))])),
   presets: manifest.presets,
@@ -192,4 +196,4 @@ const token = '"__DATA__"';
 if (!template.includes(token)) throw new Error(`Segnaposto ${token} non trovato in src/viewer/template.html`);
 // "<" escapato per non chiudere per sbaglio il tag <script>
 await writeFile(new URL('index.html', root), template.replace(token, () => JSON.stringify(data).replace(/</g, '\\u003c')));
-console.log(`characters/: ${bodies.length} sagome × ${hair.length} stili di capelli, vestiti: ${Object.entries(clothes).map(([g, c]) => `${g} ${c.items.length}`).join(', ') || 'nessuno'} (riquadro ${W}×${H}) · index.html generato`);
+console.log(`characters/: ${bodies.length} sagome, ${hair.length} stili di capelli (${Math.min(...bodies.map((b) => b.hair.length))}-${Math.max(...bodies.map((b) => b.hair.length))} per sagoma), vestiti: ${Object.entries(clothes).map(([g, c]) => `${g} ${c.items.length}`).join(', ') || 'nessuno'} (riquadro ${W}×${H}) · index.html generato`);

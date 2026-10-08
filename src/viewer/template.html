@@ -138,7 +138,7 @@
 <body>
 <header class="top">
   <h1>Personaggi</h1>
-  <p>Sagome maschili e femminili in SVG, ricolorabili per parti e combinabili con 5 stili di capelli. Stessa scala e stessa linea del suolo per tutte, così le altezze si confrontano.</p>
+  <p>Sagome maschili e femminili in SVG, ricolorabili per parti e combinabili con 15 stili di capelli (quelli da anziani solo per ragazzi e adulti). Stessa scala e stessa linea del suolo per tutte, così le altezze si confrontano.</p>
 </header>
 
 <main class="layout">
@@ -290,11 +290,11 @@
   const HAIR = DATA.hair;
 
   // Sagome: ogni SVG composto ha già tutti gli stili di capelli, adattati alla sua testa.
-  const bodies = DATA.bodies.map(({ id, group, name, svg }) => {
+  const bodies = DATA.bodies.map(({ id, group, name, svg, hair }) => {
     const source = new DOMParser().parseFromString(svg, 'image/svg+xml').documentElement;
     const viewBox = source.getAttribute('viewBox');
     const [, , w, h] = viewBox.split(/\s+/).map(Number);
-    return { id, group, name, svg, source, viewBox, w, h, css: source.querySelector('style').textContent,
+    return { id, group, name, svg, hair, source, viewBox, w, h, css: source.querySelector('style').textContent,
              symbol: `character-${id.replace('/', '-')}` };
   });
   const bodyById = Object.fromEntries(bodies.map(b => [b.id, b]));
@@ -497,8 +497,9 @@
   }
 
   function renderHairStyles() {
-    const current = variants[state.selected].hair;
-    $('hair-styles').innerHTML = HAIR.map(h =>
+    const v = variants[state.selected], current = v.hair;
+    // solo gli stili che valgono per la sagoma (le acconciature da anziani non ci sono sui bambini)
+    $('hair-styles').innerHTML = HAIR.filter(h => v.body.hair.includes(h.id)).map(h =>
       `<label><input type="radio" name="hair-style" value="${h.id}" ${h.id === current ? 'checked' : ''}>${h.name}</label>`).join('');
   }
 
@@ -705,6 +706,7 @@
     mutate(v);
     // un capo che il gruppo della nuova sagoma non ha torna alla versione base
     const c = outfitOf(v);
+    if (!v.body.hair.includes(v.hair)) v.hair = v.body.hair.includes(v.preset.hair) ? v.preset.hair : v.body.hair[0];
     if (!c.tops.some(t => t.id === v.top)) v.top = 'base';
     if (!c.bottoms.some(b => b.id === v.bottom)) v.bottom = 'base';
     follow(v, before, defaultColors(v));
@@ -713,6 +715,7 @@
   $('body-list').addEventListener('change', (e) => {
     if (e.target.name !== 'body') return;
     change(v => { v.body = bodyById[e.target.value]; });
+    renderHairStyles();
     renderOutfit();
     renderColorRows();
     renderStage();

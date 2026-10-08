@@ -1,7 +1,7 @@
 # svg_characters
 
 Personaggi in SVG pensati per essere **combinati**: dieci sagome (cinque maschili e cinque femminili, da bambino a
-adulto) × cinque stili di capelli × maglie e pantaloni × colori a piacere, più un visualizzatore HTML per provare gli
+adulto) × quindici stili di capelli × maglie e pantaloni × colori a piacere, più un visualizzatore HTML per provare gli
 incroci.
 
 ## Organizzazione
@@ -14,7 +14,9 @@ src/                        ← QUI si lavora: tutto ciò che si modifica a mano
   bodies/
     maschio/                bambino · ragazzo · slanciato · adulto · robusto   (.svg = geometria, .json = misure)
     femmina/                bambina · ragazza · slanciata · adulta · robusta
-  hair/                     spettinati · coda · chignon · ciuffo-scuro · ciuffo-castano   (.svg + .json)
+  hair/                     spettinati · coda · chignon · ciuffo-scuro · ciuffo-castano ·        (.svg + .json)
+                            arruffati · due-chignon · caschetto · rasati-lato · ricci ·
+                            calvizie · stempiato · pettinati-indietro · coda-grigia · chignon-grigio
   clothes/                  ogni gruppo ha i suoi capi, pensati per i suoi corpi
     maschio/                reference.json = corpo su cui sono disegnati i primi cinque capi per tipo; gli altri
                             sono disegnati sulla sagoma indicata nel loro .json (`on`)
@@ -38,7 +40,8 @@ lib/fit.mjs                 deformazione (thin-plate spline) che adatta i vestit
 serve.mjs                   server statico opzionale:  node serve.mjs → http://localhost:5191
 
 reference/                  fogli di riferimento da cui sono tracciate le sorgenti
-  sagome-maschili · sagome-femminili · capelli · vestiti-maschili-pantaloni · vestiti-maschili-maglie ·
+  sagome-maschili · sagome-femminili · capelli · capelli-2 · capelli-anziani ·
+  vestiti-maschili-pantaloni · vestiti-maschili-maglie ·
   vestiti-maschili-outfit · vestiti-femminili · vestiti-femminili-2 · archivio/
 tools/                      strumenti Python per tracciare i fogli (vedi tools/README.md)
 ```
@@ -50,7 +53,7 @@ Regola pratica: **si modifica `src/`, poi `node build.mjs`**. `characters/` e `i
 `build.mjs` prende una sagoma da `src/bodies/` e le aggiunge:
 
 - **il CSS comune** (`style.css`) con i colori di default di quella sagoma, presi dal suo `.json`;
-- **i cinque stili di capelli**, adattati alla sua testa;
+- **gli stili di capelli adatti alla sua età** (vedi sotto), adattati alla sua testa;
 - **tutti i vestiti del suo gruppo**, adattati al suo corpo.
 
 Poi scrive `characters/<gruppo>/<sagoma>.svg`. Capelli e vestiti sono disegnati una volta sola e **si adattano a ogni
@@ -86,7 +89,7 @@ Parti separate in gruppi con `id`, dal fondo al primo piano (uguali in tutte le 
 
 ### Scala e riquadro
 
-Le coordinate sono quelle dei fogli di riferimento, uguali per tutte le sagome: stessa scala e stessa linea del suolo (`y = 900`). Le altezze restano quindi confrontabili: se si mettono gli SVG alla stessa altezza, il bambino resta più basso dell'adulto. Tutti hanno lo stesso riquadro (oggi 316×752), che lascia spazio ai capelli (coda e ciuffi). L'origine del `viewBox` cambia da file a file (la figura è centrata sull'ingombro di corpo e capelli): per questo l'`<svg>` che usa un `<symbol>` di questi file deve avere `viewBox="0 0 316 752"`, come fa il visualizzatore.
+Le coordinate sono quelle dei fogli di riferimento, uguali per tutte le sagome: stessa scala e stessa linea del suolo (`y = 900`). Le altezze restano quindi confrontabili: se si mettono gli SVG alla stessa altezza, il bambino resta più basso dell'adulto. Tutti hanno lo stesso riquadro (oggi 322×752), che lascia spazio ai capelli (coda e ciuffi). L'origine del `viewBox` cambia da file a file (la figura è centrata sull'ingombro di corpo e capelli): per questo l'`<svg>` che usa un `<symbol>` di questi file deve avere `viewBox="0 0 322 752"`, come fa il visualizzatore.
 
 ## Capelli
 
@@ -99,6 +102,23 @@ Il gruppo `hair` sta **dentro** `head`, sopra gli occhi, così i capelli seguono
 | `chignon` | Chignon | `#39241c` |
 | `ciuffo-scuro` | Ciuffo scuro | `#362b26` |
 | `ciuffo-castano` | Ciuffo castano | `#5d3523` |
+| `arruffati` | Arruffati | `#423123` |
+| `due-chignon` | Due chignon | `#523625` |
+| `caschetto` | Caschetto | `#473327` |
+| `rasati-lato` | Rasati di lato (la zona rasata è il colore dei capelli, trasparente) | `#3b322b` |
+| `ricci` | Ricci | `#4e3424` |
+| `calvizie` | Calvizie con ciuffi (e qualche capello sparso) · solo adulti | `#9b8f89` |
+| `stempiato` | Stempiato · solo adulti | `#9d928d` |
+| `pettinati-indietro` | Pettinati all'indietro · ragazzi e adulti | `#d3c4bc` |
+| `coda-grigia` | Coda bassa · ragazzi e adulti | `#a2948c` |
+| `chignon-grigio` | Chignon basso · ragazzi e adulti | `#c7b8af` |
+
+**Età.** Le acconciature da anziani non si danno ai bambini: uno stile può dire a quali età vale (`ages` nel suo `.json`) e
+le età delle sagome sono in `ages` del manifest (bambino, ragazzo, adulto). Una sagoma contiene solo gli stili della sua
+età, e il visualizzatore mostra solo quelli: dando a un personaggio una sagoma più giovane, uno stile che non vale più
+torna a quello del preset o al primo disponibile. Calvizie e stempiato sono solo per gli adulti; coda bassa, chignon
+basso e pettinati all'indietro anche per i ragazzi; gli altri per tutti. I colori di default degli stili da anziani sono
+grigi, ma come per gli altri il colore si cambia con `--hair`.
 
 Per sceglierne un altro basta impostare `--show-hair-<id>: none` / `inline` (per esempio nello `style` dell'elemento `<svg>`); `--show-hair: none` nasconde tutti i capelli. Il colore si cambia con `--hair`, uguale per tutti gli stili.
 
@@ -176,7 +196,7 @@ Con `prefers-reduced-motion` l'SVG resta fermo. Nel visualizzatore c'è l'interr
 
 ## Visualizzatore
 
-Ci sono venti personaggi di partenza (i preset del manifest: due per sagoma, uno per serie di vestiti), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono quelli del gruppo della sagoma; se dai a un personaggio una sagoma di un gruppo che non ha il capo scelto, maglia e pantaloni tornano alla versione base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
+Ci sono venti personaggi di partenza (i preset del manifest: due per sagoma, uno per serie di vestiti; la seconda serie porta i capelli nuovi), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono quelli del gruppo della sagoma; se dai a un personaggio una sagoma di un gruppo che non ha il capo scelto, maglia e pantaloni tornano alla versione base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
 
 **Colori.** I campi sono divisi per parte (corpo, maglia, pantaloni, scarpe, contorno e occhi) e mostrano solo i ruoli che il capo scelto ha. Sotto ogni campo ci sono dei colori rapidi: toni della pelle, colori di capelli naturali e di fantasia, una tavolozza di tessuti; per le scarpe una tavolozza unica per la tomaia e una per la suola. `↺` riporta un campo al suo colore di default; *Vestiti a caso* e *Pelle e capelli a caso* pescano dalle tavolozze (maglia e pantaloni ben distinti), *Colori di default* azzera tutto.
 

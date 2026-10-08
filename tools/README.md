@@ -53,6 +53,31 @@ dell'orecchio e la scala che lo allineano alla testa di riferimento (`hairFrame`
 interne tenere. Per un nuovo stile: aggiungere una riga alla tabella (conviene provare scala e punto di appoggio
 sovrapponendo lo stile alla testa di riferimento), poi aggiungere l'id a `hair` nel manifest.
 
+## Capelli da figure intere: `trace_hair_figures.py`
+
+```
+python3 tools/trace_hair_figures.py reference/capelli-2.webp --out src/hair
+python3 tools/trace_hair_figures.py reference/capelli-anziani.webp --out src/hair
+```
+
+Per un foglio di figure intere, ognuna con un'acconciatura diversa (`lib/hair_figures.py`). I capelli vanno isolati dalla
+testa:
+
+1. **Occhi**: le due macchie scure più spesse in alto (resistono a un'apertura morfologica anche se toccano una ciocca).
+   Le teste delle figure hanno le proporzioni della testa di riferimento, quindi l'allineamento al riquadro dei capelli
+   (`hairFrame`) si fa con gli occhi: stessa posizione, scala dalla distanza fra gli occhi. Per una testa calva
+   (`fit_top`) si allinea anche la cima del cranio.
+2. **Capelli**: nella zona della testa (sopra la maglietta), i pixel lontani dal colore della pelle o meno caldi (i
+   grigi). I pixel sfumati vicino al contorno restano da assegnare: capelli, pelle e resto crescono fin dentro il
+   contorno e il confine cade a metà del tratto, come per le sagome.
+3. **Contorno**: solo dove il foglio ha un tratto scuro (fra capelli e fronte spesso c'è solo il cambio di colore), come
+   linee aperte; il riempimento è senza tratto. Le **linee interne** (ciocche) sono i tratti scuri dentro la sagoma, con
+   tre spessori; i **capelli sparsi** (`strays`) quelli sottili sopra una testa calva; la **zona rasata** (`shaved`)
+   i capelli più chiari della media, disegnati con lo stesso colore trasparente (`.c-shaved`).
+
+La tabella `HAIRS[nome del foglio]` ha una riga per figura: id, nome, età (`ages`) e le opzioni sopra. L'età dice a quali
+sagome si applica lo stile (`ages` nel manifest): gli stili da anziani non vanno ai bambini.
+
 ## Vestiti: `trace_clothes.py`
 
 ```
