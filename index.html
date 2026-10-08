@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personaggio base · Visualizzatore SVG</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f5f4f1; --panel: #ffffff; --ink: #1e1c1a; --muted: #6b665f; --line: #e3e0da;
+    --accent: #3a5bd9; --accent-ink: #ffffff; --soft: #eeece7;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151418; --panel: #201e24; --ink: #efece7; --muted: #a29c94; --line: #36333c;
+      --accent: #8ba0ff; --accent-ink: #11131c; --soft: #2a2830;
+    }
+  }
+  * { box-sizing: border-box }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, "Segoe UI", Roboto, sans-serif }
+  button, input { font: inherit; color: inherit }
+  button { cursor: pointer }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+
+  .top { max-width: 1280px; margin: 0 auto; padding: 22px 20px 0 }
+  .top h1 { margin: 0; font-size: 22px; letter-spacing: -.01em }
+  .top p { margin: 2px 0 0; color: var(--muted) }
+
+  .layout { max-width: 1280px; margin: 0 auto; padding: 16px 20px 28px; display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start }
+  @media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr) } }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius) }
+
+  /* barra strumenti */
+  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 12px }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel) }
+  .seg button { border: 0; background: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 7px }
+  .seg button + button { border-left: 1px solid var(--line) }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink) }
+  .sw { width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(128,128,128,.55); flex: none }
+  .sw[data-bg="white"] { background: #fff }
+  .sw[data-bg="check"] { background: conic-gradient(#d9dbe0 25%, #fff 0 50%, #d9dbe0 0 75%, #fff 0) 0 0 / 8px 8px }
+  .sw[data-bg="gray"] { background: #cdd2d9 }
+  .sw[data-bg="dark"] { background: #1b1d22 }
+  .zoom { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); margin-left: auto }
+  .zoom input { width: 130px; accent-color: var(--accent) }
+  .zoom output { min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink) }
+
+  /* palco */
+  .stage { --zoom: 1; min-height: 600px; overflow: auto; padding: 24px; display: grid; place-items: center; border-radius: var(--radius); border: 1px solid var(--line); container-type: inline-size }
+  .stage[data-bg="white"] { background: #fff }
+  .stage[data-bg="check"] { background: conic-gradient(#e8e9ed 25%, #fff 0 50%, #e8e9ed 0 75%, #fff 0) 0 0 / 24px 24px }
+  .stage[data-bg="gray"] { background: #cdd2d9 }
+  .stage[data-bg="dark"] { background: #1b1d22; --cap: #c9c5be }
+  .figures { display: flex; align-items: flex-end; justify-content: center; gap: clamp(8px, 2vw, 28px); margin: auto }
+  .figures svg { display: block; width: auto; overflow: visible }
+  .figures.single svg { height: calc(min(560px, 66vh) * var(--zoom)) }
+  /* 5 figure in fila: altezza limitata dalla larghezza del palco (rapporto 250:655 ≈ 2.62; 150px = spazi e margini) */
+  .figures.all svg { height: calc(min(400px, 48vh, (100cqw - 150px) / 5 * 2.62) * var(--zoom)) }
+  .fig { border: 0; background: none; padding: 6px 4px 8px; border-radius: 12px; display: grid; justify-items: center; gap: 6px; color: var(--cap, #55514b) }
+  .fig span { font-size: 13px }
+  .fig[aria-pressed="true"] { background: rgba(58, 91, 217, .12); box-shadow: inset 0 0 0 2px var(--accent); color: inherit }
+  .fig:hover { background: rgba(128, 128, 128, .12) }
+
+  /* varianti */
+  .variants { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap }
+  .variants[hidden] { display: none }
+  .variant { flex: 1 1 110px; max-width: 170px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px 6px 8px; display: grid; justify-items: center; gap: 4px }
+  .variant svg { height: 96px; width: auto }
+  .variant span { font-size: 13px; color: var(--muted) }
+  .variant[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset }
+  .variant[aria-pressed="true"] span { color: var(--ink); font-weight: 600 }
+  .variant:hover { background: var(--soft) }
+
+  /* pannello */
+  .panel { padding: 16px 18px 18px; position: sticky; top: 16px }
+  @media (max-width: 900px) { .panel { position: static } }
+  .panel h2 { margin: 0 0 10px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted) }
+  .panel h2 + * { margin-top: 0 }
+  .panel section + section { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line) }
+  #variant-name { color: var(--ink) }
+  .colors { display: grid; gap: 8px }
+  .color { display: grid; grid-template-columns: 34px 1fr 88px; align-items: center; gap: 10px }
+  .color label { font-size: 14px }
+  input[type="color"] { width: 34px; height: 34px; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: none; cursor: pointer }
+  input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px }
+  input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 6px }
+  input[type="color"]::-moz-color-swatch { border: 0; border-radius: 6px }
+  .hex { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 13px }
+  .hex[aria-invalid="true"] { border-color: #d64545 }
+  .row { display: flex; align-items: center; gap: 10px }
+  .row input[type="range"] { flex: 1; accent-color: var(--accent) }
+  .row output { min-width: 2.6em; text-align: right; font-variant-numeric: tabular-nums }
+  .parts { display: flex; flex-wrap: wrap; gap: 8px }
+  .parts label { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; cursor: pointer; user-select: none }
+  .parts label:has(input:checked) { background: var(--soft) }
+  .parts input { accent-color: var(--accent); margin: 0 }
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
+  .btn { padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel) }
+  .btn:hover { background: var(--soft) }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600 }
+  .btn.primary:hover { filter: brightness(1.06) }
+  .btn.wide { grid-column: 1 / -1 }
+  .hint { margin: 12px 0 0; font-size: 13px; color: var(--muted) }
+  kbd { padding: 0 5px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; font: 12px ui-monospace, Consolas, monospace }
+
+  #toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 10px; transition: .2s }
+  #toast.show { opacity: 1; transform: translate(-50%, 0) }
+
+  /* visibilità delle parti: pilotata da variabili CSS ereditate dall'istanza <use> */
+  #head { display: var(--show-head, inline) }
+  #torso { display: var(--show-torso, inline) }
+  #arm-left, #arm-right { display: var(--show-arms, inline) }
+  #pants { display: var(--show-pants, inline) }
+  #shoes { display: var(--show-shoes, inline) }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Personaggio base</h1>
+  <p>Shape base in SVG, ricolorabile per parti. Le 5 varianti arrivano dall'immagine di riferimento.</p>
+</header>
+
+<main class="layout">
+  <section aria-label="Anteprima">
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="Vista" id="view-seg">
+        <button type="button" data-view="single" aria-pressed="true">Singolo</button>
+        <button type="button" data-view="all" aria-pressed="false">Affiancati</button>
+      </div>
+      <div class="seg" role="group" aria-label="Sfondo" id="bg-seg">
+        <button type="button" data-bg="white" aria-pressed="true"><i class="sw" data-bg="white"></i>Bianco</button>
+        <button type="button" data-bg="check" aria-pressed="false"><i class="sw" data-bg="check"></i>Quadretti</button>
+        <button type="button" data-bg="gray" aria-pressed="false"><i class="sw" data-bg="gray"></i>Grigio</button>
+        <button type="button" data-bg="dark" aria-pressed="false"><i class="sw" data-bg="dark"></i>Scuro</button>
+      </div>
+      <label class="zoom">Zoom
+        <input type="range" id="zoom" min="40" max="200" step="5" value="100">
+        <output id="zoom-out" for="zoom">100%</output>
+      </label>
+    </div>
+
+    <div class="stage" id="stage" data-bg="white">
+      <div class="figures single" id="figures"></div>
+    </div>
+
+    <div class="variants" id="variants" role="group" aria-label="Varianti"></div>
+  </section>
+
+  <aside class="panel card" aria-label="Personalizzazione">
+    <section>
+      <h2>Colori · <span id="variant-name"></span></h2>
+      <div class="colors" id="colors"></div>
+    </section>
+    <section>
+      <h2>Contorno</h2>
+      <div class="row">
+        <input type="range" id="line-w" min="0" max="9" step="0.2" value="5.4" aria-label="Spessore del contorno">
+        <output id="line-w-out" for="line-w">5.4</output>
+      </div>
+    </section>
+    <section>
+      <h2>Parti visibili</h2>
+      <div class="parts" id="parts"></div>
+    </section>
+    <section>
+      <h2>Animazione</h2>
+      <div class="parts"><label><input type="checkbox" id="idle">Idle: respiro e battito di ciglia</label></div>
+    </section>
+    <section>
+      <h2>Esporta</h2>
+      <div class="actions">
+        <button type="button" class="btn primary" id="dl-svg">Scarica SVG</button>
+        <button type="button" class="btn" id="dl-png">Scarica PNG</button>
+        <button type="button" class="btn" id="copy-svg">Copia SVG</button>
+        <button type="button" class="btn" id="reset">Ripristina colori</button>
+      </div>
+      <p class="hint">Tasti <kbd>1</kbd>–<kbd>5</kbd> o <kbd>←</kbd> <kbd>→</kbd> per cambiare variante. L'export applica colori, spessore e parti visibili correnti; l'SVG resta animato se l'idle è attivo, il PNG è sempre un fotogramma fermo.</p>
+    </section>
+  </aside>
+</main>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<svg id="defs-host" width="0" height="0" style="position:absolute" aria-hidden="true"></svg>
+
+<script>
+  // Sorgente: character.svg (incorporato da build.mjs)
+  const CHARACTER_SVG = "\u003csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 250 655\" width=\"250\" height=\"655\" role=\"img\" aria-labelledby=\"t\">\n  \u003ctitle id=\"t\">Personaggio base\u003c/title>\n  \u003cstyle>\n    /* Ogni colore è una variabile CSS con un valore di default: il file funziona da solo\n       e il visualizzatore può ricolorare le parti sovrascrivendo le variabili. */\n    .c-stroke   { stroke: var(--outline, #15100c); stroke-width: var(--line-w, 5.4); stroke-linecap: round; stroke-linejoin: round }\n    .c-fine     { stroke-width: calc(var(--line-w, 5.4) * 0.75) }\n    .c-open     { fill: none }\n    .c-skin     { fill: var(--skin, #fec79e) }\n    .c-shirt    { fill: var(--shirt, #f2ece7) }\n    .c-pants    { fill: var(--pants, #5b6679) }\n    .c-upper-l  { fill: var(--shoe-upper-l, #322b27) }\n    .c-upper-r  { fill: var(--shoe-upper-r, #322b27) }\n    .c-toe      { fill: var(--shoe-toe, #f5ede7) }\n    .c-tongue   { fill: var(--shoe-tongue, #f5ede7) }\n    .c-lace     { stroke: var(--shoe-lace, #f5ede7); stroke-width: 4; fill: none }\n    .c-sole     { fill: var(--shoe-sole, #f5efea) }\n    .c-sole-rim { fill: var(--outline, #15100c) }\n    .c-eye      { fill: var(--eye, #1a1613) }\n\n    /* Idle: respiro (busto e braccia si allungano di ~1%, la testa segue con un leggero ritardo)\n       + battito di ciglia. Solo transform, ancorati alla base di ogni gruppo.\n       --idle-n = 0 spegne tutto; --idle-delay sfasa più istanze tra loro. */\n    .c-idle-torso, .c-idle-arm, .c-idle-head, .c-blink {\n      transform-box: fill-box;\n      animation-duration: 1.9s;\n      animation-timing-function: ease-in-out;\n      animation-direction: alternate;\n      animation-iteration-count: var(--idle-n, infinite);\n      animation-delay: var(--idle-delay, 0s);\n    }\n    .c-idle-torso { transform-origin: 50% 100%; animation-name: idle-breathe }\n    .c-idle-arm   { transform-origin: 50% 100%; animation-name: idle-arms }\n    .c-idle-head  { transform-origin: 50% 100%; animation-name: idle-head; animation-delay: calc(var(--idle-delay, 0s) + 0.14s) }\n    .c-blink      { transform-origin: 50% 50%; animation-name: idle-blink; animation-duration: 4.6s; animation-direction: normal; animation-timing-function: linear }\n    @keyframes idle-breathe { from { transform: scaleY(1) }   to { transform: scaleY(1.014) } }\n    @keyframes idle-arms    { from { transform: scaleY(1) }   to { transform: scaleY(1.01) } }\n    @keyframes idle-head    { from { transform: translateY(0) rotate(0deg) } to { transform: translateY(-2px) rotate(-0.5deg) } }\n    @keyframes idle-blink   { 0%, 90%, 100% { transform: scaleY(1) } 94% { transform: scaleY(0.08) } }\n    @media (prefers-reduced-motion: reduce) {\n      .c-idle-torso, .c-idle-arm, .c-idle-head, .c-blink { animation-iteration-count: var(--idle-n, 0) }\n    }\n  \u003c/style>\n\n  \u003c!-- Le coordinate sono quelle dell'immagine di riferimento; il gruppo le riporta a 0,0. -->\n  \u003cg transform=\"translate(-40 -240)\">\n\n    \u003c!-- Braccio destro (lato destro dell'immagine): dietro ai pantaloni -->\n    \u003cg id=\"arm-right\" class=\"c-idle-arm\">\n      \u003cpath class=\"c-skin c-stroke\" d=\"M226,530 L229.5,540 L241,600 C243,610 245,614 248,620 C252,627 253,636 251,645 C249,652 245,657 240,661 C234,665 228,667 222,668 L205,672 L205,525 Z\"/>\n    \u003c/g>\n\n    \u003c!-- Pantaloni: sagoma unica con le due gambe, cucitura centrale e pieghe all'orlo -->\n    \u003cg id=\"pants\">\n      \u003c!-- riempimento: scende sotto le scarpe, così l'orlo non si vede -->\n      \u003cpath class=\"c-pants\" d=\"M106,612 C102,640 98,662 94.5,680 L71,812 L66,818 L64.5,826 L65,848 L100,851 L134,852 L134.5,848 L136.5,842 L142,832 L140,818 L141,810 L155,720 L161,704 L164,720 L165,740 L165.5,810 L164.5,818 L161.5,826 L161,834 L165.5,841 L166.5,850 L237,852 L236.5,820 L235,812 L230.5,800 L214.5,612 Z\"/>\n      \u003c!-- contorni: lato esterno sinistro, interno delle gambe, lato esterno destro -->\n      \u003cpath class=\"c-open c-stroke\" d=\"M106,612 C102,640 98,662 94.5,680 L71,812 L66,818 L64.5,826 L65,842\"/>\n      \u003cpath class=\"c-open c-stroke\" d=\"M134.5,848 L136.5,842 L142,832 L140,818 L141,810 L155,720 L161,704 L164,720 L165,740 L165.5,810 L164.5,818 L161.5,826 L161,834 L165.5,841 L166.5,850\"/>\n      \u003cpath class=\"c-open c-stroke\" d=\"M237,842 L236.5,820 L235,812 L230.5,800 L214.5,612\"/>\n      \u003cpath class=\"c-open c-stroke\" d=\"M161,704 L163,680 L165,660 Q167.5,652 177,647\"/>\n      \u003cpath class=\"c-open c-stroke c-fine\" d=\"M92,813 Q104,807 119,817\"/>\n      \u003cpath class=\"c-open c-stroke c-fine\" d=\"M188,821 Q202,814 216,810\"/>\n    \u003c/g>\n\n    \u003c!-- Scarpe: sinistra frontale, destra in tre quarti con punta e lacci -->\n    \u003cg id=\"shoes\">\n      \u003cg id=\"shoe-left\">\n        \u003cpath class=\"c-sole-rim\" d=\"M49,864 L137.5,864 L137.5,878 C137.5,884 132,888.5 124,888.5 L63,888.5 C54,888.5 49,884 49,876 Z\"/>\n        \u003crect class=\"c-sole\" x=\"54.5\" y=\"868.5\" width=\"77\" height=\"15\" rx=\"4\"/>\n        \u003cpath class=\"c-upper-l c-stroke\" d=\"M52.5,865 C58.5,853 72,832 92,830.2 C112,829 127,840 134,855 C137,860 138,863 137,865 Z\"/>\n        \u003cpath class=\"c-tongue c-stroke c-fine\" d=\"M77,843 L102,836 L111,840 L112,845 L84,848 Z\"/>\n      \u003c/g>\n      \u003cg id=\"shoe-right\">\n        \u003cpath class=\"c-sole-rim\" d=\"M166,862 L274,858 C280,858 282,864 279.5,870 C276,877 266,880 252,881 L190,884 C174,885 166,880 166,872 Z\"/>\n        \u003cpath class=\"c-sole\" d=\"M171,864 L269,861.5 C273,862 274,865 272,868 C269,872 262,874 250,875 L192,878 C178,879 171,876 171,871 Z\"/>\n        \u003cpath class=\"c-upper-r c-stroke\" d=\"M168,862 C167,853 170,848 176,846.5 C186,844 194,841 200,836.5 C205,832 209,828 214,827 C222,826 232,826 238,828 C246,832 254,838 262,843 C268,846 273,850 275,855 C276,857 276.5,859 276,860 Z\"/>\n        \u003cpath class=\"c-lace\" d=\"M214,835 L233,831.5 M218,841 L239,837 M223,846 L244,842\"/>\n        \u003cpath class=\"c-toe c-stroke c-fine\" d=\"M222,861 C222,856 225,853 229.5,850 C233,847 238,843.5 250,842 C258,841.5 266,845 270,850 C274,853 276,856 276,860 Z\"/>\n      \u003c/g>\n    \u003c/g>\n\n    \u003c!-- Braccio sinistro con pugno: davanti ai pantaloni, dietro alla maglia -->\n    \u003cg id=\"arm-left\" class=\"c-idle-arm\">\n      \u003cpath class=\"c-skin c-stroke\" d=\"M82,525 L78.5,540 L74.5,560 L71.5,580 L69,600 L67.5,612 C62,622 57,636 60,646 C64,658 76,668 90,670 C104,671 118,662 121,646 C122,636 119,628 117,622 L112.5,612 L125,605 L125,525 Z\"/>\n    \u003c/g>\n\n    \u003c!-- Testa + collo: contorno aperto, così restano gli stacchi di mento e orecchio -->\n    \u003cg id=\"head\" class=\"c-idle-head\">\n      \u003cpath class=\"c-skin\" d=\"M165,421 C190,421 214,412 226,392 C229,386 231,380 232,372 C233,366 241,358 241,340 C242,320 240,300 233,287 C224,270 204,255 180,251 C172,250 166,250 160,250 C140,250 115,258 100,278 C90,291 82,308 81,322 C80,334 81,344 83,351 C77,352 74,358 74.5,368 C74.5,382 80,396 95,402 C102,404 110,404 114,403 L122.5,410 L129.5,414 L134.5,418 L136,421 L136,462 L171,462 L171,421 Z\"/>\n      \u003cpath class=\"c-open c-stroke\" d=\"M165,421 C190,421 214,412 226,392 C229,386 231,380 232,372 C233,366 241,358 241,340 C242,320 240,300 233,287 C224,270 204,255 180,251 C172,250 166,250 160,250 C140,250 115,258 100,278 C90,291 82,308 81,322 C80,334 81,344 83,351 C77,352 74,358 74.5,368 C74.5,382 80,396 95,402 C102,404 110,404 114,403 L122.5,410 L129.5,414 L134.5,418 L136,421 L136,447\"/>\n      \u003cpath class=\"c-open c-stroke\" d=\"M171,423 L171.5,445\"/>\n      \u003cpath class=\"c-open c-stroke c-fine\" d=\"M83,354 C91,347 105,348 110,360\"/>\n      \u003cellipse class=\"c-eye c-blink\" cx=\"173\" cy=\"357\" rx=\"6\" ry=\"19\"/>\n      \u003cellipse class=\"c-eye c-blink\" cx=\"213.5\" cy=\"357\" rx=\"6\" ry=\"19\"/>\n    \u003c/g>\n\n    \u003c!-- Maglia: busto, maniche corte, scollo tondo, cuciture delle maniche -->\n    \u003cg id=\"torso\" class=\"c-idle-torso\">\n      \u003cpath class=\"c-shirt c-stroke\" d=\"M130,438 C116,438 103,448 96,460 C88,472 80,495 70,528 C80,532 100,537 123,543 L117,549 L112.5,614 Q165,624 217,614 L213.5,555 L211,538 C219,535 228,533 237,531 C234,516 225,492 214.5,470 C209,458 196,444 179,440 C178,462 138,462 130,438 Z\"/>\n      \u003cpath class=\"c-open c-stroke\" d=\"M128,496 L123,543\"/>\n      \u003cpath class=\"c-open c-stroke\" d=\"M206,490 L211,538\"/>\n    \u003c/g>\n  \u003c/g>\n\u003c/svg>\n";
+
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const XML_HEAD = '<?xml version="1.0" encoding="UTF-8"?>\n';
+
+  // ---- dati --------------------------------------------------------------
+  const COLOR_FIELDS = [
+    { key: 'skin',       label: 'Pelle',                css: '--skin' },
+    { key: 'shirt',      label: 'Maglia',               css: '--shirt' },
+    { key: 'pants',      label: 'Pantaloni',            css: '--pants' },
+    { key: 'shoeUpperL', label: 'Scarpa sinistra',      css: '--shoe-upper-l' },
+    { key: 'shoeUpperR', label: 'Scarpa destra',        css: '--shoe-upper-r' },
+    { key: 'shoeToe',    label: 'Punta scarpa dx',      css: '--shoe-toe' },
+    { key: 'shoeTongue', label: 'Linguetta scarpa sx',  css: '--shoe-tongue' },
+    { key: 'shoeLace',   label: 'Lacci scarpa dx',      css: '--shoe-lace' },
+    { key: 'shoeSole',   label: 'Suola',                css: '--shoe-sole' },
+    { key: 'outline',    label: 'Contorno',             css: '--outline' },
+    { key: 'eye',        label: 'Occhi',                css: '--eye' },
+  ];
+
+  const PARTS = [
+    { key: 'head',  label: 'Testa' },
+    { key: 'torso', label: 'Maglia' },
+    { key: 'arms',  label: 'Braccia' },
+    { key: 'pants', label: 'Pantaloni' },
+    { key: 'shoes', label: 'Scarpe' },
+  ];
+
+  const WHITE = '#f5ede7';
+  const BASE = { skin: '#fec79e', shirt: '#f2ece7', outline: '#15100c', eye: '#1a1613', shoeLace: WHITE, shoeSole: '#f5efea' };
+  const PRESETS = [
+    { id: 'jeans',    name: 'Jeans blu',      colors: { ...BASE, pants: '#5d6779', shoeUpperL: '#322b27', shoeUpperR: '#322b27', shoeToe: WHITE,     shoeTongue: WHITE } },
+    { id: 'marrone',  name: 'Marrone',        colors: { ...BASE, pants: '#62564e', shoeUpperL: '#f5efea', shoeUpperR: '#a7a2a0', shoeToe: WHITE,     shoeTongue: WHITE } },
+    { id: 'oliva',    name: 'Oliva',          colors: { ...BASE, pants: '#6e6652', shoeUpperL: '#38302b', shoeUpperR: '#38302b', shoeToe: '#38302b', shoeTongue: '#38302b' } },
+    { id: 'antracite', name: 'Antracite',     colors: { ...BASE, pants: '#453d39', shoeUpperL: '#2f2926', shoeUpperR: '#3a322e', shoeToe: WHITE,     shoeTongue: '#2f2926' } },
+    { id: 'grigio',   name: 'Grigio ardesia', colors: { ...BASE, pants: '#68717a', shoeUpperL: '#f5efea', shoeUpperR: '#a29d9a', shoeToe: WHITE,     shoeTongue: WHITE } },
+  ];
+
+  const variants = PRESETS.map(p => ({ ...p, colors: { ...p.colors } }));
+  const state = {
+    selected: 0,
+    view: 'single',
+    bg: 'white',
+    zoom: 100,
+    lineW: 5.4,
+    idle: !matchMedia('(prefers-reduced-motion: reduce)').matches,
+    parts: Object.fromEntries(PARTS.map(p => [p.key, true])),
+  };
+
+  // ---- SVG sorgente → <symbol> riusabile --------------------------------
+  const source = new DOMParser().parseFromString(CHARACTER_SVG, 'image/svg+xml').documentElement;
+  const VIEWBOX = source.getAttribute('viewBox');
+  const [, , VB_W, VB_H] = VIEWBOX.split(/\s+/).map(Number);
+  {
+    const defs = document.createElementNS(SVG_NS, 'defs');
+    const style = document.createElementNS(SVG_NS, 'style');
+    style.textContent = source.querySelector('style').textContent;
+    const symbol = document.createElementNS(SVG_NS, 'symbol');
+    symbol.id = 'character';
+    symbol.setAttribute('viewBox', VIEWBOX);
+    for (const node of source.children) {
+      if (node.localName !== 'style' && node.localName !== 'title') symbol.appendChild(document.importNode(node, true));
+    }
+    defs.append(style, symbol);
+    document.getElementById('defs-host').append(defs);
+  }
+
+  // ---- helper ------------------------------------------------------------
+  const $ = (id) => document.getElementById(id);
+  const cssVars = (v, index = 0, animated = state.idle) => {
+    const vars = { '--line-w': state.lineW };
+    for (const f of COLOR_FIELDS) vars[f.css] = v.colors[f.key];
+    for (const p of PARTS) vars[`--show-${p.key}`] = state.parts[p.key] ? 'inline' : 'none';
+    vars['--idle-n'] = animated ? 'infinite' : '0';
+    vars['--idle-delay'] = `${-index * 0.7}s`; // sfasa le figure: non respirano tutte all'unisono
+    return vars;
+  };
+  const styleAttr = (v, index) => Object.entries(cssVars(v, index, state.idle)).map(([k, val]) => `${k}:${val}`).join(';');
+  const figureSvg = (v, i) =>
+    `<svg viewBox="${VIEWBOX}" data-i="${i}" style="${styleAttr(v, i)}" role="img" aria-label="${v.name}"><use href="#character"/></svg>`;
+
+  let toastTimer;
+  function toast(msg) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+  }
+
+  // ---- rendering ---------------------------------------------------------
+  // Ricostruisce le figure (cambio di vista o di variante)…
+  function renderStage() {
+    const figures = $('figures');
+    figures.className = `figures ${state.view}`;
+    if (state.view === 'single') {
+      figures.innerHTML = figureSvg(variants[state.selected], state.selected);
+    } else {
+      figures.innerHTML = variants.map((v, i) =>
+        `<button type="button" class="fig" data-i="${i}" aria-pressed="${i === state.selected}">${figureSvg(v, i)}<span>${v.name}</span></button>`
+      ).join('');
+    }
+    $('variants').hidden = state.view === 'all';
+    $('variants').innerHTML = variants.map((v, i) =>
+      `<button type="button" class="variant" data-i="${i}" aria-pressed="${i === state.selected}">${figureSvg(v, i)}<span>${v.name}</span></button>`
+    ).join('');
+    refresh();
+  }
+
+  // …mentre colori, spessore, parti, sfondo e zoom aggiornano solo gli stili sul posto,
+  // così l'animazione idle non riparte a ogni modifica.
+  function refresh() {
+    const stage = $('stage');
+    stage.dataset.bg = state.bg;
+    stage.style.setProperty('--zoom', state.zoom / 100);
+    for (const svg of document.querySelectorAll('#figures svg, #variants svg')) {
+      const i = +svg.dataset.i;
+      svg.setAttribute('style', styleAttr(variants[i], i));
+    }
+  }
+
+  function renderColorRows() {
+    const v = variants[state.selected];
+    $('variant-name').textContent = v.name;
+    $('colors').innerHTML = COLOR_FIELDS.map(f => `
+      <div class="color">
+        <input type="color" id="c-${f.key}" value="${v.colors[f.key]}" aria-label="${f.label}">
+        <label for="c-${f.key}">${f.label}</label>
+        <input type="text" class="hex" id="h-${f.key}" value="${v.colors[f.key]}" maxlength="7" spellcheck="false" aria-label="${f.label} (esadecimale)">
+      </div>`).join('');
+  }
+
+  function renderParts() {
+    $('parts').innerHTML = PARTS.map(p =>
+      `<label><input type="checkbox" data-part="${p.key}" ${state.parts[p.key] ? 'checked' : ''}>${p.label}</label>`).join('');
+  }
+
+  function select(i) {
+    state.selected = (i + variants.length) % variants.length;
+    renderColorRows();
+    renderStage();
+  }
+
+  // ---- export ------------------------------------------------------------
+  // Scrive nel file i valori correnti al posto delle variabili CSS, così l'SVG
+  // funziona ovunque (Illustrator, Inkscape, Figma…) e non solo nel browser.
+  function buildExportSvg(animated = state.idle) {
+    const v = variants[state.selected];
+    const vars = cssVars(v, 0, animated);
+    const doc = new DOMParser().parseFromString(CHARACTER_SVG, 'image/svg+xml');
+    const root = doc.documentElement;
+    const style = root.querySelector('style');
+    style.textContent = style.textContent
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/var\(--idle-n, 0\)/g, '0') // chi ha "riduci animazioni" attivo continua a vedere l'SVG fermo
+      .replace(/var\((--[\w-]+),\s*([^)]+)\)/g, (_, name, fallback) => vars[name] ?? fallback.trim())
+      .replace(/calc\(([\d.]+) \* ([\d.]+)\)/g, (_, a, b) => String(+(a * b).toFixed(2)))
+      .replace(/calc\((-?[\d.]+)s \+ ([\d.]+)s\)/g, (_, a, b) => `${+(+a + +b).toFixed(2)}s`);
+    root.querySelector('title').textContent = `Personaggio base – ${v.name}`;
+    const hidden = { head: ['head'], torso: ['torso'], arms: ['arm-left', 'arm-right'], pants: ['pants'], shoes: ['shoes'] };
+    for (const p of PARTS) {
+      if (state.parts[p.key]) continue;
+      for (const id of hidden[p.key]) root.querySelector(`#${id}`)?.remove();
+    }
+    return XML_HEAD + new XMLSerializer().serializeToString(root);
+  }
+
+  function download(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  async function svgToPngBlob(svgText, scale) {
+    const url = URL.createObjectURL(new Blob([svgText], { type: 'image/svg+xml' }));
+    try {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      const canvas = document.createElement('canvas');
+      canvas.width = VB_W * scale;
+      canvas.height = VB_H * scale;
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      return await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = Object.assign(document.createElement('textarea'), { value: text });
+      document.body.append(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+  }
+
+  // ---- eventi ------------------------------------------------------------
+  function setPressed(container, attr, value) {
+    for (const b of container.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset[attr] === value));
+  }
+
+  $('view-seg').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-view]');
+    if (!b) return;
+    state.view = b.dataset.view;
+    setPressed($('view-seg'), 'view', state.view);
+    renderStage();
+  });
+
+  $('bg-seg').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-bg]');
+    if (!b) return;
+    state.bg = b.dataset.bg;
+    setPressed($('bg-seg'), 'bg', state.bg);
+    refresh();
+  });
+
+  $('zoom').addEventListener('input', (e) => {
+    state.zoom = +e.target.value;
+    $('zoom-out').textContent = `${state.zoom}%`;
+    refresh();
+  });
+
+  const pick = (e) => {
+    const b = e.target.closest('button[data-i]');
+    if (b) select(+b.dataset.i);
+  };
+  $('figures').addEventListener('click', pick);
+  $('variants').addEventListener('click', pick);
+
+  const HEX = /^#[0-9a-f]{6}$/i;
+  $('colors').addEventListener('input', (e) => {
+    const t = e.target;
+    const key = t.id.slice(2);
+    if (!COLOR_FIELDS.some(f => f.key === key)) return;
+    let value = t.value.trim();
+    if (t.classList.contains('hex')) {
+      if (!value.startsWith('#')) value = `#${value}`;
+      const ok = HEX.test(value);
+      t.setAttribute('aria-invalid', String(!ok));
+      if (!ok) return;
+      $(`c-${key}`).value = value;
+    } else {
+      $(`h-${key}`).value = value;
+    }
+    variants[state.selected].colors[key] = value.toLowerCase();
+    refresh();
+  });
+
+  $('line-w').addEventListener('input', (e) => {
+    state.lineW = +e.target.value;
+    $('line-w-out').textContent = state.lineW.toFixed(1);
+    refresh();
+  });
+
+  $('parts').addEventListener('change', (e) => {
+    const key = e.target.dataset.part;
+    if (!key) return;
+    state.parts[key] = e.target.checked;
+    refresh();
+  });
+
+  $('idle').addEventListener('change', (e) => {
+    state.idle = e.target.checked;
+    refresh();
+  });
+
+  $('reset').addEventListener('click', () => {
+    variants[state.selected].colors = { ...PRESETS[state.selected].colors };
+    renderColorRows();
+    refresh();
+    toast('Colori ripristinati');
+  });
+
+  $('dl-svg').addEventListener('click', () => {
+    download(new Blob([buildExportSvg()], { type: 'image/svg+xml' }), `personaggio-${variants[state.selected].id}.svg`);
+  });
+
+  $('dl-png').addEventListener('click', async () => {
+    try {
+      // il PNG è un fotogramma: si esporta sempre la posa base, senza animazione
+      download(await svgToPngBlob(buildExportSvg(false), 3), `personaggio-${variants[state.selected].id}.png`);
+    } catch {
+      toast('Export PNG non riuscito');
+    }
+  });
+
+  $('copy-svg').addEventListener('click', async () => {
+    await copyText(buildExportSvg());
+    toast('SVG copiato negli appunti');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target.matches('input[type="text"], textarea') || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (/^[1-9]$/.test(e.key) && +e.key <= variants.length) select(+e.key - 1);
+    else if (e.key === 'ArrowRight' && !e.target.matches('input[type="range"]')) select(state.selected + 1);
+    else if (e.key === 'ArrowLeft' && !e.target.matches('input[type="range"]')) select(state.selected - 1);
+  });
+
+  // ---- avvio -------------------------------------------------------------
+  renderParts();
+  $('idle').checked = state.idle;
+  select(0);
+</script>
+</body>
+</html>

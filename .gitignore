@@ -1,0 +1,7 @@
+# Configurazione locale degli strumenti di anteprima
+.claude/
+
+# Node / sistema
+node_modules/
+.DS_Store
+Thumbs.db

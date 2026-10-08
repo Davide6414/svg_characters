@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personaggio base · Visualizzatore SVG</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f5f4f1; --panel: #ffffff; --ink: #1e1c1a; --muted: #6b665f; --line: #e3e0da;
+    --accent: #3a5bd9; --accent-ink: #ffffff; --soft: #eeece7;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151418; --panel: #201e24; --ink: #efece7; --muted: #a29c94; --line: #36333c;
+      --accent: #8ba0ff; --accent-ink: #11131c; --soft: #2a2830;
+    }
+  }
+  * { box-sizing: border-box }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, "Segoe UI", Roboto, sans-serif }
+  button, input { font: inherit; color: inherit }
+  button { cursor: pointer }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+
+  .top { max-width: 1280px; margin: 0 auto; padding: 22px 20px 0 }
+  .top h1 { margin: 0; font-size: 22px; letter-spacing: -.01em }
+  .top p { margin: 2px 0 0; color: var(--muted) }
+
+  .layout { max-width: 1280px; margin: 0 auto; padding: 16px 20px 28px; display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start }
+  @media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr) } }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius) }
+
+  /* barra strumenti */
+  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 12px }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel) }
+  .seg button { border: 0; background: none; padding: 6px 12px; display: inline-flex; align-items: center; gap: 7px }
+  .seg button + button { border-left: 1px solid var(--line) }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink) }
+  .sw { width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(128,128,128,.55); flex: none }
+  .sw[data-bg="white"] { background: #fff }
+  .sw[data-bg="check"] { background: conic-gradient(#d9dbe0 25%, #fff 0 50%, #d9dbe0 0 75%, #fff 0) 0 0 / 8px 8px }
+  .sw[data-bg="gray"] { background: #cdd2d9 }
+  .sw[data-bg="dark"] { background: #1b1d22 }
+  .zoom { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); margin-left: auto }
+  .zoom input { width: 130px; accent-color: var(--accent) }
+  .zoom output { min-width: 3.2em; text-align: right; font-variant-numeric: tabular-nums; color: var(--ink) }
+
+  /* palco */
+  .stage { --zoom: 1; min-height: 600px; overflow: auto; padding: 24px; display: grid; place-items: center; border-radius: var(--radius); border: 1px solid var(--line); container-type: inline-size }
+  .stage[data-bg="white"] { background: #fff }
+  .stage[data-bg="check"] { background: conic-gradient(#e8e9ed 25%, #fff 0 50%, #e8e9ed 0 75%, #fff 0) 0 0 / 24px 24px }
+  .stage[data-bg="gray"] { background: #cdd2d9 }
+  .stage[data-bg="dark"] { background: #1b1d22; --cap: #c9c5be }
+  .figures { display: flex; align-items: flex-end; justify-content: center; gap: clamp(8px, 2vw, 28px); margin: auto }
+  .figures svg { display: block; width: auto; overflow: visible }
+  .figures.single svg { height: calc(min(560px, 66vh) * var(--zoom)) }
+  /* 5 figure in fila: altezza limitata dalla larghezza del palco (rapporto 250:655 ≈ 2.62; 150px = spazi e margini) */
+  .figures.all svg { height: calc(min(400px, 48vh, (100cqw - 150px) / 5 * 2.62) * var(--zoom)) }
+  .fig { border: 0; background: none; padding: 6px 4px 8px; border-radius: 12px; display: grid; justify-items: center; gap: 6px; color: var(--cap, #55514b) }
+  .fig span { font-size: 13px }
+  .fig[aria-pressed="true"] { background: rgba(58, 91, 217, .12); box-shadow: inset 0 0 0 2px var(--accent); color: inherit }
+  .fig:hover { background: rgba(128, 128, 128, .12) }
+
+  /* varianti */
+  .variants { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap }
+  .variants[hidden] { display: none }
+  .variant { flex: 1 1 110px; max-width: 170px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px 6px 8px; display: grid; justify-items: center; gap: 4px }
+  .variant svg { height: 96px; width: auto }
+  .variant span { font-size: 13px; color: var(--muted) }
+  .variant[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset }
+  .variant[aria-pressed="true"] span { color: var(--ink); font-weight: 600 }
+  .variant:hover { background: var(--soft) }
+
+  /* pannello */
+  .panel { padding: 16px 18px 18px; position: sticky; top: 16px }
+  @media (max-width: 900px) { .panel { position: static } }
+  .panel h2 { margin: 0 0 10px; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted) }
+  .panel h2 + * { margin-top: 0 }
+  .panel section + section { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line) }
+  #variant-name { color: var(--ink) }
+  .colors { display: grid; gap: 8px }
+  .color { display: grid; grid-template-columns: 34px 1fr 88px; align-items: center; gap: 10px }
+  .color label { font-size: 14px }
+  input[type="color"] { width: 34px; height: 34px; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: none; cursor: pointer }
+  input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px }
+  input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 6px }
+  input[type="color"]::-moz-color-swatch { border: 0; border-radius: 6px }
+  .hex { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 13px }
+  .hex[aria-invalid="true"] { border-color: #d64545 }
+  .row { display: flex; align-items: center; gap: 10px }
+  .row input[type="range"] { flex: 1; accent-color: var(--accent) }
+  .row output { min-width: 2.6em; text-align: right; font-variant-numeric: tabular-nums }
+  .parts { display: flex; flex-wrap: wrap; gap: 8px }
+  .parts label { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; cursor: pointer; user-select: none }
+  .parts label:has(input:checked) { background: var(--soft) }
+  .parts input { accent-color: var(--accent); margin: 0 }
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
+  .btn { padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel) }
+  .btn:hover { background: var(--soft) }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600 }
+  .btn.primary:hover { filter: brightness(1.06) }
+  .btn.wide { grid-column: 1 / -1 }
+  .hint { margin: 12px 0 0; font-size: 13px; color: var(--muted) }
+  kbd { padding: 0 5px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; font: 12px ui-monospace, Consolas, monospace }
+
+  #toast { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 10px; transition: .2s }
+  #toast.show { opacity: 1; transform: translate(-50%, 0) }
+
+  /* visibilità delle parti: pilotata da variabili CSS ereditate dall'istanza <use> */
+  #head { display: var(--show-head, inline) }
+  #torso { display: var(--show-torso, inline) }
+  #arm-left, #arm-right { display: var(--show-arms, inline) }
+  #pants { display: var(--show-pants, inline) }
+  #shoes { display: var(--show-shoes, inline) }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Personaggio base</h1>
+  <p>Shape base in SVG, ricolorabile per parti. Le 5 varianti arrivano dall'immagine di riferimento.</p>
+</header>
+
+<main class="layout">
+  <section aria-label="Anteprima">
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="Vista" id="view-seg">
+        <button type="button" data-view="single" aria-pressed="true">Singolo</button>
+        <button type="button" data-view="all" aria-pressed="false">Affiancati</button>
+      </div>
+      <div class="seg" role="group" aria-label="Sfondo" id="bg-seg">
+        <button type="button" data-bg="white" aria-pressed="true"><i class="sw" data-bg="white"></i>Bianco</button>
+        <button type="button" data-bg="check" aria-pressed="false"><i class="sw" data-bg="check"></i>Quadretti</button>
+        <button type="button" data-bg="gray" aria-pressed="false"><i class="sw" data-bg="gray"></i>Grigio</button>
+        <button type="button" data-bg="dark" aria-pressed="false"><i class="sw" data-bg="dark"></i>Scuro</button>
+      </div>
+      <label class="zoom">Zoom
+        <input type="range" id="zoom" min="40" max="200" step="5" value="100">
+        <output id="zoom-out" for="zoom">100%</output>
+      </label>
+    </div>
+
+    <div class="stage" id="stage" data-bg="white">
+      <div class="figures single" id="figures"></div>
+    </div>
+
+    <div class="variants" id="variants" role="group" aria-label="Varianti"></div>
+  </section>
+
+  <aside class="panel card" aria-label="Personalizzazione">
+    <section>
+      <h2>Colori · <span id="variant-name"></span></h2>
+      <div class="colors" id="colors"></div>
+    </section>
+    <section>
+      <h2>Contorno</h2>
+      <div class="row">
+        <input type="range" id="line-w" min="0" max="9" step="0.2" value="5.4" aria-label="Spessore del contorno">
+        <output id="line-w-out" for="line-w">5.4</output>
+      </div>
+    </section>
+    <section>
+      <h2>Parti visibili</h2>
+      <div class="parts" id="parts"></div>
+    </section>
+    <section>
+      <h2>Animazione</h2>
+      <div class="parts"><label><input type="checkbox" id="idle">Idle: respiro e battito di ciglia</label></div>
+    </section>
+    <section>
+      <h2>Esporta</h2>
+      <div class="actions">
+        <button type="button" class="btn primary" id="dl-svg">Scarica SVG</button>
+        <button type="button" class="btn" id="dl-png">Scarica PNG</button>
+        <button type="button" class="btn" id="copy-svg">Copia SVG</button>
+        <button type="button" class="btn" id="reset">Ripristina colori</button>
+      </div>
+      <p class="hint">Tasti <kbd>1</kbd>–<kbd>5</kbd> o <kbd>←</kbd> <kbd>→</kbd> per cambiare variante. L'export applica colori, spessore e parti visibili correnti; l'SVG resta animato se l'idle è attivo, il PNG è sempre un fotogramma fermo.</p>
+    </section>
+  </aside>
+</main>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<svg id="defs-host" width="0" height="0" style="position:absolute" aria-hidden="true"></svg>
+
+<script>
+  // Sorgente: character.svg (incorporato da build.mjs)
+  const CHARACTER_SVG = "__CHARACTER_SVG__";
+
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const XML_HEAD = '<?xml version="1.0" encoding="UTF-8"?>\n';
+
+  // ---- dati --------------------------------------------------------------
+  const COLOR_FIELDS = [
+    { key: 'skin',       label: 'Pelle',                css: '--skin' },
+    { key: 'shirt',      label: 'Maglia',               css: '--shirt' },
+    { key: 'pants',      label: 'Pantaloni',            css: '--pants' },
+    { key: 'shoeUpperL', label: 'Scarpa sinistra',      css: '--shoe-upper-l' },
+    { key: 'shoeUpperR', label: 'Scarpa destra',        css: '--shoe-upper-r' },
+    { key: 'shoeToe',    label: 'Punta scarpa dx',      css: '--shoe-toe' },
+    { key: 'shoeTongue', label: 'Linguetta scarpa sx',  css: '--shoe-tongue' },
+    { key: 'shoeLace',   label: 'Lacci scarpa dx',      css: '--shoe-lace' },
+    { key: 'shoeSole',   label: 'Suola',                css: '--shoe-sole' },
+    { key: 'outline',    label: 'Contorno',             css: '--outline' },
+    { key: 'eye',        label: 'Occhi',                css: '--eye' },
+  ];
+
+  const PARTS = [
+    { key: 'head',  label: 'Testa' },
+    { key: 'torso', label: 'Maglia' },
+    { key: 'arms',  label: 'Braccia' },
+    { key: 'pants', label: 'Pantaloni' },
+    { key: 'shoes', label: 'Scarpe' },
+  ];
+
+  const WHITE = '#f5ede7';
+  const BASE = { skin: '#fec79e', shirt: '#f2ece7', outline: '#15100c', eye: '#1a1613', shoeLace: WHITE, shoeSole: '#f5efea' };
+  const PRESETS = [
+    { id: 'jeans',    name: 'Jeans blu',      colors: { ...BASE, pants: '#5d6779', shoeUpperL: '#322b27', shoeUpperR: '#322b27', shoeToe: WHITE,     shoeTongue: WHITE } },
+    { id: 'marrone',  name: 'Marrone',        colors: { ...BASE, pants: '#62564e', shoeUpperL: '#f5efea', shoeUpperR: '#a7a2a0', shoeToe: WHITE,     shoeTongue: WHITE } },
+    { id: 'oliva',    name: 'Oliva',          colors: { ...BASE, pants: '#6e6652', shoeUpperL: '#38302b', shoeUpperR: '#38302b', shoeToe: '#38302b', shoeTongue: '#38302b' } },
+    { id: 'antracite', name: 'Antracite',     colors: { ...BASE, pants: '#453d39', shoeUpperL: '#2f2926', shoeUpperR: '#3a322e', shoeToe: WHITE,     shoeTongue: '#2f2926' } },
+    { id: 'grigio',   name: 'Grigio ardesia', colors: { ...BASE, pants: '#68717a', shoeUpperL: '#f5efea', shoeUpperR: '#a29d9a', shoeToe: WHITE,     shoeTongue: WHITE } },
+  ];
+
+  const variants = PRESETS.map(p => ({ ...p, colors: { ...p.colors } }));
+  const state = {
+    selected: 0,
+    view: 'single',
+    bg: 'white',
+    zoom: 100,
+    lineW: 5.4,
+    idle: !matchMedia('(prefers-reduced-motion: reduce)').matches,
+    parts: Object.fromEntries(PARTS.map(p => [p.key, true])),
+  };
+
+  // ---- SVG sorgente → <symbol> riusabile --------------------------------
+  const source = new DOMParser().parseFromString(CHARACTER_SVG, 'image/svg+xml').documentElement;
+  const VIEWBOX = source.getAttribute('viewBox');
+  const [, , VB_W, VB_H] = VIEWBOX.split(/\s+/).map(Number);
+  {
+    const defs = document.createElementNS(SVG_NS, 'defs');
+    const style = document.createElementNS(SVG_NS, 'style');
+    style.textContent = source.querySelector('style').textContent;
+    const symbol = document.createElementNS(SVG_NS, 'symbol');
+    symbol.id = 'character';
+    symbol.setAttribute('viewBox', VIEWBOX);
+    for (const node of source.children) {
+      if (node.localName !== 'style' && node.localName !== 'title') symbol.appendChild(document.importNode(node, true));
+    }
+    defs.append(style, symbol);
+    document.getElementById('defs-host').append(defs);
+  }
+
+  // ---- helper ------------------------------------------------------------
+  const $ = (id) => document.getElementById(id);
+  const cssVars = (v, index = 0, animated = state.idle) => {
+    const vars = { '--line-w': state.lineW };
+    for (const f of COLOR_FIELDS) vars[f.css] = v.colors[f.key];
+    for (const p of PARTS) vars[`--show-${p.key}`] = state.parts[p.key] ? 'inline' : 'none';
+    vars['--idle-n'] = animated ? 'infinite' : '0';
+    vars['--idle-delay'] = `${-index * 0.7}s`; // sfasa le figure: non respirano tutte all'unisono
+    return vars;
+  };
+  const styleAttr = (v, index) => Object.entries(cssVars(v, index, state.idle)).map(([k, val]) => `${k}:${val}`).join(';');
+  const figureSvg = (v, i) =>
+    `<svg viewBox="${VIEWBOX}" data-i="${i}" style="${styleAttr(v, i)}" role="img" aria-label="${v.name}"><use href="#character"/></svg>`;
+
+  let toastTimer;
+  function toast(msg) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+  }
+
+  // ---- rendering ---------------------------------------------------------
+  // Ricostruisce le figure (cambio di vista o di variante)…
+  function renderStage() {
+    const figures = $('figures');
+    figures.className = `figures ${state.view}`;
+    if (state.view === 'single') {
+      figures.innerHTML = figureSvg(variants[state.selected], state.selected);
+    } else {
+      figures.innerHTML = variants.map((v, i) =>
+        `<button type="button" class="fig" data-i="${i}" aria-pressed="${i === state.selected}">${figureSvg(v, i)}<span>${v.name}</span></button>`
+      ).join('');
+    }
+    $('variants').hidden = state.view === 'all';
+    $('variants').innerHTML = variants.map((v, i) =>
+      `<button type="button" class="variant" data-i="${i}" aria-pressed="${i === state.selected}">${figureSvg(v, i)}<span>${v.name}</span></button>`
+    ).join('');
+    refresh();
+  }
+
+  // …mentre colori, spessore, parti, sfondo e zoom aggiornano solo gli stili sul posto,
+  // così l'animazione idle non riparte a ogni modifica.
+  function refresh() {
+    const stage = $('stage');
+    stage.dataset.bg = state.bg;
+    stage.style.setProperty('--zoom', state.zoom / 100);
+    for (const svg of document.querySelectorAll('#figures svg, #variants svg')) {
+      const i = +svg.dataset.i;
+      svg.setAttribute('style', styleAttr(variants[i], i));
+    }
+  }
+
+  function renderColorRows() {
+    const v = variants[state.selected];
+    $('variant-name').textContent = v.name;
+    $('colors').innerHTML = COLOR_FIELDS.map(f => `
+      <div class="color">
+        <input type="color" id="c-${f.key}" value="${v.colors[f.key]}" aria-label="${f.label}">
+        <label for="c-${f.key}">${f.label}</label>
+        <input type="text" class="hex" id="h-${f.key}" value="${v.colors[f.key]}" maxlength="7" spellcheck="false" aria-label="${f.label} (esadecimale)">
+      </div>`).join('');
+  }
+
+  function renderParts() {
+    $('parts').innerHTML = PARTS.map(p =>
+      `<label><input type="checkbox" data-part="${p.key}" ${state.parts[p.key] ? 'checked' : ''}>${p.label}</label>`).join('');
+  }
+
+  function select(i) {
+    state.selected = (i + variants.length) % variants.length;
+    renderColorRows();
+    renderStage();
+  }
+
+  // ---- export ------------------------------------------------------------
+  // Scrive nel file i valori correnti al posto delle variabili CSS, così l'SVG
+  // funziona ovunque (Illustrator, Inkscape, Figma…) e non solo nel browser.
+  function buildExportSvg(animated = state.idle) {
+    const v = variants[state.selected];
+    const vars = cssVars(v, 0, animated);
+    const doc = new DOMParser().parseFromString(CHARACTER_SVG, 'image/svg+xml');
+    const root = doc.documentElement;
+    const style = root.querySelector('style');
+    style.textContent = style.textContent
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/var\(--idle-n, 0\)/g, '0') // chi ha "riduci animazioni" attivo continua a vedere l'SVG fermo
+      .replace(/var\((--[\w-]+),\s*([^)]+)\)/g, (_, name, fallback) => vars[name] ?? fallback.trim())
+      .replace(/calc\(([\d.]+) \* ([\d.]+)\)/g, (_, a, b) => String(+(a * b).toFixed(2)))
+      .replace(/calc\((-?[\d.]+)s \+ ([\d.]+)s\)/g, (_, a, b) => `${+(+a + +b).toFixed(2)}s`);
+    root.querySelector('title').textContent = `Personaggio base – ${v.name}`;
+    const hidden = { head: ['head'], torso: ['torso'], arms: ['arm-left', 'arm-right'], pants: ['pants'], shoes: ['shoes'] };
+    for (const p of PARTS) {
+      if (state.parts[p.key]) continue;
+      for (const id of hidden[p.key]) root.querySelector(`#${id}`)?.remove();
+    }
+    return XML_HEAD + new XMLSerializer().serializeToString(root);
+  }
+
+  function download(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  async function svgToPngBlob(svgText, scale) {
+    const url = URL.createObjectURL(new Blob([svgText], { type: 'image/svg+xml' }));
+    try {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      const canvas = document.createElement('canvas');
+      canvas.width = VB_W * scale;
+      canvas.height = VB_H * scale;
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      return await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = Object.assign(document.createElement('textarea'), { value: text });
+      document.body.append(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+  }
+
+  // ---- eventi ------------------------------------------------------------
+  function setPressed(container, attr, value) {
+    for (const b of container.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset[attr] === value));
+  }
+
+  $('view-seg').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-view]');
+    if (!b) return;
+    state.view = b.dataset.view;
+    setPressed($('view-seg'), 'view', state.view);
+    renderStage();
+  });
+
+  $('bg-seg').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-bg]');
+    if (!b) return;
+    state.bg = b.dataset.bg;
+    setPressed($('bg-seg'), 'bg', state.bg);
+    refresh();
+  });
+
+  $('zoom').addEventListener('input', (e) => {
+    state.zoom = +e.target.value;
+    $('zoom-out').textContent = `${state.zoom}%`;
+    refresh();
+  });
+
+  const pick = (e) => {
+    const b = e.target.closest('button[data-i]');
+    if (b) select(+b.dataset.i);
+  };
+  $('figures').addEventListener('click', pick);
+  $('variants').addEventListener('click', pick);
+
+  const HEX = /^#[0-9a-f]{6}$/i;
+  $('colors').addEventListener('input', (e) => {
+    const t = e.target;
+    const key = t.id.slice(2);
+    if (!COLOR_FIELDS.some(f => f.key === key)) return;
+    let value = t.value.trim();
+    if (t.classList.contains('hex')) {
+      if (!value.startsWith('#')) value = `#${value}`;
+      const ok = HEX.test(value);
+      t.setAttribute('aria-invalid', String(!ok));
+      if (!ok) return;
+      $(`c-${key}`).value = value;
+    } else {
+      $(`h-${key}`).value = value;
+    }
+    variants[state.selected].colors[key] = value.toLowerCase();
+    refresh();
+  });
+
+  $('line-w').addEventListener('input', (e) => {
+    state.lineW = +e.target.value;
+    $('line-w-out').textContent = state.lineW.toFixed(1);
+    refresh();
+  });
+
+  $('parts').addEventListener('change', (e) => {
+    const key = e.target.dataset.part;
+    if (!key) return;
+    state.parts[key] = e.target.checked;
+    refresh();
+  });
+
+  $('idle').addEventListener('change', (e) => {
+    state.idle = e.target.checked;
+    refresh();
+  });
+
+  $('reset').addEventListener('click', () => {
+    variants[state.selected].colors = { ...PRESETS[state.selected].colors };
+    renderColorRows();
+    refresh();
+    toast('Colori ripristinati');
+  });
+
+  $('dl-svg').addEventListener('click', () => {
+    download(new Blob([buildExportSvg()], { type: 'image/svg+xml' }), `personaggio-${variants[state.selected].id}.svg`);
+  });
+
+  $('dl-png').addEventListener('click', async () => {
+    try {
+      // il PNG è un fotogramma: si esporta sempre la posa base, senza animazione
+      download(await svgToPngBlob(buildExportSvg(false), 3), `personaggio-${variants[state.selected].id}.png`);
+    } catch {
+      toast('Export PNG non riuscito');
+    }
+  });
+
+  $('copy-svg').addEventListener('click', async () => {
+    await copyText(buildExportSvg());
+    toast('SVG copiato negli appunti');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target.matches('input[type="text"], textarea') || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (/^[1-9]$/.test(e.key) && +e.key <= variants.length) select(+e.key - 1);
+    else if (e.key === 'ArrowRight' && !e.target.matches('input[type="range"]')) select(state.selected + 1);
+    else if (e.key === 'ArrowLeft' && !e.target.matches('input[type="range"]')) select(state.selected - 1);
+  });
+
+  // ---- avvio -------------------------------------------------------------
+  renderParts();
+  $('idle').checked = state.idle;
+  select(0);
+</script>
+</body>
+</html>
