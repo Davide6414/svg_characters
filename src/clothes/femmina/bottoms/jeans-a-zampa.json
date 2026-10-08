@@ -5,13 +5,13 @@
   },
   "on": "femmina/slanciata",
   "landmarks": {
-    "pants-tl": [
+    "pants-bl": [
       602.5,
-      527.6
+      872.7
     ],
-    "pants-tr": [
+    "pants-br": [
       766.5,
-      527.6
+      872.7
     ]
   }
 }

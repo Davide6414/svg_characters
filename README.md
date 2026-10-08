@@ -9,19 +9,24 @@ incroci.
 ```
 src/                        ← QUI si lavora: tutto ciò che si modifica a mano o si ricava dai fogli
   manifest.json             gruppi, ordine di sagome, capelli e vestiti, palette comune, preset del visualizzatore
-                            (un preset può anche dare colori di partenza, per esempio quelli delle scarpe)
+                            (un preset può dare un nome e colori di partenza: pelle, capelli, scarpe)
   style.css                 classi dei colori, visibilità di capelli e vestiti, animazione idle (uguali per tutte)
   bodies/
     maschio/                bambino · ragazzo · slanciato · adulto · robusto   (.svg = geometria, .json = misure)
     femmina/                bambina · ragazza · slanciata · adulta · robusta
   hair/                     spettinati · coda · chignon · ciuffo-scuro · ciuffo-castano   (.svg + .json)
   clothes/                  ogni gruppo ha i suoi capi, pensati per i suoi corpi
-    maschio/                reference.json = punti di riferimento del corpo su cui sono disegnati i vestiti
-      tops/                 felpa · giacca · polo · maglione · camicia           (.svg + .json)
-      bottoms/              jeans · chino · jogger · cargo · larghi              (.svg + .json)
+    maschio/                reference.json = corpo su cui sono disegnati i primi cinque capi per tipo; gli altri
+                            sono disegnati sulla sagoma indicata nel loro .json (`on`)
+      tops/                 felpa · giacca · polo · maglione · camicia ·                       (.svg + .json)
+                            maglietta-riga · felpa-rossa · camicia-risvoltata · polo-blu · cardigan-grigio
+      bottoms/              jeans · chino · jogger · cargo · larghi ·
+                            bermuda-cargo · jeans-grigi · pantaloni-kaki · pantaloni-cintura · jeans-chiari
     femmina/                ogni capo è disegnato sulla sagoma femminile indicata nel suo .json (`on`)
-      tops/                 maglietta-fiore · felpa-cappuccio · top-corto · maglietta-v · cardigan
-      bottoms/              pantaloncini · jeans-scuri · jeans-a-zampa · pantaloni-neri · pantaloni-marroni
+      tops/                 maglietta-fiore · felpa-cappuccio · top-corto · maglietta-v · cardigan ·
+                            abitino · maglia-righe · giacca-jeans · maglione-v · cardigan-fiori
+      bottoms/              pantaloncini · jeans-scuri · jeans-a-zampa · pantaloni-neri · pantaloni-marroni ·
+                            leggings · jeans-cargo · jeans-neri · pantaloni-oliva · pantaloni-scuri
   viewer/template.html      il visualizzatore
 
 characters/                 ← GENERATO da build.mjs: ogni sagoma con tutti i capelli e i vestiti del suo gruppo
@@ -34,7 +39,7 @@ serve.mjs                   server statico opzionale:  node serve.mjs → http:/
 
 reference/                  fogli di riferimento da cui sono tracciate le sorgenti
   sagome-maschili · sagome-femminili · capelli · vestiti-maschili-pantaloni · vestiti-maschili-maglie ·
-  vestiti-femminili · archivio/
+  vestiti-maschili-outfit · vestiti-femminili · vestiti-femminili-2 · archivio/
 tools/                      strumenti Python per tracciare i fogli (vedi tools/README.md)
 ```
 
@@ -81,7 +86,7 @@ Parti separate in gruppi con `id`, dal fondo al primo piano (uguali in tutte le 
 
 ### Scala e riquadro
 
-Le coordinate sono quelle dei fogli di riferimento, uguali per tutte le sagome: stessa scala e stessa linea del suolo (`y = 900`). Le altezze restano quindi confrontabili: se si mettono gli SVG alla stessa altezza, il bambino resta più basso dell'adulto. Tutti hanno lo stesso riquadro (oggi 316×742), che lascia spazio ai capelli (coda e ciuffi). L'origine del `viewBox` cambia da file a file (la figura è centrata sull'ingombro di corpo e capelli): per questo l'`<svg>` che usa un `<symbol>` di questi file deve avere `viewBox="0 0 316 742"`, come fa il visualizzatore.
+Le coordinate sono quelle dei fogli di riferimento, uguali per tutte le sagome: stessa scala e stessa linea del suolo (`y = 900`). Le altezze restano quindi confrontabili: se si mettono gli SVG alla stessa altezza, il bambino resta più basso dell'adulto. Tutti hanno lo stesso riquadro (oggi 316×752), che lascia spazio ai capelli (coda e ciuffi). L'origine del `viewBox` cambia da file a file (la figura è centrata sull'ingombro di corpo e capelli): per questo l'`<svg>` che usa un `<symbol>` di questi file deve avere `viewBox="0 0 316 752"`, come fa il visualizzatore.
 
 ## Capelli
 
@@ -110,6 +115,11 @@ Maschio:
 | `polo` (colletto, patta con bottoni) | `jogger` (coste e cordino) |
 | `maglione` (girocollo, coste) | `cargo` (tasche laterali) |
 | `camicia` (camicia aperta sulla maglietta) | `larghi` (a gamba larga, con pieghe) |
+| `maglietta-riga` (bianca con una riga sul petto) | `bermuda-cargo` (tasche laterali, con gambe e calze) |
+| `felpa-rossa` (cappuccio, cordini, tasca, polsini) | `jeans-grigi` (cucitura centrale) |
+| `camicia-risvoltata` (aperta, maniche arrotolate, taschino, maglietta sotto) | `pantaloni-kaki` |
+| `polo-blu` (colletto, bottoni, infilata nei pantaloni) | `pantaloni-cintura` (cintura e fibbia) |
+| `cardigan-grigio` (bottoni, coste, maglietta sotto) | `jeans-chiari` |
 
 Femmina:
 
@@ -120,6 +130,11 @@ Femmina:
 | `top-corto` (canotta nera: spalle, braccia e pancia scoperte) | `jeans-a-zampa` (passanti, bottone, tasche) |
 | `maglietta-v` (verde oliva, scollo a V) | `pantaloni-neri` (a gamba larga) |
 | `cardigan` (maniche arrotolate, bottoni, maglietta sotto) | `pantaloni-marroni` |
+| `abitino` (colletto, fiore, pieghe) | `leggings` (con le caviglie) |
+| `maglia-righe` (righe e polsini) | `jeans-cargo` (tasche laterali) |
+| `giacca-jeans` (aperta su un top nero, maniche risvoltate, taschini) | `jeans-neri` (risvoltati, caviglie scoperte) |
+| `maglione-v` (a coste, maniche a tre quarti) | `pantaloni-oliva` |
+| `cardigan-fiori` (tasca, coste, su una maglia a fiori) | `pantaloni-scuri` |
 
 Si sceglie un capo per tipo con `--show-top-<id>` e `--show-bottom-<id>` (`inline` | `none`; `base` per la versione della sagoma). Un capo sostituisce la versione base. Ogni capo ha fino a quattro **ruoli di colore**:
 
@@ -127,20 +142,23 @@ Si sceglie un capo per tipo con `--show-top-<id>` e `--show-bottom-<id>` (`inlin
 | --- | --- | --- | --- |
 | principale | `--shirt` | `--pants` | il colore del capo |
 | bordi | `--shirt-trim` | `--pants-trim` | coste, colletti, patte, cuffie, risvolti |
-| dettagli | `--shirt-accent` (e `--shirt-accent2`) | `--pants-accent` | cerniera, cordini, petali e centro del fiore |
+| dettagli | `--shirt-accent` (e `--shirt-accent2`) | `--pants-accent` | cerniera, cordini, righe, fiori, cintura |
 | sotto | `--shirt-under` | `--pants-under` | la maglietta sotto un capo aperto; le calze |
+
+Righe e fantasie sono dettagli: una maglia a righe ha le righe in `--shirt-accent`, la maglia a fiori i fiori.
 
 Un capo ha solo i ruoli che gli servono (la polo non ha dettagli, la camicia non ha bordi). La pelle che un capo lascia
 scoperta (gambe sotto i pantaloncini, pancia, spalle) usa `--skin`, come il resto del corpo.
 
-**Capi femminili.** Vengono da un unico foglio (`reference/vestiti-femminili.webp`) in cui ogni figura indossa maglia e
-pantaloni sul proprio corpo, quindi ogni capo è disegnato su una sagoma diversa e si adatta alle altre dal punto di
-partenza giusto. Il foglio mostra anche le scarpe di ogni outfit: non sono capi ma colori: i preset femminili li impostano
-(`colors` del preset: scarpe rosa, lilla, nere, beige). Cose particolari rispetto ai capi maschili:
+**Capi da fogli di outfit.** I capi femminili e la seconda serie maschile vengono da fogli
+(`vestiti-femminili`, `vestiti-femminili-2`, `vestiti-maschili-outfit`) in cui ogni figura indossa maglia e pantaloni sul
+proprio corpo, quindi ogni capo è disegnato su una sagoma diversa e si adatta alle altre dal punto di partenza giusto. I
+fogli mostrano anche le scarpe di ogni outfit: non sono capi ma colori, e li impostano i preset (`colors`). Cose
+particolari rispetto ai primi capi maschili:
 
 - *Pelle scoperta*: i pantaloncini portano con sé gambe e calze (i pantaloni della sagoma si nascondono); il top corto porta spalle e braccia (`replaces: ["arms"]` nel `.json`, nel gruppo `.g-arms`: le braccia della sagoma si nascondono con `--show-body-arms: none`, e `--show-arms` nasconde tutte le braccia) e la pancia.
-- *Livello sotto* (`<g id="…-under">`): la pancia del top corto sta sotto i pantaloni, così non dipende dai pantaloni scelti; i pantaloni salgono di qualche px sotto la maglia, così con una maglia più corta non resta un buco in vita.
-- *Dettagli senza contorno* ricavati dal colore: petali e centro del fiore, risvolto dei pantaloncini, calze.
+- *Livello sotto* (`<g id="…-under">`): la pancia del top corto sta sotto i pantaloni, così non dipende dai pantaloni scelti; i pantaloni salgono di qualche px sotto la maglia, e una maglia corta o infilata (la polo, il top sotto la giacca di jeans) scende sotto i pantaloni, così negli incroci non restano buchi in vita.
+- *Dettagli senza contorno* ricavati dal colore: fiori, righe, risvolti, calze, bottoni chiari.
 - *Scollo*: la pelle sotto il collo (V, cappuccio, scollo ampio) è parte del capo.
 
 ## Animazione idle
@@ -158,9 +176,11 @@ Con `prefers-reduced-motion` l'SVG resta fermo. Nel visualizzatore c'è l'interr
 
 ## Visualizzatore
 
-Ci sono dieci personaggi di partenza (i preset del manifest), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono quelli del gruppo della sagoma; se dai a un personaggio una sagoma di un gruppo che non ha il capo scelto, maglia e pantaloni tornano alla versione base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
+Ci sono venti personaggi di partenza (i preset del manifest: due per sagoma, uno per serie di vestiti), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono quelli del gruppo della sagoma; se dai a un personaggio una sagoma di un gruppo che non ha il capo scelto, maglia e pantaloni tornano alla versione base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
 
-I colori di partenza sono i default scritti nel CSS di ogni SVG, senza doppioni altrove. Il bottone *Scarica SVG* scrive i valori scelti direttamente nel file (e tiene solo i capelli, la maglia e i pantaloni scelti), quindi il risultato si apre anche in Illustrator, Inkscape o Figma (che ignorano `var()`).
+**Colori.** I campi sono divisi per parte (corpo, maglia, pantaloni, scarpe, contorno e occhi) e mostrano solo i ruoli che il capo scelto ha. Sotto ogni campo ci sono dei colori rapidi: toni della pelle, colori di capelli naturali e di fantasia, una tavolozza di tessuti; per le scarpe una tavolozza unica per la tomaia e una per la suola. `↺` riporta un campo al suo colore di default; *Vestiti a caso* e *Pelle e capelli a caso* pescano dalle tavolozze (maglia e pantaloni ben distinti), *Colori di default* azzera tutto.
+
+I colori di partenza sono i default scritti nel CSS di ogni SVG, più i `colors` del preset (pelle, capelli, scarpe). Il bottone *Scarica SVG* scrive i valori scelti direttamente nel file (e tiene solo i capelli, la maglia e i pantaloni scelti), quindi il risultato si apre anche in Illustrator, Inkscape o Figma (che ignorano `var()`).
 
 ## Aggiungere una sagoma, uno stile di capelli o dei vestiti
 

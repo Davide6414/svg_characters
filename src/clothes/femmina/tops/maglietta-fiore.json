@@ -2,8 +2,8 @@
   "name": "Maglietta con fiore",
   "colors": {
     "main": "#faa8bd",
-    "accent": "#fdfbf9",
-    "accent2": "#fdb56f"
+    "accent": "#fefdfc",
+    "accent2": "#feb267"
   },
   "on": "femmina/bambina",
   "landmarks": {

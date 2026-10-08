@@ -133,7 +133,7 @@ function css(body, defaultHair, defaults, preset) {
   const vars = { ...manifest.palette, ...body.colors, ...preset?.colors };
   const cl = clothesCss(body, defaults);
   let out = styleTemplate.replace(/\{\{([\w-]+)\}\}/g, (m, k) => {
-    if (k === 'hair-fills') return body.hair.map((h) => `.c-hair-${h.id} { fill: var(--hair, ${h.color}) }`).join('\n');
+    if (k === 'hair-fills') return body.hair.map((h) => `.c-hair-${h.id} { fill: var(--hair, ${preset?.colors?.hair ?? h.color}) }`).join('\n');
     if (k === 'hair-show') return body.hair.map((h) => `#hair-${h.id} { display: var(--show-hair-${h.id}, ${h.id === defaultHair ? 'inline' : 'none'}) }`).join('\n');
     if (k === 'hair-default') return defaultHair;
     if (k === 'outfit-default') return `${defaults.top} + ${defaults.bottom}`;

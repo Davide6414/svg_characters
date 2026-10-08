@@ -1,0 +1,9 @@
+{
+  "name": "Cardigan e maglia a fiori",
+  "colors": {
+    "main": "#a47681",
+    "accent": "#c3a8b6",
+    "under": "#fbf0e4"
+  },
+  "on": "femmina/robusta"
+}

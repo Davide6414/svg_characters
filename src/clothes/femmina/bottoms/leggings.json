@@ -1,0 +1,25 @@
+{
+  "name": "Leggings",
+  "colors": {
+    "main": "#c0a2d1"
+  },
+  "on": "femmina/bambina",
+  "landmarks": {
+    "pants-tl": [
+      82.5,
+      759.9
+    ],
+    "pants-tr": [
+      210.5,
+      759.9
+    ],
+    "pants-bl": [
+      82.5,
+      867.6
+    ],
+    "pants-br": [
+      210.5,
+      867.6
+    ]
+  }
+}

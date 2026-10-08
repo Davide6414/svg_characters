@@ -1,0 +1,25 @@
+{
+  "name": "Jeans chiari",
+  "colors": {
+    "main": "#657480"
+  },
+  "on": "maschio/robusto",
+  "landmarks": {
+    "pants-tl": [
+      1193.5,
+      629.7
+    ],
+    "pants-tr": [
+      1356.5,
+      629.7
+    ],
+    "pants-bl": [
+      1193.5,
+      862.0
+    ],
+    "pants-br": [
+      1356.5,
+      862.0
+    ]
+  }
+}

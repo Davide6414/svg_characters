@@ -81,24 +81,28 @@ L'adattamento ai singoli corpi non si fa qui ma in `build.mjs` (vedi il README p
 ## Outfit: `trace_outfits.py`
 
 ```
-python3 tools/trace_outfits.py reference/vestiti-femminili.webp --group femmina \
-    --bodies src/bodies/femmina --out src/clothes/femmina
+python3 tools/trace_outfits.py reference/vestiti-femminili.webp   --group femmina --bodies src/bodies/femmina --out src/clothes/femmina
+python3 tools/trace_outfits.py reference/vestiti-femminili-2.webp --group femmina --bodies src/bodies/femmina --out src/clothes/femmina
+python3 tools/trace_outfits.py reference/vestiti-maschili-outfit.webp --group maschio --bodies src/bodies/maschio --out src/clothes/maschio
 ```
 
-Per un foglio in cui **ogni figura indossa maglia e pantaloni sul proprio corpo** (le cinque sagome femminili, ognuna
-con il suo outfit). Il corpo di riferimento di un capo è la sagoma su cui è disegnato (stesso nome in `--bodies`): la
+Per un foglio in cui **ogni figura indossa maglia e pantaloni sul proprio corpo** (le cinque sagome di un gruppo, ognuna
+con il suo outfit). La tabella delle figure si sceglie dal nome del foglio (`OUTFITS['vestiti-femminili-2']`…). Il corpo di riferimento di un capo è la sagoma su cui è disegnato (stesso nome in `--bodies`): la
 figura si allinea a quella sagoma con la testa e la linea del suolo (le due coincidono entro un paio di px), e il json
 del capo dice su quale è disegnato (`on`); `build.mjs` lo adatta poi alle altre. Scrive `tops/<id>.svg + .json` e
 `bottoms/<id>.svg + .json`.
 
-A differenza di `trace_clothes.py`, qui le regioni di ogni figura si **assegnano a mano**: la tabella `OUTFITS` in cima al
+A differenza di `trace_clothes.py`, qui le regioni di ogni figura si **assegnano a mano**: ogni tabella `OUTFITS` in cima al
 file ha una riga per figura, con per ogni capo `{indice regione: ruolo}` (per vedere gli indici: `-v`, che stampa area
 e colore di ogni regione). Oltre ai ruoli di colore c'è `skin` (pelle lasciata scoperta). Le altre chiavi, spiegate nel
 docstring del file, gestiscono i casi che i fogli maschili non avevano (`lib/outfits.py`):
 
-- `split`: dettagli senza contorno ricavati dal colore dentro una regione (regole `white`, `orange`, `lighter`: petali
-  e centro del fiore, risvolto dei pantaloncini, calze). Si disegnano sopra la regione senza tratto, e il tratto del
-  bordo della regione si ridisegna sopra (così non si copre);
+- `split`: dettagli senza contorno ricavati dal colore dentro una regione (regole `white`, `orange`, `lighter`,
+  `darker`, `red`, `lilac`: fiori, righe, risvolti, calze, bottoni chiari). Si disegnano sopra la regione senza tratto,
+  e il tratto del bordo della regione si ridisegna sopra (così non si copre); il colore di partenza è quello dei pixel
+  del dettaglio più lontani dal fondo (i bordi sfumati non lo sbiadiscono);
+- `join`: regioni da unire in una (le gambe dei leggings, i jeans tagliati dalla cucitura centrale): il confine resta
+  come cucitura; `extend_top`: la regione sale fino in vita (i fianchi nascosti da un abito);
 - `neck`: la pelle sotto il collo della sagoma (V, scollo ampio, cappuccio aperto) sta nella regione della testa del
   foglio, non in una regione del capo: si ritaglia sotto la riga del collo della sagoma;
 - `layers` e `pad_under`: parti che stanno in un livello sotto i pantaloni (la pancia di un top corto), allungate in
@@ -107,8 +111,9 @@ docstring del file, gestiscono i casi che i fogli maschili non avevano (`lib/out
   braccia, quando le maniche sono più corte di quelle della sagoma di base: l'orlo della manica si aggancia all'inizio
   del braccio con dei punti di riferimento corretti (`landmarks` nel json del capo);
 - `under_up`, `behind`: i pantaloni salgono sotto la maglia e proseguono dietro le braccia, così con altre maglie non
-  restano buchi in vita; `to_shoes`: scendono sotto le scarpe. Il bordo alto dei pantaloni si aggancia a quello dei
-  pantaloni della sagoma (`landmarks`);
+  restano buchi in vita; `under_down`: lo stesso per una maglia corta o infilata, che scende sotto i pantaloni;
+  `to_shoes`: scendono sotto le scarpe. I bordi alto e basso dei pantaloni si agganciano a quelli dei pantaloni della
+  sagoma (`landmarks`) quando sono vicini (entro 20 px: una vita alta o una cintura restano dove sono);
 - `folds`: dove cercare anche le pieghe chiare (per i pantaloni, la regione principale, in automatico).
 
 Dopo la tracciatura: i capi in `clothes.<gruppo>` del manifest; i colori delle scarpe di ogni outfit si ricavano dal

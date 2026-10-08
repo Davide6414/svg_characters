@@ -2,8 +2,8 @@
   "name": "Pantaloncini risvoltati",
   "colors": {
     "main": "#6c88a4",
-    "trim": "#97aec6",
-    "under": "#faf9f9"
+    "trim": "#9db4ca",
+    "under": "#fdfdfc"
   },
   "on": "femmina/bambina",
   "landmarks": {
@@ -14,6 +14,14 @@
     "pants-tr": [
       210.5,
       765.9
+    ],
+    "pants-bl": [
+      82.5,
+      867.2
+    ],
+    "pants-br": [
+      210.5,
+      867.2
     ]
   }
 }

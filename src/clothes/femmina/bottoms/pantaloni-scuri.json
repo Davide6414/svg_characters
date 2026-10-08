@@ -1,0 +1,25 @@
+{
+  "name": "Pantaloni marrone scuro",
+  "colors": {
+    "main": "#61544c"
+  },
+  "on": "femmina/robusta",
+  "landmarks": {
+    "pants-tl": [
+      1188.5,
+      629.8
+    ],
+    "pants-tr": [
+      1352.5,
+      629.8
+    ],
+    "pants-bl": [
+      1188.5,
+      871.5
+    ],
+    "pants-br": [
+      1352.5,
+      871.5
+    ]
+  }
+}

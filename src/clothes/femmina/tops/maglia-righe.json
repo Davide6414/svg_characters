@@ -1,0 +1,9 @@
+{
+  "name": "Maglia a righe",
+  "colors": {
+    "main": "#fbf6f0",
+    "trim": "#f9f4ed",
+    "accent": "#e48381"
+  },
+  "on": "femmina/ragazza"
+}
