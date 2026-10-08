@@ -56,8 +56,8 @@
   .figures { display: flex; align-items: flex-end; justify-content: center; gap: clamp(8px, 2vw, 28px); margin: auto }
   .figures svg { display: block; width: auto; overflow: visible }
   .figures.single svg { height: calc(min(560px, 66vh) * var(--zoom)) }
-  /* 5 figure in fila: altezza limitata dalla larghezza del palco (rapporto 250:655 ≈ 2.62; 150px = spazi e margini) */
-  .figures.all svg { height: calc(min(400px, 48vh, (100cqw - 150px) / 5 * 2.62) * var(--zoom)) }
+  /* 5 figure in fila: altezza limitata dalla larghezza del palco (--ar = altezza/larghezza del viewBox, impostata da JS; 150px = spazi e margini) */
+  .figures.all svg { height: calc(min(400px, 48vh, (100cqw - 150px) / 5 * var(--ar, 2.2)) * var(--zoom)) }
   .fig { border: 0; background: none; padding: 6px 4px 8px; border-radius: 12px; display: grid; justify-items: center; gap: 6px; color: var(--cap, #55514b) }
   .fig span { font-size: 13px }
   .fig[aria-pressed="true"] { background: rgba(58, 91, 217, .12); box-shadow: inset 0 0 0 2px var(--accent); color: inherit }
@@ -119,7 +119,7 @@
 <body>
 <header class="top">
   <h1>Personaggio base</h1>
-  <p>Shape base in SVG, ricolorabile per parti. Le 5 varianti arrivano dall'immagine di riferimento.</p>
+  <p>Shape base in SVG, ricolorabile per parti. Le 5 varianti arrivano dall'immagine di riferimento, i 5 stili di capelli da quella dei capelli.</p>
 </header>
 
 <main class="layout">
@@ -154,6 +154,10 @@
       <div class="colors" id="colors"></div>
     </section>
     <section>
+      <h2>Capelli · stile</h2>
+      <div class="parts" id="hair-styles" role="radiogroup" aria-label="Stile dei capelli"></div>
+    </section>
+    <section>
       <h2>Contorno</h2>
       <div class="row">
         <input type="range" id="line-w" min="0" max="9" step="0.2" value="5.4" aria-label="Spessore del contorno">
@@ -174,9 +178,9 @@
         <button type="button" class="btn primary" id="dl-svg">Scarica SVG</button>
         <button type="button" class="btn" id="dl-png">Scarica PNG</button>
         <button type="button" class="btn" id="copy-svg">Copia SVG</button>
-        <button type="button" class="btn" id="reset">Ripristina colori</button>
+        <button type="button" class="btn" id="reset">Ripristina variante</button>
       </div>
-      <p class="hint">Tasti <kbd>1</kbd>–<kbd>5</kbd> o <kbd>←</kbd> <kbd>→</kbd> per cambiare variante. L'export applica colori, spessore e parti visibili correnti; l'SVG resta animato se l'idle è attivo, il PNG è sempre un fotogramma fermo.</p>
+      <p class="hint">Tasti <kbd>1</kbd>–<kbd>5</kbd> o <kbd>←</kbd> <kbd>→</kbd> per cambiare variante. L'export applica colori, stile dei capelli, spessore e parti visibili correnti; l'SVG resta animato se l'idle è attivo, il PNG è sempre un fotogramma fermo.</p>
     </section>
   </aside>
 </main>
@@ -194,6 +198,7 @@
   // ---- dati --------------------------------------------------------------
   const COLOR_FIELDS = [
     { key: 'skin',       label: 'Pelle',                css: '--skin' },
+    { key: 'hair',       label: 'Capelli',              css: '--hair' },
     { key: 'shirt',      label: 'Maglia',               css: '--shirt' },
     { key: 'pants',      label: 'Pantaloni',            css: '--pants' },
     { key: 'shoeUpperL', label: 'Scarpa sinistra',      css: '--shoe-upper-l' },
@@ -206,8 +211,17 @@
     { key: 'eye',        label: 'Occhi',                css: '--eye' },
   ];
 
+  const HAIR_STYLES = [
+    { n: 1, label: 'Spettinati' },
+    { n: 2, label: 'Coda e frangia' },
+    { n: 3, label: 'Chignon' },
+    { n: 4, label: 'Ciuffo scuro' },
+    { n: 5, label: 'Ciuffo castano' },
+  ];
+
   const PARTS = [
     { key: 'head',  label: 'Testa' },
+    { key: 'hair',  label: 'Capelli' },
     { key: 'torso', label: 'Maglia' },
     { key: 'arms',  label: 'Braccia' },
     { key: 'pants', label: 'Pantaloni' },
@@ -216,12 +230,14 @@
 
   const WHITE = '#f5ede7';
   const BASE = { skin: '#fec79e', shirt: '#f2ece7', outline: '#15100c', eye: '#1a1613', shoeLace: WHITE, shoeSole: '#f5efea' };
+  // hairStyle: quale dei 5 stili di capelli (1–5) ha la variante; ogni variante parte con quello
+  // e col colore del suo omonimo nell'immagine dei capelli, ma si può cambiare dal pannello.
   const PRESETS = [
-    { id: 'jeans',    name: 'Jeans blu',      colors: { ...BASE, pants: '#5d6779', shoeUpperL: '#322b27', shoeUpperR: '#322b27', shoeToe: WHITE,     shoeTongue: WHITE } },
-    { id: 'marrone',  name: 'Marrone',        colors: { ...BASE, pants: '#62564e', shoeUpperL: '#f5efea', shoeUpperR: '#a7a2a0', shoeToe: WHITE,     shoeTongue: WHITE } },
-    { id: 'oliva',    name: 'Oliva',          colors: { ...BASE, pants: '#6e6652', shoeUpperL: '#38302b', shoeUpperR: '#38302b', shoeToe: '#38302b', shoeTongue: '#38302b' } },
-    { id: 'antracite', name: 'Antracite',     colors: { ...BASE, pants: '#453d39', shoeUpperL: '#2f2926', shoeUpperR: '#3a322e', shoeToe: WHITE,     shoeTongue: '#2f2926' } },
-    { id: 'grigio',   name: 'Grigio ardesia', colors: { ...BASE, pants: '#68717a', shoeUpperL: '#f5efea', shoeUpperR: '#a29d9a', shoeToe: WHITE,     shoeTongue: WHITE } },
+    { id: 'jeans',    name: 'Jeans blu',      hairStyle: 1, colors: { ...BASE, hair: '#452d20', pants: '#5d6779', shoeUpperL: '#322b27', shoeUpperR: '#322b27', shoeToe: WHITE,     shoeTongue: WHITE } },
+    { id: 'marrone',  name: 'Marrone',        hairStyle: 2, colors: { ...BASE, hair: '#673a25', pants: '#62564e', shoeUpperL: '#f5efea', shoeUpperR: '#a7a2a0', shoeToe: WHITE,     shoeTongue: WHITE } },
+    { id: 'oliva',    name: 'Oliva',          hairStyle: 3, colors: { ...BASE, hair: '#39231b', pants: '#6e6652', shoeUpperL: '#38302b', shoeUpperR: '#38302b', shoeToe: '#38302b', shoeTongue: '#38302b' } },
+    { id: 'antracite', name: 'Antracite',     hairStyle: 4, colors: { ...BASE, hair: '#352a25', pants: '#453d39', shoeUpperL: '#2f2926', shoeUpperR: '#3a322e', shoeToe: WHITE,     shoeTongue: '#2f2926' } },
+    { id: 'grigio',   name: 'Grigio ardesia', hairStyle: 5, colors: { ...BASE, hair: '#5c3423', pants: '#68717a', shoeUpperL: '#f5efea', shoeUpperR: '#a29d9a', shoeToe: WHITE,     shoeTongue: WHITE } },
   ];
 
   const variants = PRESETS.map(p => ({ ...p, colors: { ...p.colors } }));
@@ -259,6 +275,7 @@
     const vars = { '--line-w': state.lineW };
     for (const f of COLOR_FIELDS) vars[f.css] = v.colors[f.key];
     for (const p of PARTS) vars[`--show-${p.key}`] = state.parts[p.key] ? 'inline' : 'none';
+    for (const s of HAIR_STYLES) vars[`--show-hair-${s.n}`] = v.hairStyle === s.n ? 'inline' : 'none';
     vars['--idle-n'] = animated ? 'infinite' : '0';
     vars['--idle-delay'] = `${-index * 0.7}s`; // sfasa le figure: non respirano tutte all'unisono
     return vars;
@@ -301,6 +318,7 @@
     const stage = $('stage');
     stage.dataset.bg = state.bg;
     stage.style.setProperty('--zoom', state.zoom / 100);
+    stage.style.setProperty('--ar', VB_H / VB_W);
     for (const svg of document.querySelectorAll('#figures svg, #variants svg')) {
       const i = +svg.dataset.i;
       svg.setAttribute('style', styleAttr(variants[i], i));
@@ -323,9 +341,16 @@
       `<label><input type="checkbox" data-part="${p.key}" ${state.parts[p.key] ? 'checked' : ''}>${p.label}</label>`).join('');
   }
 
+  function renderHairStyles() {
+    const current = variants[state.selected].hairStyle;
+    $('hair-styles').innerHTML = HAIR_STYLES.map(s =>
+      `<label><input type="radio" name="hair-style" value="${s.n}" ${s.n === current ? 'checked' : ''}>${s.label}</label>`).join('');
+  }
+
   function select(i) {
     state.selected = (i + variants.length) % variants.length;
     renderColorRows();
+    renderHairStyles();
     renderStage();
   }
 
@@ -345,11 +370,13 @@
       .replace(/calc\(([\d.]+) \* ([\d.]+)\)/g, (_, a, b) => String(+(a * b).toFixed(2)))
       .replace(/calc\((-?[\d.]+)s \+ ([\d.]+)s\)/g, (_, a, b) => `${+(+a + +b).toFixed(2)}s`);
     root.querySelector('title').textContent = `Personaggio base – ${v.name}`;
-    const hidden = { head: ['head'], torso: ['torso'], arms: ['arm-left', 'arm-right'], pants: ['pants'], shoes: ['shoes'] };
+    const hidden = { head: ['head'], hair: ['hair'], torso: ['torso'], arms: ['arm-left', 'arm-right'], pants: ['pants'], shoes: ['shoes'] };
     for (const p of PARTS) {
       if (state.parts[p.key]) continue;
       for (const id of hidden[p.key]) root.querySelector(`#${id}`)?.remove();
     }
+    // degli stili di capelli resta solo quello scelto (Illustrator e Figma non rispettano display:none)
+    for (const s of HAIR_STYLES) if (s.n !== v.hairStyle) root.querySelector(`#hair-${s.n}`)?.remove();
     return XML_HEAD + new XMLSerializer().serializeToString(root);
   }
 
@@ -461,11 +488,19 @@
     refresh();
   });
 
+  $('hair-styles').addEventListener('change', (e) => {
+    if (e.target.name !== 'hair-style') return;
+    variants[state.selected].hairStyle = +e.target.value;
+    refresh();
+  });
+
   $('reset').addEventListener('click', () => {
     variants[state.selected].colors = { ...PRESETS[state.selected].colors };
+    variants[state.selected].hairStyle = PRESETS[state.selected].hairStyle;
     renderColorRows();
+    renderHairStyles();
     refresh();
-    toast('Colori ripristinati');
+    toast('Variante ripristinata');
   });
 
   $('dl-svg').addEventListener('click', () => {
