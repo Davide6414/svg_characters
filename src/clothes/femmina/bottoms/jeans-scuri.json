@@ -1,0 +1,17 @@
+{
+  "name": "Jeans scuri",
+  "colors": {
+    "main": "#565f6d"
+  },
+  "on": "femmina/ragazza",
+  "landmarks": {
+    "pants-tl": [
+      343.0,
+      636.1
+    ],
+    "pants-tr": [
+      486.0,
+      636.1
+    ]
+  }
+}

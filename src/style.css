@@ -2,6 +2,7 @@
    e il visualizzatore può ricolorare le parti sovrascrivendo le variabili. */
 .c-stroke   { stroke: var(--outline, #15100c); stroke-width: var(--line-w, 5.4); stroke-linecap: round; stroke-linejoin: round }
 .c-fine     { stroke-width: calc(var(--line-w, 5.4) * 0.75) }
+.c-hair     { stroke-width: calc(var(--line-w, 5.4) * 0.5) }
 .c-open     { fill: none }
 .c-skin     { fill: var(--skin, {{skin}}) }
 .c-shirt    { fill: var(--shirt, {{shirt}}) }
@@ -26,6 +27,10 @@
    Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under. */
 {{clothes-fills}}
 {{clothes-show}}
+/* Alcuni capi disegnano le braccia al posto di quelle della sagoma (spalle e braccia scoperte): le mettono nel gruppo
+   .g-arms, e --show-body-arms nasconde quelle della sagoma. --show-arms (inline | none) nasconde tutte le braccia. */
+#arm-left, #arm-right { display: var(--show-body-arms, {{body-arms-default}}) }
+.g-arms { display: var(--show-arms, inline) }
 
 /* Idle: respiro (busto e braccia si allungano di ~1%, la testa segue con un leggero ritardo)
    + battito di ciglia. Solo transform, ancorati alla base di ogni gruppo.

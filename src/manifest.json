@@ -10,11 +10,14 @@
     "femmina/bambina", "femmina/ragazza", "femmina/slanciata", "femmina/adulta", "femmina/robusta"
   ],
   "hair": ["spettinati", "coda", "chignon", "ciuffo-scuro", "ciuffo-castano"],
-  "clothesFrom": {"femmina": "maschio"},
   "clothes": {
     "maschio": {
       "tops": ["felpa", "giacca", "polo", "maglione", "camicia"],
       "bottoms": ["jeans", "chino", "jogger", "cargo", "larghi"]
+    },
+    "femmina": {
+      "tops": ["maglietta-fiore", "felpa-cappuccio", "top-corto", "maglietta-v", "cardigan"],
+      "bottoms": ["pantaloncini", "jeans-scuri", "jeans-a-zampa", "pantaloni-neri", "pantaloni-marroni"]
     }
   },
   "presets": [
@@ -23,10 +26,10 @@
     {"body": "maschio/slanciato", "hair": "chignon", "top": "polo", "bottom": "jogger"},
     {"body": "maschio/adulto", "hair": "ciuffo-scuro", "top": "maglione", "bottom": "cargo"},
     {"body": "maschio/robusto", "hair": "ciuffo-castano", "top": "camicia", "bottom": "larghi"},
-    {"body": "femmina/bambina", "hair": "coda"},
-    {"body": "femmina/ragazza", "hair": "chignon", "top": "maglione", "bottom": "chino"},
-    {"body": "femmina/slanciata", "hair": "coda", "bottom": "cargo"},
-    {"body": "femmina/adulta", "hair": "chignon", "top": "giacca", "bottom": "jeans"},
-    {"body": "femmina/robusta", "hair": "ciuffo-castano", "top": "felpa", "bottom": "jogger"}
+    {"body": "femmina/bambina", "hair": "coda", "top": "maglietta-fiore", "bottom": "pantaloncini", "colors": {"shoe-upper-l": "#e57d8d", "shoe-upper-r": "#ec8295", "shoe-toe": "#fbfbfb", "shoe-tongue": "#f999a9", "shoe-lace": "#f7f7f7", "shoe-sole": "#fbfbfb"}},
+    {"body": "femmina/ragazza", "hair": "chignon", "top": "felpa-cappuccio", "bottom": "jeans-scuri", "colors": {"shoe-upper-l": "#a38dbc", "shoe-upper-r": "#a18ab6", "shoe-toe": "#fbfbfb", "shoe-tongue": "#b19dc3", "shoe-lace": "#f2f2f2", "shoe-sole": "#fbfbfb"}},
+    {"body": "femmina/slanciata", "hair": "coda", "top": "top-corto", "bottom": "jeans-a-zampa"},
+    {"body": "femmina/adulta", "hair": "chignon", "top": "maglietta-v", "bottom": "pantaloni-neri", "colors": {"shoe-tongue": "#f9f9f8"}},
+    {"body": "femmina/robusta", "hair": "ciuffo-castano", "top": "cardigan", "bottom": "pantaloni-marroni", "colors": {"shoe-upper-l": "#cebcab", "shoe-upper-r": "#cfbdac", "shoe-toe": "#cfbdac", "shoe-tongue": "#e1d2c3", "shoe-lace": "#e1d2c3", "shoe-sole": "#f4e9dd"}}
   ]
 }

@@ -117,9 +117,8 @@
   #toast.show { opacity: 1; transform: translate(-50%, 0) }
 
   /* visibilità delle parti: pilotata da variabili CSS ereditate dall'istanza <use>
-     (maglia e pantaloni, e i capi che li sostituiscono, sono in src/style.css) */
+     (maglia, pantaloni, braccia e i capi che li sostituiscono sono in src/style.css) */
   #head { display: var(--show-head, inline) }
-  #arm-left, #arm-right { display: var(--show-arms, inline) }
   #shoes { display: var(--show-shoes, inline) }
 </style>
 </head>
@@ -226,10 +225,12 @@
     { key: 'shirt',      label: 'Maglia',               css: '--shirt', sel: '.c-shirt' },
     { key: 'shirtTrim',  label: 'Maglia · bordi',       css: '--shirt-trim', sel: topRole('trim') },
     { key: 'shirtAccent', label: 'Maglia · dettagli',   css: '--shirt-accent', sel: topRole('accent') },
+    { key: 'shirtAccent2', label: 'Maglia · dettagli 2', css: '--shirt-accent2', sel: topRole('accent2') },
     { key: 'shirtUnder', label: 'Maglietta sotto',      css: '--shirt-under', sel: topRole('under') },
     { key: 'pants',      label: 'Pantaloni',            css: '--pants', sel: '.c-pants' },
     { key: 'pantsTrim',  label: 'Pantaloni · bordi',    css: '--pants-trim', sel: bottomRole('trim') },
     { key: 'pantsAccent', label: 'Pantaloni · dettagli', css: '--pants-accent', sel: bottomRole('accent') },
+    { key: 'pantsUnder', label: 'Calze',                 css: '--pants-under', sel: bottomRole('under') },
     { key: 'shoeUpperL', label: 'Scarpa sinistra',      css: '--shoe-upper-l', sel: '.c-upper-l' },
     { key: 'shoeUpperR', label: 'Scarpa destra',        css: '--shoe-upper-r', sel: '.c-upper-r' },
     { key: 'shoeToe',    label: 'Punta scarpa dx',      css: '--shoe-toe', sel: '.c-toe' },
@@ -270,7 +271,7 @@
   const NEUTRAL = '#888888';       // per i ruoli che il capo non ha (non si vedono)
   const scopeOf = (v, f) => {
     if (f.key === 'hair') return `\\.c-hair-${v.hair}\\s*\\{`;
-    const [, kind, role] = f.key.match(/^(shirt|pants)(Trim|Accent|Under)?$/) ?? [];
+    const [, kind, role] = f.key.match(/^(shirt|pants)(Trim|Accent2|Accent|Under)?$/) ?? [];
     if (!kind) return '';
     const item = kind === 'shirt' ? v.top : v.bottom, r = (role ?? 'Main').toLowerCase();
     if (item === 'base') return `\\.c-${kind}\\s*\\{`;
@@ -289,6 +290,8 @@
   const variants = DATA.presets.map(makeVariant);
   // i capi disponibili per il gruppo della sagoma attuale
   const outfitOf = (v) => DATA.clothes[v.body.group] ?? { tops: [], bottoms: [] };
+  // parti del corpo che maglia e pantaloni scelti disegnano al posto di quelle della sagoma (per esempio le braccia)
+  const replacedParts = (v) => new Set([['tops', v.top], ['bottoms', v.bottom]].flatMap(([list, id]) => outfitOf(v)[list].find(c => c.id === id)?.replaces ?? []));
   const uniq = (items) => [...new Map(items.map(i => [i.id, i])).values()];
   const ALL_TOPS = uniq(Object.values(DATA.clothes).flatMap(c => c.tops)), ALL_BOTTOMS = uniq(Object.values(DATA.clothes).flatMap(c => c.bottoms));
 
@@ -336,6 +339,7 @@
     // maglia e pantaloni: la scelta (o la sagoma base) si vede solo se la parte è attiva
     for (const id of ['base', ...ALL_TOPS.map(t => t.id)]) vars[`--show-top-${id}`] = state.parts.torso && v.top === id ? 'inline' : 'none';
     for (const id of ['base', ...ALL_BOTTOMS.map(t => t.id)]) vars[`--show-bottom-${id}`] = state.parts.pants && v.bottom === id ? 'inline' : 'none';
+    vars['--show-body-arms'] = state.parts.arms && !replacedParts(v).has('arms') ? 'inline' : 'none';   // un capo può disegnare le braccia
     vars['--idle-n'] = animated ? 'infinite' : '0';
     vars['--idle-delay'] = `${-index * 0.7}s`; // sfasa le figure: non respirano tutte all'unisono
     return vars;
@@ -468,12 +472,14 @@
     }
     // di capelli, maglie e pantaloni resta solo ciò che è scelto (Illustrator e Figma non rispettano display:none)
     for (const h of HAIR) if (h.id !== v.hair) root.querySelector(`#hair-${h.id}`)?.remove();
-    for (const t of ALL_TOPS) if (t.id !== v.top) root.querySelector(`#top-${t.id}`)?.remove();
-    for (const b of ALL_BOTTOMS) if (b.id !== v.bottom) root.querySelector(`#bottom-${b.id}`)?.remove();
+    for (const t of ALL_TOPS) if (t.id !== v.top) root.querySelectorAll(`#top-${t.id}, #top-${t.id}-under`).forEach(n => n.remove());
+    for (const b of ALL_BOTTOMS) if (b.id !== v.bottom) root.querySelectorAll(`#bottom-${b.id}, #bottom-${b.id}-under`).forEach(n => n.remove());
+    if (!state.parts.arms) root.querySelectorAll('.g-arms').forEach(n => n.remove());
+    if (replacedParts(v).has('arms')) for (const id of ['arm-left', 'arm-right']) root.querySelector(`#${id}`)?.remove();
     if (v.top !== 'base') root.querySelector('#torso')?.remove();       // la maglietta base sta sotto un altro capo: non serve
     if (v.bottom !== 'base') root.querySelector('#pants')?.remove();
-    if (!state.parts.torso) root.querySelector(`#top-${v.top}`)?.remove();
-    if (!state.parts.pants) root.querySelector(`#bottom-${v.bottom}`)?.remove();
+    if (!state.parts.torso) root.querySelectorAll(`#top-${v.top}, #top-${v.top}-under`).forEach(n => n.remove());
+    if (!state.parts.pants) root.querySelectorAll(`#bottom-${v.bottom}, #bottom-${v.bottom}-under`).forEach(n => n.remove());
     return XML_HEAD + new XMLSerializer().serializeToString(root);
   }
   const fileStem = () => `personaggio-${variants[state.selected].body.id.replace('/', '-')}`;

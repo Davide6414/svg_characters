@@ -78,6 +78,42 @@ destra): id, nome e le correzioni `{indice regione: ruolo}`. Per vedere gli indi
 
 L'adattamento ai singoli corpi non si fa qui ma in `build.mjs` (vedi il README principale).
 
+## Outfit: `trace_outfits.py`
+
+```
+python3 tools/trace_outfits.py reference/vestiti-femminili.webp --group femmina \
+    --bodies src/bodies/femmina --out src/clothes/femmina
+```
+
+Per un foglio in cui **ogni figura indossa maglia e pantaloni sul proprio corpo** (le cinque sagome femminili, ognuna
+con il suo outfit). Il corpo di riferimento di un capo è la sagoma su cui è disegnato (stesso nome in `--bodies`): la
+figura si allinea a quella sagoma con la testa e la linea del suolo (le due coincidono entro un paio di px), e il json
+del capo dice su quale è disegnato (`on`); `build.mjs` lo adatta poi alle altre. Scrive `tops/<id>.svg + .json` e
+`bottoms/<id>.svg + .json`.
+
+A differenza di `trace_clothes.py`, qui le regioni di ogni figura si **assegnano a mano**: la tabella `OUTFITS` in cima al
+file ha una riga per figura, con per ogni capo `{indice regione: ruolo}` (per vedere gli indici: `-v`, che stampa area
+e colore di ogni regione). Oltre ai ruoli di colore c'è `skin` (pelle lasciata scoperta). Le altre chiavi, spiegate nel
+docstring del file, gestiscono i casi che i fogli maschili non avevano (`lib/outfits.py`):
+
+- `split`: dettagli senza contorno ricavati dal colore dentro una regione (regole `white`, `orange`, `lighter`: petali
+  e centro del fiore, risvolto dei pantaloncini, calze). Si disegnano sopra la regione senza tratto, e il tratto del
+  bordo della regione si ridisegna sopra (così non si copre);
+- `neck`: la pelle sotto il collo della sagoma (V, scollo ampio, cappuccio aperto) sta nella regione della testa del
+  foglio, non in una regione del capo: si ritaglia sotto la riga del collo della sagoma;
+- `layers` e `pad_under`: parti che stanno in un livello sotto i pantaloni (la pancia di un top corto), allungate in
+  verticale sotto la maglia e i pantaloni vicini;
+- `parts`: regioni che sostituiscono le braccia della sagoma (spalle e braccia scoperte) e `arms`: le regioni delle
+  braccia, quando le maniche sono più corte di quelle della sagoma di base: l'orlo della manica si aggancia all'inizio
+  del braccio con dei punti di riferimento corretti (`landmarks` nel json del capo);
+- `under_up`, `behind`: i pantaloni salgono sotto la maglia e proseguono dietro le braccia, così con altre maglie non
+  restano buchi in vita; `to_shoes`: scendono sotto le scarpe. Il bordo alto dei pantaloni si aggancia a quello dei
+  pantaloni della sagoma (`landmarks`);
+- `folds`: dove cercare anche le pieghe chiare (per i pantaloni, la regione principale, in automatico).
+
+Dopo la tracciatura: i capi in `clothes.<gruppo>` del manifest; i colori delle scarpe di ogni outfit si ricavano dal
+foglio e si scrivono nel preset (`colors`).
+
 ## Limiti noti
 
 - La classificazione delle regioni si basa su colore e posizione: un foglio con una posa diversa (o una persona

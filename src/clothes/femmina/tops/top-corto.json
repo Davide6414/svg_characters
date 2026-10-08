@@ -1,0 +1,10 @@
+{
+  "name": "Top corto",
+  "colors": {
+    "main": "#3b3835"
+  },
+  "on": "femmina/slanciata",
+  "replaces": [
+    "arms"
+  ]
+}

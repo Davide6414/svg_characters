@@ -1,0 +1,27 @@
+{
+  "name": "Maglietta con fiore",
+  "colors": {
+    "main": "#faa8bd",
+    "accent": "#fdfbf9",
+    "accent2": "#fdb56f"
+  },
+  "on": "femmina/bambina",
+  "landmarks": {
+    "armL-tl": [
+      76.0,
+      708.4
+    ],
+    "armL-tr": [
+      120.0,
+      708.4
+    ],
+    "armR-tl": [
+      193.0,
+      711.2
+    ],
+    "armR-tr": [
+      223.0,
+      711.2
+    ]
+  }
+}

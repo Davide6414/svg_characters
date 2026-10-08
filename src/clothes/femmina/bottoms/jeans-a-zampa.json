@@ -1,0 +1,17 @@
+{
+  "name": "Jeans a zampa",
+  "colors": {
+    "main": "#889eb4"
+  },
+  "on": "femmina/slanciata",
+  "landmarks": {
+    "pants-tl": [
+      602.5,
+      527.6
+    ],
+    "pants-tr": [
+      766.5,
+      527.6
+    ]
+  }
+}

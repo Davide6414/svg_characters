@@ -1,10 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-28 165 316 745" width="316" height="745" role="img" aria-labelledby="t">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-28 165 316 742" width="316" height="742" role="img" aria-labelledby="t">
   <title id="t">Bambino</title>
   <style>
     /* Ogni colore è una variabile CSS con un valore di default: il file funziona da solo
        e il visualizzatore può ricolorare le parti sovrascrivendo le variabili. */
     .c-stroke   { stroke: var(--outline, #15100c); stroke-width: var(--line-w, 5.4); stroke-linecap: round; stroke-linejoin: round }
     .c-fine     { stroke-width: calc(var(--line-w, 5.4) * 0.75) }
+    .c-hair     { stroke-width: calc(var(--line-w, 5.4) * 0.5) }
     .c-open     { fill: none }
     .c-skin     { fill: var(--skin, #fec39c) }
     .c-shirt    { fill: var(--shirt, #f5f1ee) }
@@ -67,6 +68,10 @@
     #bottom-jogger { display: var(--show-bottom-jogger, none) }
     #bottom-cargo { display: var(--show-bottom-cargo, none) }
     #bottom-larghi { display: var(--show-bottom-larghi, none) }
+    /* Alcuni capi disegnano le braccia al posto di quelle della sagoma (spalle e braccia scoperte): le mettono nel gruppo
+       .g-arms, e --show-body-arms nasconde quelle della sagoma. --show-arms (inline | none) nasconde tutte le braccia. */
+    #arm-left, #arm-right { display: var(--show-body-arms, inline) }
+    .g-arms { display: var(--show-arms, inline) }
 
     /* Idle: respiro (busto e braccia si allungano di ~1%, la testa segue con un leggero ritardo)
        + battito di ciglia. Solo transform, ancorati alla base di ogni gruppo.

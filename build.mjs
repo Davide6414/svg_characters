@@ -2,7 +2,7 @@
 //
 //   src/bodies/<gruppo>/<sagoma>.svg + .json   sagome (solo geometria + dati misurati)
 //   src/hair/<stile>.svg + .json               stili di capelli (coordinate del riquadro dei capelli)
-//   src/clothes/<gruppo>/{tops,bottoms}/…      vestiti, disegnati su un corpo di riferimento (reference.json)
+//   src/clothes/<gruppo>/{tops,bottoms}/…      vestiti, disegnati su un corpo di riferimento (reference.json del gruppo o `on` del capo)
 //   src/style.css                              classi dei colori, visibilità di capelli e vestiti, animazione idle
 //   src/manifest.json                          gruppi, ordine, palette comune, vestiti, preset
 //
@@ -45,18 +45,26 @@ const bodies = await Promise.all(manifest.bodies.map(async (path) => {
 }));
 
 // ---- vestiti -----------------------------------------------------------------
-// Un capo ('top' = sopra il busto, 'bottom' = pantaloni) è disegnato sul corpo di riferimento del suo gruppo.
+// Un capo ('top' = sopra il busto, 'bottom' = pantaloni) è disegnato su un corpo di riferimento: quello del gruppo
+// (src/clothes/<gruppo>/reference.json) oppure la sagoma indicata dal capo (`on`, per esempio "femmina/ragazza").
+// `<g id="garment">` è il capo; `<g id="underlay">`, se c'è, sta sotto i pantaloni (pelle scoperta da una maglia corta).
 const KINDS = { tops: 'top', bottoms: 'bottom' };
+const bodyById = Object.fromEntries(bodies.map((b) => [b.id, b]));
+const groupContent = (svg, id) => svg.match(new RegExp(`<g id="${id}">\\n([\\s\\S]*?)\\n  </g>`))?.[1];
 const clothes = {};
 for (const [group, lists] of Object.entries(manifest.clothes ?? {})) {
-  const ref = await readJson(`src/clothes/${group}/reference.json`);
-  clothes[group] = { ref, items: [] };
+  const groupRef = await read(`src/clothes/${group}/reference.json`).then(JSON.parse, () => null);
+  clothes[group] = { items: [] };
   for (const [folder, kind] of Object.entries(KINDS)) {
     for (const id of lists[folder] ?? []) {
-      const svg = await read(`src/clothes/${group}/${folder}/${id}.svg`);
-      const content = svg.match(/<g id="garment">\n([\s\S]*)\n  <\/g>\s*<\/svg>/)?.[1];
-      if (!content) throw new Error(`src/clothes/${group}/${folder}/${id}.svg: gruppo <g id="garment"> non trovato`);
-      clothes[group].items.push({ id, kind, group, ref, ...(await readJson(`src/clothes/${group}/${folder}/${id}.json`)), content });
+      const path = `src/clothes/${group}/${folder}/${id}`;
+      const svg = await read(`${path}.svg`);
+      const content = groupContent(svg, 'garment');
+      if (!content) throw new Error(`${path}.svg: gruppo <g id="garment"> non trovato`);
+      const meta = await readJson(`${path}.json`);
+      const ref = meta.on ? { landmarks: { ...bodyById[meta.on].landmarks, ...meta.landmarks } } : groupRef;
+      if (!ref) throw new Error(`${path}: serve src/clothes/${group}/reference.json oppure "on" nel json`);
+      clothes[group].items.push({ id, kind, group, ref, ...meta, content, under: groupContent(svg, 'underlay') ?? '' });
     }
   }
 }
@@ -64,15 +72,10 @@ for (const [group, lists] of Object.entries(manifest.clothes ?? {})) {
 // Adattamento: thin-plate spline dai punti di riferimento del corpo di riferimento a quelli della sagoma.
 // Le coordinate vengono riscritte (lo spessore del contorno resta uguale); la rigidità tiene la deformazione dolce.
 const FIT_STIFFNESS = 0.02;
-// Capi di un gruppo: i suoi, più quelli di un altro gruppo se il manifest lo dice (`clothesFrom`, es. femmina: maschio).
-// Ogni capo si adatta partendo dal corpo di riferimento su cui è stato disegnato (`ref`). Gli id sono unici fra i gruppi.
+// Ogni capo si adatta partendo dal corpo su cui è stato disegnato (`ref`). Gli id sono unici fra i gruppi.
 const allIds = Object.values(clothes).flatMap((c) => c.items.map((g) => `${g.kind}-${g.id}`));
 if (new Set(allIds).size !== allIds.length) throw new Error('src/clothes: id di capo ripetuto fra gruppi diversi');
-function wardrobe(group) {
-  const own = clothes[group]?.items ?? [];
-  const from = clothes[manifest.clothesFrom?.[group]]?.items ?? [];
-  return [...own, ...from];
-}
+const wardrobe = (group) => clothes[group]?.items ?? [];
 function clothesFor(body) {
   const fits = new Map();
   const fit = (ref) => {
@@ -82,7 +85,8 @@ function clothesFor(body) {
     }
     return fits.get(ref);
   };
-  return wardrobe(body.group).map((g) => { const f = fit(g.ref); return { ...g, content: mapCircles(mapPaths(g.content, f), f) }; });
+  const map = (xml, f) => mapCircles(mapPaths(xml, f), f);
+  return wardrobe(body.group).map((g) => { const f = fit(g.ref); return { ...g, content: map(g.content, f), under: map(g.under, f) }; });
 }
 for (const b of bodies) b.clothes = clothesFor(b);
 
@@ -101,7 +105,7 @@ for (const b of bodies) b.hair = hairFor(b);
 
 // ---- riquadro comune: stessa scala e linea del suolo, spazio per i capelli ------------
 const ext = (b) => {
-  const pts = [...coords(b.inner), ...b.hair.flatMap((h) => coords(h.group)), ...b.clothes.flatMap((g) => coords(g.content))];
+  const pts = [...coords(b.inner), ...b.hair.flatMap((h) => coords(h.group)), ...b.clothes.flatMap((g) => coords(g.content + g.under))];
   const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
   return [Math.min(...xs) - 3.5, Math.min(...ys) - 3.5, Math.max(...xs) + 3.5, Math.max(...ys) + 3.5];
 };
@@ -113,26 +117,27 @@ const H = Math.ceil(Math.max(...bodies.map((b) => b.ext[3]))) - Y0;
 // ---- composizione ----------------------------------------------------------
 // colori per ruolo dei vestiti: --shirt (busto) e --pants (pantaloni) sono il colore principale, le altre
 // variabili i ruoli secondari; la visibilità si sceglie con --show-top-<id> / --show-bottom-<id>
-const ROLE_VAR = { top: { main: '--shirt', trim: '--shirt-trim', accent: '--shirt-accent', under: '--shirt-under' },
-                   bottom: { main: '--pants', trim: '--pants-trim', accent: '--pants-accent' } };
+const ROLE_VAR = { top: { main: '--shirt', trim: '--shirt-trim', accent: '--shirt-accent', accent2: '--shirt-accent2', under: '--shirt-under' },
+                   bottom: { main: '--pants', trim: '--pants-trim', accent: '--pants-accent', under: '--pants-under' } };
 function clothesCss(body, defaults) {
   const fills = body.clothes.flatMap((g) => Object.entries(g.colors).map(([role, color]) =>
-    `#${g.kind}-${g.id} .c-${role} { fill: var(${ROLE_VAR[g.kind][role]}, ${color}) }`));
+    `${g.under ? `#${g.kind}-${g.id}-under .c-${role}, ` : ''}#${g.kind}-${g.id} .c-${role} { fill: var(${ROLE_VAR[g.kind][role]}, ${color}) }`));
   const show = [['top', 'torso'], ['bottom', 'pants']].flatMap(([kind, base]) => [
     `#${base} { display: var(--show-${kind}-base, ${defaults[kind] === 'base' ? 'inline' : 'none'}) }`,
     ...body.clothes.filter((g) => g.kind === kind).map((g) =>
-      `#${kind}-${g.id} { display: var(--show-${kind}-${g.id}, ${defaults[kind] === g.id ? 'inline' : 'none'}) }`)]);
+      `#${kind}-${g.id}${g.under ? `, #${kind}-${g.id}-under` : ''} { display: var(--show-${kind}-${g.id}, ${defaults[kind] === g.id ? 'inline' : 'none'}) }`)]);
   return { fills: fills.join('\n'), show: show.join('\n') };
 }
 
-function css(body, defaultHair, defaults) {
-  const vars = { ...manifest.palette, ...body.colors };
+function css(body, defaultHair, defaults, preset) {
+  const vars = { ...manifest.palette, ...body.colors, ...preset?.colors };
   const cl = clothesCss(body, defaults);
   let out = styleTemplate.replace(/\{\{([\w-]+)\}\}/g, (m, k) => {
     if (k === 'hair-fills') return body.hair.map((h) => `.c-hair-${h.id} { fill: var(--hair, ${h.color}) }`).join('\n');
     if (k === 'hair-show') return body.hair.map((h) => `#hair-${h.id} { display: var(--show-hair-${h.id}, ${h.id === defaultHair ? 'inline' : 'none'}) }`).join('\n');
     if (k === 'hair-default') return defaultHair;
     if (k === 'outfit-default') return `${defaults.top} + ${defaults.bottom}`;
+    if (k === 'body-arms-default') return body.clothes.some((g) => defaults[g.kind] === g.id && g.replaces?.includes('arms')) ? 'none' : 'inline';
     if (k === 'clothes-fills') return cl.fills;
     if (k === 'clothes-show') return cl.show;
     if (!(k in vars)) throw new Error(`style.css: segnaposto {{${k}}} senza valore per ${body.id}`);
@@ -146,17 +151,19 @@ function compose(body) {
   const defaultHair = preset?.hair ?? manifest.hair[0];
   const defaults = { top: preset?.top ?? 'base', bottom: preset?.bottom ?? 'base' };
   const group = (kind) => body.clothes.filter((g) => g.kind === kind).map((g) => `  <!-- ${g.name} -->\n  <g id="${kind}-${g.id}">\n${g.content}\n  </g>`).join('\n');
+  const underlay = [...body.clothes.filter((g) => g.kind === 'bottom'), ...body.clothes.filter((g) => g.kind === 'top')].filter((g) => g.under).map((g) => `  <!-- ${g.name}: parti sotto i pantaloni -->\n  <g id="${g.kind}-${g.id}-under">\n${g.under}\n  </g>`).join('\n');
   const x0 = Math.round((body.ext[0] + body.ext[2]) / 2 - W / 2);
   const hairXml = '\n    <!-- Capelli: nel gruppo della testa, così seguono il respiro. Stile mostrato di default: ' + defaultHair + ' -->\n' +
     '    <g id="hair">\n' + body.hair.map((h) => `      <!-- ${h.name} -->\n` + h.group.split('\n').map((l) => '    ' + l).join('\n')).join('\n') + '\n    </g>';
-  // i pantaloni vanno prima delle scarpe, le maglie dopo il busto
+  // le parti sotto i pantaloni vanno prima dei pantaloni, i pantaloni prima delle scarpe, le maglie dopo il busto
   let inner = body.inner.replace('    <!-- @hair -->', hairXml.replace(/^\n/, '\n'));
+  if (underlay) inner = inner.replace('  <g id="pants">', underlay + '\n  <g id="pants">');
   if (group('bottom')) inner = inner.replace('  <g id="shoes">', group('bottom') + '\n  <g id="shoes">');
   if (group('top')) inner = inner.replace(/\s*$/, '\n') + group('top') + '\n';
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} ${Y0} ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="t">
   <title id="t">${body.name}</title>
   <style>
-${css(body, defaultHair, defaults)}
+${css(body, defaultHair, defaults, preset)}
   </style>
 
   <!-- Coordinate dei fogli di riferimento: stessa scala e stessa linea del suolo (y = 900) per tutte le sagome, quindi le altezze restano confrontabili. -->${inner}</svg>
@@ -177,7 +184,7 @@ const data = {
   hair: hair.map(({ id, name, color }) => ({ id, name, color })),
   bodies: bodies.map(({ id, group, name, svg }) => ({ id, group, name, svg })),
   clothes: Object.fromEntries(manifest.groups.filter((g) => wardrobe(g.id).length).map((g) => [g.id, Object.fromEntries(Object.keys(KINDS).map((folder) =>
-    [folder, wardrobe(g.id).filter((i) => i.kind === KINDS[folder]).map(({ id, name }) => ({ id, name }))]))])),
+    [folder, wardrobe(g.id).filter((i) => i.kind === KINDS[folder]).map(({ id, name, replaces }) => ({ id, name, replaces: replaces ?? [] }))]))])),
   presets: manifest.presets,
 };
 const template = await read('src/viewer/template.html');
