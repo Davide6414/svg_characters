@@ -39,9 +39,11 @@ def alien_svg(body, title):
          f'  <title>{title}</title>',
          '  <g id="alien-head" class="c-alien-head">']
     # la testa (col collo, che sta sotto il colletto) in due passate: riempimento, poi contorno, come per gli umani
+    L += ['    <!-- @prot-back -->']                                                       # protuberanze dietro la testa (corna, pinne…)
     L += ['    ' + _path('c-skin', p.get('fill', p['d'])) for p in P['head']]           # il riempimento scende sotto il colletto
     L += ['    ' + _path('c-open c-stroke', p['d']) for p in P['head']]
     L += seam_paths('head', 4)
+    L += ['    <!-- @prot -->']                                                            # e quelle davanti (sopra il contorno, sotto occhi e narici)
     for n in body['nostrils']:
         L.append(f'    <ellipse class="c-dot" cx="{fmt(n["cx"])}" cy="{fmt(n["cy"])}" rx="{fmt(n["rx"])}" ry="{fmt(n["ry"])}"/>')
     for e in body['eyes']:

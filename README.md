@@ -4,7 +4,7 @@ Personaggi in SVG pensati per essere **combinati**, in due sezioni separate:
 
 - **Umani**: dieci sagome (cinque maschili e cinque femminili, da bambino a adulto) × venti stili di capelli × cinque barbe
   (per gli uomini) × maglie e pantaloni × colori a piacere;
-- **Alieni**: otto sagome aliene (quattro maschili e quattro femminili: bambino, ragazzo, adulto e una sagoma curva) con la loro maglia e i loro pantaloncini, ricolorabili per parti (vedi *Alieni*).
+- **Alieni**: otto sagome aliene (quattro maschili e quattro femminili: bambino, ragazzo, adulto e una sagoma curva) con la loro maglia e i loro pantaloncini, otto protuberanze (corna, palchi, pinne, creste) e colori a piacere (vedi *Alieni*).
 
 Un visualizzatore HTML (`index.html`, con una scheda per sezione) permette di provare gli incroci.
 
@@ -54,7 +54,8 @@ reference/                  fogli di riferimento da cui sono tracciate le sorgen
   sagome-maschili · sagome-femminili · capelli · capelli-2 · capelli-3 · capelli-anziani · barbe ·
   vestiti-maschili-pantaloni · vestiti-maschili-maglie ·
   vestiti-maschili-outfit · vestiti-femminili · vestiti-femminili-2 · vestiti-femminili-3 · vestiti-femminili-4 · archivio/
-  alieno-modello (l'alieno nudo da cui parte lo stile) · sagome-aliene-maschili · sagome-aliene-femminili
+  alieno-modello (l'alieno nudo da cui parte lo stile) · sagome-aliene-maschili · sagome-aliene-femminili ·
+  protuberanze-teste · protuberanze-figure
 tools/                      strumenti Python per tracciare i fogli (vedi tools/README.md)
 ```
 
@@ -272,7 +273,8 @@ Con `prefers-reduced-motion` l'SVG resta fermo. Nel visualizzatore c'è l'interr
 
 Gli alieni sono una sezione a parte: risorse in `src/alien/`, composizione in `build/alien.mjs`, file in `characters/alieno/`. Con gli
 umani hanno in comune solo la scala (stessa linea del suolo `y = 900`, la figura più alta come un adulto) e le utilità della pagina.
-Non hanno capelli, barbe o capi da scegliere: ogni sagoma ha la sua maglia e i suoi pantaloncini, e i colori si scelgono a piacere.
+Non hanno capelli, barbe o capi da scegliere: ogni sagoma ha la sua maglia e i suoi pantaloncini (colori a piacere) e, a scelta, una
+**protuberanza** (corna, palchi, pinne, creste: vedi sotto).
 
 | Gruppo | Sagome | Dal foglio |
 | --- | --- | --- |
@@ -283,9 +285,11 @@ Il disegno di partenza dello stile (un alieno nudo) è `reference/alieno-modello
 
 ```
 src/alien/manifest.json     palette di default (skin, shirt, pants, eye), lineWidth (spessore di partenza del contorno),
-                            gruppi, sagome (`gruppo/nome`) e preset (sagoma + nome + colori di partenza)
-src/alien/style.css         classi dei colori, visibilità delle parti, animazione idle
+                            gruppi, sagome (`gruppo/nome`), protuberanze e preset (sagoma + nome + colori di partenza
+                            + eventuale protuberanza `prot`)
+src/alien/style.css         classi dei colori, visibilità delle parti e delle protuberanze, animazione idle
 src/alien/bodies/<gruppo>/  <nome>.svg (geometria) + <nome>.json (nome, misure della testa, punti di riferimento, colori)
+src/alien/protrusions/      <id>.svg (geometria) + <id>.json (nome e testa di riferimento)
 ```
 
 **Struttura dell'SVG di una sagoma.** Dal fondo al primo piano: `alien-head` (testa e collo, in due passate come per gli umani: riempimento
@@ -297,9 +301,31 @@ piedi, cucitura dei pantaloncini, cuciture della maglia) sono linee aperte. Le p
 scende di 10 px sotto il colletto (nascosto dalla maglia): quando la testa si alza nell'idle non si apre una fessura. Il sorgente
 contiene solo la geometria: colori, CSS e riquadro comune (stessa scala e stessa linea del suolo per tutte) li aggiunge la build.
 
-**Variabili CSS.** `--skin`, `--shirt`, `--pants`, `--eye`, `--outline`, `--line-w`, `--idle-n` (`0` spegne l'animazione), `--idle-delay`, e la
-visibilità di ogni parte con `--show-alien-head`, `--show-alien-torso`, `--show-alien-arms`, `--show-alien-pants`, `--show-alien-legs`
-(`inline` | `none`). Le narici seguono `--outline`.
+**Protuberanze.** Come i capelli degli umani sono disegnate una volta sola, su una testa di riferimento (`frame` nel loro `.json`: la
+cima e il centro e la mezza larghezza del cranio di `maschio/adulto`), e la build le adatta a ogni sagoma con le stesse misure della sua
+testa (`skullX`, `skullHalf`, `T` nel `.json` della sagoma, cima e calotta del cranio): scala uniforme, così non si deformano. Sono nel
+gruppo della testa (seguono l'idle). Un percorso `c-behind` sta **dietro** la testa (`alien-prot-<id>-back`, prima del suo riempimento):
+la base continua di qualche px dentro il cranio, dove la testa di ogni sagoma la copre, e il tratto c'è solo sul bordo esterno; gli
+altri stanno **davanti** (`alien-prot-<id>`, sopra il contorno e sotto gli occhi: le corna a spirale, che passano davanti al cranio).
+
+| Protuberanza (`id`) | Nome | Foglio |
+| --- | --- | --- |
+| `corna-a-spirale` | Corna a spirale (davanti alla testa) | `protuberanze-teste` |
+| `palchi` | Palchi | `protuberanze-teste` |
+| `corna-lunghe` | Corna lunghe | `protuberanze-teste` |
+| `corno-curvo` | Corno curvo (uno grande e uno piccolo) | `protuberanze-teste` |
+| `cresta-a-foglia` | Cresta a foglia (sul retro della testa) | `protuberanze-figure` |
+| `pinne` | Pinne laterali | `protuberanze-figure` |
+| `cresta-al-vento` | Cresta al vento | `protuberanze-figure` |
+| `spine` | Cresta a spine (con le orecchie a punta) | `protuberanze-figure` |
+
+Valgono per tutte le sagome; una alla volta (nessuna di default, o quella del preset: `prot` nel manifest). Il colore è quello della pelle
+finché non se ne sceglie un altro (`--prot`).
+
+**Variabili CSS.** `--skin`, `--shirt`, `--pants`, `--eye`, `--outline`, `--line-w`, `--prot` (colore delle protuberanze; se manca vale
+`--skin`), `--idle-n` (`0` spegne l'animazione), `--idle-delay`, e la visibilità di ogni parte con `--show-alien-head`, `--show-alien-torso`,
+`--show-alien-arms`, `--show-alien-pants`, `--show-alien-legs` e `--show-alien-prot` (tutte le protuberanze), più
+`--show-alien-prot-<id>` (una sola) (`inline` | `none`). Le narici seguono `--outline`.
 
 **Animazione idle.** Come per gli umani: busto e braccia respirano (si allungano di ~1%, ancorati alla base), la testa si alza di 2 px con un
 piccolo ritardo, gli occhi sbattono ogni 4.6 s. Con `prefers-reduced-motion` l'SVG resta fermo. Nel fotogramma estremo del respiro non si
@@ -317,12 +343,16 @@ python3 tools/trace_alien.py reference/sagome-aliene-femminili.webp --out src/al
 Poi: le sagome in `bodies` e un preset per ognuna in `src/alien/manifest.json`, lo spessore del contorno stampato dallo strumento in
 `lineWidth`, e `node build.mjs`. Un gruppo nuovo è una cartella in più e una voce in `groups`.
 
+Le protuberanze si tracciano con `tools/trace_protrusions.py` (vedi `tools/README.md`); l'id va in `protrusions` del manifest e, se si vuole
+un personaggio di partenza con quella protuberanza, in un preset (`prot`). Rifacendo le sagome vanno rifatte anche le protuberanze
+(ne dipendono le misure della testa di riferimento).
+
 ## Visualizzatore
 
 La pagina ha una scheda per sezione (**Umani**, **Alieni**; l'indirizzo `#umani` / `#alieni` apre quella voluta) e ognuna ha la sua
 anteprima, il suo pannello e il suo stato: passando da una all'altra non si perde il personaggio scelto. Quanto segue descrive gli
 umani; la sezione degli alieni ha lo stesso impianto con sagoma, colori (pelle, occhi, maglia, pantaloncini, contorno), parti visibili
-(testa, maglia, braccia, pantaloncini, gambe), idle ed export.
+(testa, maglia, braccia, pantaloncini, gambe, protuberanze), scelta della protuberanza, idle ed export.
 
 Ci sono ventisei personaggi di partenza (i preset del manifest: uno o due per sagoma, quattro per le femmine, ognuno con un abbinamento di capi della sua sagoma; la seconda, la terza e la quarta serie femminile portano i capelli nuovi; *Adulto · polo* e *Robusto · cardigan* hanno la barba), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **barba** (solo sagome maschili: la sezione compare solo per loro e solo con le barbe che valgono per la sagoma), **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono solo quelli della sagoma scelta: se cambi sagoma, maglia e pantaloni passano all'abito di partenza di quella sagoma (il primo dei suoi preset), e se la sagoma non ha capi restano la maglietta e i pantaloni base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
 

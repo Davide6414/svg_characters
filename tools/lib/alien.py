@@ -14,6 +14,7 @@ from .segment import K, segment
 GROUND = 900.0            # y della linea del suolo, la stessa delle sagome umane
 CENTER_X = 975.0          # x del centro di ogni figura (le coordinate orizzontali non contano: la build centra il riquadro)
 HEIGHT = 690.0            # altezza (px) della figura più alta, come un adulto umano
+SKULL_DEPTH = 0.6         # la calotta del cranio va dalla cima fino a questa frazione della distanza cima → occhi
 NECK_FILL = 10            # px: la pelle del collo scende tanto sotto il colletto (la testa che si alza non lascia fessure)
 ROLES = ('head', 'torso', 'arm-left', 'arm-right', 'pants', 'leg-left', 'leg-right')
 
@@ -184,7 +185,10 @@ def trace_alien_body(sheet, box, scale, ground=GROUND, roles=None, bridge=(), se
     ys, xs = np.nonzero(seg.lab == hid)
     X = np.array([to_xy(u, v)[0] for u, v in zip(xs[::7], ys[::7])]); Y = np.array([to_xy(u, v)[1] for u, v in zip(xs[::7], ys[::7])])
     eyeY = float(np.mean([e['cy'] for e in eyes]))
-    head = dict(L=float(X.min()), R=float(X.max()), T=float(Y.min()), eyeY=eyeY, eyeX=float(np.mean([e['cx'] for e in eyes])))
+    ex = sorted(e['cx'] for e in eyes)
+    above = Y < Y.min() + SKULL_DEPTH * (eyeY - Y.min())       # il cranio (la calotta, senza le gote): le protuberanze si adattano a questo
+    head = dict(L=float(X.min()), R=float(X.max()), T=float(Y.min()), eyeY=eyeY, eyeX=float(np.mean(ex)), eyeDx=float((ex[-1] - ex[0]) / 2),
+                skullX=float((X[above].min() + X[above].max()) / 2), skullHalf=float((X[above].max() - X[above].min()) / 2))
 
     main = lambda role: max(parts[role], key=lambda p: p['area'])['med']             # la regione più grande della parte
     colors = {'skin': _hex(main('head')), 'shirt': _hex(main('torso')), 'pants': _hex(main('pants'))}

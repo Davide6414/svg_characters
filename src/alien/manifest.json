@@ -58,6 +58,56 @@
     {
       "body": "femmina/curva",
       "name": "Curva"
+    },
+    {
+      "body": "maschio/bambino",
+      "name": "Bambino · corna a spirale",
+      "prot": "corna-a-spirale"
+    },
+    {
+      "body": "maschio/ragazzo",
+      "name": "Ragazzo · cresta a foglia",
+      "prot": "cresta-a-foglia"
+    },
+    {
+      "body": "maschio/adulto",
+      "name": "Adulto · corna lunghe",
+      "prot": "corna-lunghe"
+    },
+    {
+      "body": "maschio/curvo",
+      "name": "Curvo · cresta al vento",
+      "prot": "cresta-al-vento"
+    },
+    {
+      "body": "femmina/bambina",
+      "name": "Bambina · pinne",
+      "prot": "pinne"
+    },
+    {
+      "body": "femmina/ragazza",
+      "name": "Ragazza · palchi",
+      "prot": "palchi"
+    },
+    {
+      "body": "femmina/adulta",
+      "name": "Adulta · corno curvo",
+      "prot": "corno-curvo"
+    },
+    {
+      "body": "femmina/curva",
+      "name": "Curva · spine",
+      "prot": "spine"
     }
+  ],
+  "protrusions": [
+    "corna-a-spirale",
+    "palchi",
+    "corna-lunghe",
+    "corno-curvo",
+    "cresta-a-foglia",
+    "pinne",
+    "cresta-al-vento",
+    "spine"
   ]
 }

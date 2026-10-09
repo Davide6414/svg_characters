@@ -9,6 +9,7 @@
 .c-pants    { fill: var(--pants, {{pants}}) }
 .c-eye      { fill: var(--eye, {{eye}}) }
 .c-dot      { fill: var(--outline, #15100c) }
+.c-prot     { fill: var(--prot, var(--skin, {{skin}})) }
 
 /* Parti: il visualizzatore le nasconde con --show-alien-NOME (inline | none). */
 #alien-head  { display: var(--show-alien-head, inline) }
@@ -16,6 +17,11 @@
 #alien-arm-left, #alien-arm-right { display: var(--show-alien-arms, inline) }
 #alien-pants { display: var(--show-alien-pants, inline) }
 #alien-legs  { display: var(--show-alien-legs, inline) }
+
+/* Protuberanze (corna, pinne…): una alla volta, nessuna di default; --show-alien-prot: none le nasconde tutte. Il colore è quello
+   della pelle, salvo --prot. Quelle dietro la testa sono nel gruppo della testa, prima del suo riempimento. */
+#alien-prot, #alien-prot-back { display: var(--show-alien-prot, inline) }
+{{prot-show}}
 
 /* Idle: respiro (busto e braccia si allungano di ~1%, la testa segue con un leggero ritardo)
    + battito di ciglia. Solo transform, ancorati alla base di ogni gruppo.

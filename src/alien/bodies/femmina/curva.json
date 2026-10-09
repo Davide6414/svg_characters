@@ -5,7 +5,10 @@
     "R": 1095.2,
     "T": 296.7,
     "eyeY": 425.9,
-    "eyeX": 1015.4
+    "eyeX": 1015.4,
+    "eyeDx": 37.7,
+    "skullX": 995.4,
+    "skullHalf": 99.4
   },
   "landmarks": {
     "neck-l": [

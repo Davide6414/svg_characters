@@ -269,6 +269,39 @@ regione si fonde con lo sfondo), la tabella `FIXES` in cima a `trace_alien.py` h
 
 Dopo la tracciatura: le sagome in `bodies` e un preset per ognuna in `src/alien/manifest.json`, poi `node build.mjs`.
 
+## Protuberanze: `trace_protrusions.py`
+
+```
+python3 tools/trace_protrusions.py --frame src/alien/bodies/maschio/adulto.json --out src/alien/protrusions
+```
+
+Per i fogli di **teste e figure aliene con una protuberanza** (corna, palchi, pinne, creste): `reference/protuberanze-teste.webp` (quattro
+teste con il busto, che non ha il contorno in basso: lo strumento lo chiude con un segmento) e `reference/protuberanze-figure.webp`
+(quattro figure intere). Scrive `<id>.svg` + `<id>.json` per ogni figura della tabella `FIGURES` in cima al file. `--frame` è la sagoma
+che dà la testa di riferimento (di solito `maschio/adulto`): le coordinate delle protuberanze stanno nel suo riquadro (centro e mezza
+larghezza del cranio, cima) e la build le adatta alla testa di ogni sagoma (`lib/protrusion.py`).
+
+Nei fogli la protuberanza è **fusa con la testa**: stesso colore e, di solito, nessuna linea fra le due (le regioni non la separano), quindi
+la tabella dice dove tagliarla. Ogni figura ha `parts`:
+
+- `kind='cut'` (dietro la testa): `poly`, un poligono in px del foglio che racchiude la protuberanza e lascia fuori il cranio (il taglio
+  passa lungo la base: dove la protuberanza attacca alla testa, un poco fuori dal cranio). La parte è la silhouette dentro il poligono.
+  Continua di `EXT` px dentro il cranio (ma non fino al suo bordo), dove la testa di ogni sagoma la copre; il tratto è solo sul bordo
+  esterno. Le linee interne (nervature, spirali) restano; quelle lungo il taglio (il contorno del cranio) no. Per un cranio tondo si
+  può dare `not_circle=(cx, cy, r)`: la silhouette fuori da quel cerchio (la cresta a spine);
+- `kind='region'` (davanti alla testa): `seed`, un punto dentro una regione chiusa dal tratto del foglio (un corno che passa davanti al
+  cranio); riempimento e contorno interi. `bridge` della figura chiude un'interruzione del tratto (il corno di destra delle corna a spirale).
+
+Altre opzioni della figura: `bust` (è un busto) e `fit={sx, sy, dx, dy}`, ritocchi alla posizione e alla scala sulla testa di riferimento
+(le unità del riquadro di riferimento: per esempio `dx=14` sposta la cresta al vento verso la testa, dove la base si nasconde meglio).
+
+Come adatta: la figura si porta sulla testa di riferimento con scala **uniforme** (rapporto fra le mezze larghezze della calotta del
+cranio, dalla cima fino al 60% della distanza dagli occhi), cima e centro del cranio sovrapposti. Le teste dei fogli hanno proporzioni
+un poco diverse da quelle delle sagome (un cranio più alto): una scala diversa in x e in y deformerebbe le corna.
+
+Dopo la tracciatura: gli id in `protrusions` del manifest (`src/alien/manifest.json`), poi `node build.mjs`. Se si rifanno le sagome
+(`trace_alien.py`) vanno rifatte anche le protuberanze (ne leggono la testa di riferimento).
+
 ## Limiti noti
 
 - La classificazione delle regioni si basa su colore e posizione: un foglio con una posa diversa (o una persona
