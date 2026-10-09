@@ -512,6 +512,10 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'ArrowLeft' && !slider) select(idx[(pos - 1 + idx.length) % idx.length]);
 });
 
+// Lo script sta in una funzione (le sezioni non condividono nomi): questo è l'unico punto d'accesso dall'esterno, per
+// tools/audit.mjs, che confronta l'SVG esportato con quello della sagoma.
+window.humanViewer = { state, bodies, variants, DATA, defaultColors, cssVars, buildExportSvg };
+
 // ---- avvio -------------------------------------------------------------
 renderGroupSeg();
 renderParts();

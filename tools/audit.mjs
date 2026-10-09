@@ -395,6 +395,7 @@ function browserSide() {
 // rendersi uguale al file della sagoma con le stesse variabili.
 async function exportCheck(page) {
   return page.evaluate(async () => {
+    const { state, bodies, variants, DATA, defaultColors, cssVars, buildExportSvg } = window.humanViewer;     // la sezione degli umani (src/viewer/human.js)
     const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
     const raster = async (svg, w, h) => {
       const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
