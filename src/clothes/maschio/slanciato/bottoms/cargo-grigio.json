@@ -1,0 +1,26 @@
+{
+  "name": "Bermuda cargo grigi",
+  "colors": {
+    "main": "#4a4644",
+    "trim": "#484343",
+    "under": "#fafaf9"
+  },
+  "landmarks": {
+    "pants-tl": [
+      622.5,
+      615.6
+    ],
+    "pants-tr": [
+      767.0,
+      615.6
+    ],
+    "pants-bl": [
+      622.5,
+      850.5
+    ],
+    "pants-br": [
+      767.0,
+      850.5
+    ]
+  }
+}

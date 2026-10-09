@@ -60,8 +60,12 @@ def _rule_lilac(rgb, ref_lum):
     return (rgb[..., 2] - rgb[..., 1] > 2) & (_lum(rgb) < ref_lum - 20)
 
 
+def _rule_blue(rgb, ref_lum):
+    return (rgb[..., 2] - rgb[..., 0] > 45) & (rgb[..., 2] > 140)
+
+
 RULES = {'white': _rule_white, 'orange': _rule_orange, 'lighter': _rule_lighter, 'darker': _rule_darker,
-         'red': _rule_red, 'lilac': _rule_lilac}
+         'red': _rule_red, 'lilac': _rule_lilac, 'blue': _rule_blue}
 
 
 def _smooth_mask(mask, sigma, min_area, close=0):
@@ -217,6 +221,8 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
     out = {}
     for kind in ('top', 'bottom'):
         cs = spec[kind]
+        for i, c in cs.get('color', {}).items():                  # colore principale scelto a mano (una regione a righe: la mediana sarebbe sbiadita)
+            med[i] = np.array([int(c[k:k + 2], 16) for k in (1, 3, 5)], float)
         labels = set(cs['regions']) | {j for key in ('join', 'absorb') for js in cs.get(key, {}).values() for j in js}
         base, overlays, strokes = [], [], []          # ordine di disegno: regioni, dettagli senza contorno, tratti sopra i dettagli
         shape, joined_seams = {}, []

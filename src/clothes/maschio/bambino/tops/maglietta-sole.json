@@ -1,0 +1,25 @@
+{
+  "name": "Maglietta con sole",
+  "colors": {
+    "main": "#fde5a9",
+    "accent": "#ed852a"
+  },
+  "landmarks": {
+    "armL-tl": [
+      77.5,
+      727.1
+    ],
+    "armL-tr": [
+      125.5,
+      727.1
+    ],
+    "armR-tl": [
+      203.5,
+      728.0
+    ],
+    "armR-tr": [
+      233.5,
+      728.0
+    ]
+  }
+}

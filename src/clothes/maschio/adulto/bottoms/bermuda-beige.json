@@ -1,0 +1,24 @@
+{
+  "name": "Bermuda beige",
+  "colors": {
+    "main": "#caae8a"
+  },
+  "landmarks": {
+    "pants-tl": [
+      887.5,
+      610.8
+    ],
+    "pants-tr": [
+      1060.5,
+      610.8
+    ],
+    "pants-bl": [
+      887.5,
+      849.7
+    ],
+    "pants-br": [
+      1060.5,
+      849.7
+    ]
+  }
+}

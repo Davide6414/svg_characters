@@ -1,0 +1,26 @@
+{
+  "name": "Pantaloncini blu",
+  "colors": {
+    "main": "#5e8eb5",
+    "trim": "#81a8cc",
+    "under": "#f9f9f8"
+  },
+  "landmarks": {
+    "pants-tl": [
+      88.0,
+      775.0
+    ],
+    "pants-tr": [
+      222.5,
+      775.0
+    ],
+    "pants-bl": [
+      88.0,
+      861.0
+    ],
+    "pants-br": [
+      222.5,
+      861.0
+    ]
+  }
+}

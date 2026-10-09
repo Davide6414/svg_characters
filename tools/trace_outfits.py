@@ -15,7 +15,7 @@ assegnano a mano nelle tabelle OUTFITS: per vedere gli indici si lancia con -v.
 Ogni capo ha:
   regions    {indice regione: ruolo}. Ruoli: main, trim, accent, accent2, under, skin (pelle lasciata scoperta)
   split      {indice regione: [(ruolo, regola[, area minima]), …]} dettagli senza contorno ricavati dal colore dentro
-             la regione (regole: white, orange, lighter, darker, red, lilac) e disegnati sopra senza tratto
+             la regione (regole: white, orange, lighter, darker, red, lilac, blue) e disegnati sopra senza tratto
   behind     {indice: regioni dei bracci} la regione prosegue dietro le braccia (un pugno sui pantaloni lascia un vuoto)
   to_shoes   regioni che scendono sotto le scarpe (pantaloni, calze, gambe), così l'orlo non si vede
   to_ground  {indice: rientro px | (rientro, px sopra il suolo[, px sopra l'orlo dove si misura la gamba])} come to_shoes ma per i fogli con scarpe diverse da quelle della sagoma (tacchi, ballerine): ogni gamba si
@@ -47,6 +47,7 @@ Ogni capo ha:
   min_seam   px: lunghezza minima delle linee interne (9 di solito; più alta se i bordi doppi del foglio lasciano trattini corti)
   smooth     {indice: px} apre la regione (erosione e dilatazione) per toglierle i bernoccoli: un cinturino fuso in una caviglia
   no_seams   regioni da cui non si estraggono le linee interne (una gamba di pelle accanto a un bordo doppio: sarebbero ghirigori)
+  color      {indice: '#rrggbb'} colore principale scelto a mano (una regione a righe di due colori ha una mediana sbiadita)
   folds      regioni dove cercare anche le pieghe chiare (per i pantaloni: la regione principale, in automatico)
 
 Ogni riga della tabella (figura) può avere anche, oltre a `top` e `bottom`:
@@ -219,6 +220,34 @@ OUTFITS['vestiti-maschili-outfit'] = [
                   folds=(3, 4), under_down={5: (25, 0)}),
          bottom=dict(id='jeans-chiari', name='Jeans chiari', regions={6: 'main'}, to_shoes=(6,),
                      behind={6: (3, 4, 5)}, under_up={6: 30})),
+]
+
+
+OUTFITS['vestiti-maschili-2'] = [
+    dict(body='bambino', bridge=[((106, 820.5), (148, 821.5))],                                   # manca il tratto sotto l'orlo dei pantaloncini a sinistra
+         top=dict(id='maglietta-sole', name='Maglietta con sole', regions={3: 'main'}, arms=(4, 5),
+                  split={3: [('accent', 'orange')]}),                                                  # sole e raggi
+         bottom=dict(id='pantaloncini-blu', name='Pantaloncini blu', regions={6: 'main', 7: 'skin', 8: 'skin', 9: 'under', 10: 'under'},
+                     split={6: [('trim', 'lighter')]}, to_shoes=(9, 10), behind={6: (4, 5)}, under_up={6: 30})),   # risvolto, gambe e calze
+    dict(body='ragazzo',
+         top=dict(id='maglietta-righe-blu', name='Maglietta a righe blu', regions={3: 'main'}, arms=(4, 5),
+                  color={3: '#f3f5f9'}, split={3: [('accent', 'blue')]}),                              # fondo bianco e righe blu
+         bottom=dict(id='cargo-beige', name='Bermuda cargo beige', regions={6: 'main', 7: 'trim', 8: 'trim', 9: 'skin', 10: 'skin', 11: 'under', 12: 'under'},
+                     to_shoes=(11, 12), behind={6: (4, 5)}, under_up={6: 30})),
+    dict(body='slanciato',
+         top=dict(id='maglietta-verde', name='Maglietta verde', regions={3: 'main'}, arms=(5, 4)),
+         bottom=dict(id='cargo-grigio', name='Bermuda cargo grigi', regions={7: 'main', 6: 'main', 8: 'trim', 11: 'trim', 9: 'trim', 10: 'trim',
+                                                                       12: 'skin', 13: 'skin', 14: 'under', 15: 'under'},
+                     join={7: (6,)}, to_shoes=(14, 15), behind={7: (5, 4)}, under_up={7: 30})),
+    dict(body='adulto', bridge=[((1069, 394.5), (1072, 399.5))],                                   # il colletto destro e la patta si fondevano con lo sfondo
+         top=dict(id='polo-bianca', name='Polo bianca', regions={3: 'main', 5: 'trim'}, arms=(7, 8), neck=True),
+         bottom=dict(id='bermuda-beige', name='Bermuda beige', regions={9: 'main', 10: 'skin', 11: 'skin'},
+                     smooth={10: 4, 11: 4}, to_ground={10: 0, 11: 0}, behind={9: (7, 8)}, under_up={9: 30})),
+    dict(body='robusto',
+         top=dict(id='camicia-celeste', name='Camicia celeste aperta', regions={3: 'main', 4: 'main', 5: 'under'}, arms=(6, 7), neck=True,
+                  folds=(3, 4), under_down={5: (25, 0)}, back=False),
+         bottom=dict(id='pantaloni-lino', name='Pantaloni di lino risvoltati', regions={8: 'main', 9: 'skin', 10: 'skin'},
+                     smooth={9: 4, 10: 4}, to_ground={9: (0, 14, 22), 10: (0, 14, 22)}, behind={8: (6, 7)}, under_up={8: 30})),
 ]
 
 

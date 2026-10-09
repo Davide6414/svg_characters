@@ -1,0 +1,26 @@
+{
+  "name": "Bermuda cargo beige",
+  "colors": {
+    "main": "#d9b78e",
+    "trim": "#dbb991",
+    "under": "#fcfcfb"
+  },
+  "landmarks": {
+    "pants-tl": [
+      351.5,
+      661.9
+    ],
+    "pants-tr": [
+      501.0,
+      661.9
+    ],
+    "pants-bl": [
+      351.5,
+      853.9
+    ],
+    "pants-br": [
+      501.0,
+      853.9
+    ]
+  }
+}

@@ -102,6 +102,8 @@
     #top-camicia-back .c-under, #top-camicia .c-under { fill: var(--shirt-under, #f9f2eb) }
     #top-polo-blu-under .c-main, #top-polo-blu-back .c-main, #top-polo-blu .c-main { fill: var(--shirt, #404556) }
     #top-polo-blu-under .c-trim, #top-polo-blu-back .c-trim, #top-polo-blu .c-trim { fill: var(--shirt-trim, #d9d1ca) }
+    #top-polo-bianca-back .c-main, #top-polo-bianca .c-main { fill: var(--shirt, #f8f2ec) }
+    #top-polo-bianca-back .c-trim, #top-polo-bianca .c-trim { fill: var(--shirt-trim, #f6f3f0) }
     #bottom-jeans-under .c-main, #bottom-jeans-back .c-main, #bottom-jeans .c-main { fill: var(--pants, #627087) }
     #bottom-chino-under .c-main, #bottom-chino-back .c-main, #bottom-chino .c-main { fill: var(--pants, #c8af97) }
     #bottom-jogger-under .c-main, #bottom-jogger-back .c-main, #bottom-jogger .c-main { fill: var(--pants, #bfbab6) }
@@ -112,6 +114,7 @@
     #bottom-pantaloni-cintura-under .c-main, #bottom-pantaloni-cintura-back .c-main, #bottom-pantaloni-cintura .c-main { fill: var(--pants, #42403f) }
     #bottom-pantaloni-cintura-under .c-trim, #bottom-pantaloni-cintura-back .c-trim, #bottom-pantaloni-cintura .c-trim { fill: var(--pants-trim, #c8bfb7) }
     #bottom-pantaloni-cintura-under .c-accent, #bottom-pantaloni-cintura-back .c-accent, #bottom-pantaloni-cintura .c-accent { fill: var(--pants-accent, #4b372c) }
+    #bottom-bermuda-beige-under .c-main, #bottom-bermuda-beige-back .c-main, #bottom-bermuda-beige .c-main { fill: var(--pants, #caae8a) }
     #torso, #torso-fill { display: var(--show-top-base, none) }
     #top-felpa, #top-felpa-back { display: var(--show-top-felpa, none) }
     #top-giacca, #top-giacca-back { display: var(--show-top-giacca, none) }
@@ -119,6 +122,7 @@
     #top-maglione, #top-maglione-back { display: var(--show-top-maglione, inline) }
     #top-camicia, #top-camicia-back { display: var(--show-top-camicia, none) }
     #top-polo-blu, #top-polo-blu-under, #top-polo-blu-back { display: var(--show-top-polo-blu, none) }
+    #top-polo-bianca, #top-polo-bianca-back { display: var(--show-top-polo-bianca, none) }
     #pants, #pants-under, #pants-fill { display: var(--show-bottom-base, none) }
     #bottom-jeans, #bottom-jeans-under, #bottom-jeans-back { display: var(--show-bottom-jeans, none) }
     #bottom-chino, #bottom-chino-under, #bottom-chino-back { display: var(--show-bottom-chino, none) }
@@ -126,6 +130,7 @@
     #bottom-cargo, #bottom-cargo-under, #bottom-cargo-back { display: var(--show-bottom-cargo, inline) }
     #bottom-larghi, #bottom-larghi-under, #bottom-larghi-back { display: var(--show-bottom-larghi, none) }
     #bottom-pantaloni-cintura, #bottom-pantaloni-cintura-under, #bottom-pantaloni-cintura-back { display: var(--show-bottom-pantaloni-cintura, none) }
+    #bottom-bermuda-beige, #bottom-bermuda-beige-under, #bottom-bermuda-beige-back { display: var(--show-bottom-bermuda-beige, none) }
     /* Alcuni capi disegnano le braccia al posto di quelle della sagoma (spalle e braccia scoperte): le mettono nel gruppo
        .g-arms, e --show-body-arms nasconde quelle della sagoma. --show-arms (inline | none) nasconde tutte le braccia. */
     #arm-left, #arm-right { display: var(--show-body-arms, inline) }
@@ -202,6 +207,11 @@
     <use href="#fill-bottom-maschio-adulto" class="c-main c-edgefill"/>
 
   </g>
+  <!-- Bermuda beige: sotto le braccia -->
+  <g id="bottom-bermuda-beige-back">
+    <use href="#fill-bottom-maschio-adulto" class="c-main c-edgefill"/>
+
+  </g>
   <!-- Felpa: sotto le braccia -->
   <g id="top-felpa-back" class="c-idle-torso c-origin-maschio-adulto">
     <use href="#fill-top-maschio-adulto" class="c-main"/>
@@ -231,6 +241,11 @@
   <g id="top-polo-blu-back" class="c-idle-torso c-origin-maschio-adulto">
     <use href="#fill-top-maschio-adulto" class="c-main"/>
     <path class="c-main c-stroke" d="M926.3,581.4C925.3,579.8 925.7,567.3 927.6,545C927.8,541.8 928.1,537.3 928.1,534.9C928.1,530.6 928.2,530.2 929.8,530.8C930.7,531.2 930.8,536 930.1,545.2C927.8,572.9 927.6,579.1 929.4,580.8L930.7,582L928.7,582C927.6,582 926.5,581.7 926.3,581.4ZM1038.6,581.5C1038.6,581.2 1038.9,581 1039.3,581C1039.7,581 1040.3,580.5 1040.6,579.9C1041,579.3 1042.2,577.7 1043.3,576.5C1046.2,573.3 1046.4,572.2 1044.8,565.4C1041.8,552.5 1040.7,527.7 1043.1,528.1C1044,528.2 1044.1,528.8 1044.3,536.5C1044.7,548.4 1045.8,558.9 1047.3,565.4C1048.9,572.2 1048.7,573.3 1045.8,576.5C1044.7,577.7 1043.3,579.5 1042.9,580.4C1042.1,582 1038.6,582.9 1038.6,581.5Z" fill-rule="evenodd"/>
+  </g>
+  <!-- Polo bianca: sotto le braccia -->
+  <g id="top-polo-bianca-back" class="c-idle-torso c-origin-maschio-adulto">
+    <use href="#fill-top-maschio-adulto" class="c-main"/>
+    <path class="c-main c-stroke" d="M922.8,611.1C920.9,607.7 922.7,572.1 926.5,536.9C926.9,533.4 927.3,530.4 927.5,530.1C927.6,529.9 927.4,529.5 926.9,529.2C926.5,529 926.2,528.6 926.4,528.4C927,527.9 930.2,529.5 929.9,530.1C929.6,530.6 928.8,537.3 927.3,552.9C924.9,577.6 923.7,608.9 925.1,611C926.1,612.6 926.1,612.7 924.7,612.7C924,612.7 923.4,612.2 922.8,611.1ZM1042,611.8C1041.8,611.5 1042,611.2 1042.5,611C1043,610.8 1044.1,610.2 1045,609.5L1046.6,608.3L1046.3,603C1046,597.8 1045,587.9 1042.2,559.8C1041.4,552.2 1040.6,543 1040.3,539.4C1040,535.7 1039.7,531.1 1039.5,529.1C1039.3,526.1 1039.3,525.4 1040,524.7C1041.6,523.2 1042,523.8 1041.9,527.4C1041.9,531.9 1042.8,542.7 1044.6,559.8C1047.3,587.1 1048.3,597.4 1048.6,602.7L1049,608L1047.1,609.8C1045.1,611.7 1042.5,612.7 1042,611.8Z" fill-rule="evenodd"/>
   </g>
   <g id="head" class="c-idle-head">
     <g id="hair-back">
@@ -572,6 +587,10 @@
   <g id="bottom-pantaloni-cintura-under">
     <path class="c-main c-stroke" d="M946.4,615.7C945.7,615 946.1,608.8 946.9,607.2C947.4,606.4 947.9,604.6 948,603.2C948.3,600.9 948.4,600.7 949.8,600.6C952.1,600.3 952.1,600.6 952.1,579.8L952.1,560.2L953.5,555.8L954.9,551.2L992.1,551.2L1029.3,551.2L1030.7,555.8L1032.1,560.2L1032.1,578.8C1032.1,599.4 1031.9,598.4 1035.3,598.6L1037.8,598.8L1037.8,607.2L1037.8,615.8L992.3,615.9C967.2,615.9 946.6,615.9 946.4,615.7Z"/>
   </g>
+  <!-- Bermuda beige: parti sotto i pantaloni -->
+  <g id="bottom-bermuda-beige-under">
+    <path class="c-main c-stroke" d="M931.4,643.7C931.2,643.5 931.1,635.8 931.1,626.7L931.1,610L935.3,596.3L939.4,582.6L987.1,583.1L1034.8,582.4L1038.9,596L1043.1,609.7L1043,626.9L1042.9,643.8L987.3,644.5C956.7,644.3 931.6,643.8 931.4,643.7Z"/>
+  </g>
   <!-- Polo blu: parti sotto i pantaloni -->
   <g id="top-polo-blu-under" class="c-idle-torso c-origin-maschio-adulto">
     <path class="c-main c-stroke" d="M938.3,613.4C938.2,613 938.1,600.7 938.2,586L938.3,559.2L987.1,559.2L1035.8,559.2L1035.8,586.5L1035.8,613.8L987.2,613.9C948.5,614 938.5,613.9 938.3,613.4Z"/>
@@ -662,6 +681,13 @@
     <path class="c-open c-stroke c-fine" d="M1010.6,835.2C1014.2,833.5 1026.5,826.9 1032.1,825.1C1037.7,823.3 1042.1,824.2 1044.1,824"/>
     <path class="c-open c-stroke c-hair" d="M1000.6,633.5C1001.1,629 1003,610.9 1003.5,606.4"/>
     <path class="c-open c-stroke c-hair" d="M990.1,635C990.2,631.5 990.9,617.5 991.1,614"/>
+  </g>
+  <!-- Bermuda beige -->
+  <g id="bottom-bermuda-beige">
+    <path class="c-main c-stroke" d="M956.5,726C955.9,725.9 951.8,725.7 947.2,725.6C936.9,725.6 926.3,724.9 916.9,723.5C914.2,723.1 911.5,722.9 911,723.1C910.5,723.2 909.7,723.2 909.1,722.8C908.5,722.4 906.7,721.9 905,721.4C903.3,721.1 901.5,720.5 900.8,720.1C899.4,719.2 899.3,721.2 902.1,694.9C903.2,685.4 904,677 904,676.1C904,674.2 926,612.9 926.9,612.4C927.8,611.9 928.7,611.9 939,613.6C970,617.9 1006,617.5 1031.3,612.6C1040.9,610.5 1043.4,610.1 1043.8,611.2C1045.3,616.2 1050,665.7 1049.5,671C1049.3,672.5 1049.5,681.3 1050,690.7C1051.3,722 1051.7,719.5 1045.7,720.7C1043.9,721 1041.5,721.6 1040.3,722C1039.1,722.3 1037.6,722.6 1037,722.5C1036.3,722.4 1033.1,722.7 1029.8,723C1021.7,723.7 990.4,723.8 988.2,723C987.3,722.7 986,722.4 985.1,722.4C984.2,722.4 983.1,722.1 982.6,721.7C981.2,720.6 979.9,720.9 978.3,722.6C976.7,724.4 976.2,724.5 965.4,725.4C961.7,725.6 958.4,726.1 958.1,726.2C957.7,726.3 957,726.2 956.5,726Z"/>
+    <path class="c-skin c-stroke" d="M896.7,891C895.7,889.7 896.4,837.6 897.5,825.6C898.2,818.6 899,810.1 899.3,806.8C900.6,790.9 903.5,766.8 906.8,745C907.6,740 908.4,734 908.8,731.7C909.8,723.8 911.1,722.6 918,723.6C925.2,724.8 936.5,725.5 945.8,725.6C957,725.8 958,726.6 956.5,734.3C954.2,746.8 947.1,794 944.4,814.7C943.9,818.9 943.3,823.1 943.1,824.1C943,825.2 942.7,838.9 942.5,854.7L942.2,883.8L919.6,887.1C907.1,889.4 896.8,891.2 896.7,891Z"/>
+    <path class="c-skin c-stroke" d="M993.6,881.7C993.4,881.4 993.3,869.2 993.2,854.4C993.2,839.8 993,824.5 992.8,820.4C992.6,816.3 992.1,806.7 991.7,798.9C991.3,791.3 990.7,781.2 990.4,776.5C989.7,765.6 990,726.7 990.8,725.3C991.7,723.6 994.2,723.4 1009.6,723.3C1017.7,723.4 1026.3,723.3 1028.6,723C1038.2,722.1 1037.5,719.3 1037.4,759C1037.4,777.3 1037.6,799.4 1037.9,808.2C1038.6,828.2 1038.8,827.2 1033,828.2C1028.1,829.1 1024.9,830.7 1023,833.3L1021.5,835.3L1021.3,859.8L1021,883.7L1007.5,882.6C1000,882.2 993.8,881.9 993.6,881.7Z"/>
+    <path class="c-open c-stroke" d="M977.1,717.4C977.7,716.7 978.6,723.2 980.4,713.2C982.3,703.3 986.5,667.1 988,657.2C989.6,647.2 988,655.3 989.9,653.9C991.8,652.5 997.9,649.6 999.4,648.7"/>
   </g>
   <g id="shoes">
     <g id="shoe-left">
@@ -759,5 +785,16 @@
     <path class="c-open c-stroke" d="M978.6,439.5C977.8,439.1 975.2,437.3 974.1,437C972.9,436.7 974.2,435.6 971.6,437.5C968.9,439.4 960.7,446.7 958.1,448.5C955.4,450.3 957.7,451.1 955.6,448.5C953.4,445.9 947.9,438.4 945.1,433C942.3,427.6 939.7,418.9 938.6,416.1"/>
     <path class="c-open c-stroke c-fine" d="M1039.6,523C1039.7,521.1 1041,521.7 1040.1,511.5C1039.2,501.3 1035.1,470.2 1034.1,462"/>
     <path class="c-open c-stroke" d="M936.1,531C936.9,522.9 940.2,490.6 941.1,482.5"/>
+  </g>
+  <!-- Polo bianca -->
+  <g id="top-polo-bianca" class="c-idle-torso c-origin-maschio-adulto">
+    <path class="c-main c-stroke" d="M957.7,615.3C952.8,615 944.4,614.1 938.9,613.4C933.5,612.7 928.3,612.3 927.5,612.5C924,613.1 923.6,604.5 925.6,573.8C926.6,558.5 929.3,531.1 929.9,530.1C930.3,529.5 927.9,528.4 925.1,528C919.4,527.2 905.8,524 898.8,521.8C896.8,521.2 894,520.5 892.6,520.3C891.2,520.2 889.8,519.8 889.5,519.6C889.2,519.4 887.1,518.5 884.9,517.7C879.8,515.8 879.2,515.3 879.6,512.8C880.3,508.3 887.4,483.7 889.6,478.1C890.2,476.6 891.7,472.4 893,468.9C897.6,456.3 903.5,445 909.3,437.6C914.9,430.5 931.2,419.1 937.7,417.9C939.1,417.6 939.8,417 941.7,414.3C943.6,411.5 950.3,404.8 952.1,403.7C952.4,403.5 954,403.3 955.5,403.3L958.4,403.1L958.2,405.7C958.1,407.1 957.8,408.6 957.6,408.9C956,410.8 960.1,416.6 966,421.1C967.1,421.9 969.1,423.4 970.5,424.5C971.9,425.6 974.9,427.5 977.1,428.7C982.3,431.6 983.8,433.1 986.4,437.9C987.6,440 988.8,441.9 989,442C990.1,442.7 989.4,445.9 987.3,450.2C984.2,456.2 984.2,456.5 986.2,477.4C986.9,485.3 986.6,485 994.4,484.6C1001.1,484.2 1001,484.3 1000.6,478.6C1000.5,476.2 1000.1,471.1 999.9,467.2C998.7,449.5 998.7,449.9 1000.1,447.3C1001.1,445.4 1001.3,444.6 1001.1,442.8C1000.4,437.7 1002.5,437.9 1009.3,443.5C1018.9,451.4 1020.7,448.1 1016.7,429.4C1015.9,425.5 1016.3,422.9 1017.8,423.5C1018.2,423.6 1018.8,423.8 1019.1,423.8C1022.1,423.8 1036.3,435.8 1040.2,441.6C1047.9,453.2 1056.9,477.3 1065.2,508.6C1066.8,514.6 1066.1,516.3 1060.8,518.2C1059.8,518.6 1058.8,519.1 1058.5,519.4C1058.1,519.8 1056.8,520.2 1055.4,520.4C1054,520.6 1050.6,521.5 1047.9,522.3C1045.1,523.2 1042.4,523.9 1041.9,523.9C1039.7,523.9 1039.2,525.2 1039.5,529.1C1039.7,531.1 1040,535.7 1040.3,539.4C1040.6,543 1041.4,552.2 1042.2,559.8C1045,587.9 1046,597.8 1046.3,603L1046.6,608.3L1045,609.5C1043.8,610.4 1042.6,610.8 1040.8,611C1039.3,611.1 1035,611.7 1031.3,612.4C1012,615.8 981.8,617 957.7,615.3Z"/>
+    <path class="c-trim c-stroke" d="M987.9,484.4C986.8,483.6 986.4,481.5 985.6,471.4C984.4,457.5 984.6,455.4 987.2,450.3C988.5,447.8 989.5,445.3 989.5,444.7C989.5,444.1 990.1,443.1 990.8,442.4C992.4,441 997.5,431 999,426.6C1000.6,421.7 1000.1,418.8 996.9,415.7C995.8,414.5 995.6,414 995.6,411.4L995.6,408.6L998,408.6C999.9,408.6 1000.5,408.8 1000.9,409.5C1001.1,410 1001.6,410.5 1002,410.5C1002.3,410.5 1002.8,410.9 1003.1,411.4C1003.4,411.9 1004.5,412.5 1005.4,412.6C1006.6,412.8 1007.5,413.5 1008.6,414.8C1009.4,415.9 1011.1,417.6 1012.2,418.7C1017.1,423.3 1017,423.2 1016.4,424.7C1016.1,425.8 1016.1,426.8 1016.5,428.4C1018.1,434.7 1018.9,445.2 1017.9,447C1016.9,449 1015.1,448.3 1009.3,443.5C1002.5,437.9 1000.4,437.7 1001.1,442.8C1001.3,444.6 1001.1,445.4 1000.1,447.3C998.7,450 998.7,451 1000.7,478.6C1001.1,484.2 1000.8,484.5 995.7,484.5C993.7,484.5 991.3,484.7 990.4,484.8C989.4,485 988.4,484.8 987.9,484.4Z"/>
+    <path class="c-skin" d="M988.2,436C987.4,434.6 985.6,432.2 984.1,430.7C980.4,427 980.4,427.1 988.3,427.1C996.8,427.1 996.6,426.9 993.3,433.5C990.5,439.2 990,439.5 988.2,436Z"/>
+    <path class="c-open c-stroke c-fine" d="M978.1,442.7C977.4,442.1 976.4,437.8 973.8,438.9C971.2,440.1 964.9,447.6 962.4,449.4C959.9,451.2 961.4,452.8 958.6,449.9C955.8,446.9 948.6,436.4 945.8,431.8C942.9,427.2 942.1,424.3 941.5,422.3C941,420.3 942.3,420.3 942.5,420"/>
+    <path class="c-open c-stroke c-hair" d="M1037.4,519.7C1036.7,511.6 1033.9,479.3 1033.2,471.2"/>
+    <path class="c-open c-stroke c-hair" d="M934.9,529.2C936,521.2 940.4,489.2 941.5,481.2"/>
+    <circle class="c-dot" cx="992.2" cy="457.4" r="2.6"/>
+    <circle class="c-dot" cx="993.3" cy="474.5" r="2.5"/>
   </g>
 </svg>

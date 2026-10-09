@@ -166,6 +166,7 @@ python3 tools/trace_outfits.py reference/vestiti-femminili-2.webp --bodies src/b
 python3 tools/trace_outfits.py reference/vestiti-femminili-3.webp --bodies src/bodies/femmina --out src/clothes/femmina
 python3 tools/trace_outfits.py reference/vestiti-femminili-4.webp --bodies src/bodies/femmina --out src/clothes/femmina
 python3 tools/trace_outfits.py reference/vestiti-maschili-outfit.webp --bodies src/bodies/maschio --out src/clothes/maschio
+python3 tools/trace_outfits.py reference/vestiti-maschili-2.webp --bodies src/bodies/maschio --out src/clothes/maschio
 ```
 
 Per un foglio in cui **ogni figura indossa maglia e pantaloni sul proprio corpo** (le cinque sagome di un gruppo, ognuna
@@ -206,6 +207,10 @@ docstring del file, gestiscono i casi che i fogli maschili non avevano (`lib/out
   marrone di un abito rosa, `dark=80` lo chiude in una regione) e `cuts=[(regione, y)]`: divide una regione con un taglio
   orizzontale all'altezza `y` del foglio (un abito senza la linea della vita: la parte sotto prende l'indice successivo all'ultimo,
   lo stampa `-v`);
+- `color` e la regola `blue`: una regione a righe di due colori (la maglietta bianca e blu) ha una mediana sbiadita: `color={3: '#f3f5f9'}`
+  fissa il colore principale e `split={3: [('accent', 'blue')]}` ricava le righe blu. Nella polo bianca il colletto e la patta erano collegati allo
+  sfondo da un varco del contorno: `bridge` lo chiude e la parte diventa una regione (`trim`). `back=False` toglie la striscia dietro il capo
+  (la camicia aperta del robusto la disegnava come un contorno doppio accanto al braccio).
 - `to_ground`: nei fogli con scarpe diverse da quelle della sagoma (tacchi, ballerine, sandali) l'orlo dei pantaloni e le gambe di pelle finiscono
   in un punto che non combacia con le scarpe della sagoma (orli a gradini, gambe che galleggiano, un cinturino fuso nella caviglia).
   `to_ground={indice: rientro}` prolunga ogni gamba della regione con un rettangolo fino al suolo (e taglia i gradini a ±3 px), così

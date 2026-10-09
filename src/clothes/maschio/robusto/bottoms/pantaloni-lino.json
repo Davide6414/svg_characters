@@ -1,0 +1,24 @@
+{
+  "name": "Pantaloni di lino risvoltati",
+  "colors": {
+    "main": "#f0e5d6"
+  },
+  "landmarks": {
+    "pants-tl": [
+      1193.5,
+      623.9
+    ],
+    "pants-tr": [
+      1356.5,
+      623.9
+    ],
+    "pants-bl": [
+      1193.5,
+      874.4
+    ],
+    "pants-br": [
+      1356.5,
+      874.4
+    ]
+  }
+}
