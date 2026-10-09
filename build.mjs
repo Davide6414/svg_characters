@@ -219,6 +219,11 @@ function compose(body) {
     .replace('<g id="neck-fill">', `<g id="neck-fill"${breathe('top')}>`);
   // dietro al braccio lontano: prima i riempimenti e le parti dietro, poi le parti sotto (fasce in vita, pancia scoperta)
   inner = inner.replace('  <g id="pants-under">', backlay + '\n  <g id="pants-under">');
+  // la testa (coi capelli) sta dietro a braccia, busto e pantaloni: le ciocche lunghe che scendono sulle spalle non
+  // coprono le braccia, e la maglia (disegnata dopo) copre il collo come prima. Sta dopo i livelli dietro del busto.
+  const head = inner.match(/  <g id="head"[\s\S]*?\n  <\/g>\n/)?.[0];
+  if (!head) throw new Error(`${body.id}: gruppo head non trovato`);
+  inner = inner.replace(head, '').replace('  <g id="pants-under">', () => head + '  <g id="pants-under">');
   if (underlay) inner = inner.replace('  <g id="arm-right"', underlay + '\n  <g id="arm-right"');
   if (group('bottom')) inner = inner.replace('  <g id="shoes">', group('bottom') + '\n  <g id="shoes">');
   if (group('top')) inner = inner.replace(/\s*$/, '\n') + group('top') + '\n';

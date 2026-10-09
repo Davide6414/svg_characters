@@ -72,7 +72,7 @@ riscritte, quindi lo spessore del contorno resta uguale ovunque.
 ## Struttura dell'SVG di una sagoma
 
 Parti separate in gruppi con `id`, dal fondo al primo piano (uguali in tutte le sagome):
-`neck-fill` e i livelli dietro (`pants-fill`, `torso-fill`, `bottom-<id>-back`, `top-<id>-back`) → `arm-right` → parti sotto i pantaloni (`pants-under`, `bottom-<id>-under`, `top-<id>-under`) → `pants` (e i `bottom-<id>`) → `shoes` (`shoe-left`, `shoe-right`) → `arm-left` → `head` (riempimento e contorno separati, con i capelli in tre livelli, vedi *Capelli*; gli occhi per ultimi) → `torso` (e i `top-<id>`).
+`neck-fill` e i livelli dietro (`pants-fill`, `torso-fill`, `bottom-<id>-back`, `top-<id>-back`) → `head` (riempimento e contorno separati, con i capelli in tre livelli, vedi *Capelli*; gli occhi per ultimi) → parti sotto i pantaloni (`pants-under`, `bottom-<id>-under`, `top-<id>-under`) → `arm-right` → `pants` (e i `bottom-<id>`) → `shoes` (`shoe-left`, `shoe-right`) → `arm-left` → `torso` (e i `top-<id>`).
 
 - Ogni parte è una regione chiusa col suo contorno, e le regioni vicine si toccano a metà del tratto scuro del foglio, quindi non ci sono buchi né sovrapposizioni fra le linee.
 - Dentro le regioni ci sono le linee aperte: orecchio, cuciture delle maniche e del busto, cucitura interna e pieghe all'orlo dei pantaloni. Nei bambini c'è anche la tasca (un dettaglio dei pantaloni).
@@ -95,7 +95,8 @@ Le coordinate sono quelle dei fogli di riferimento, uguali per tutte le sagome: 
 ## Capelli
 
 I capelli stanno **dentro** `head`, così seguono il movimento idle della testa, e sono disegnati prima degli occhi: una
-frangia lunga passa dietro gli occhi e non li copre. Ogni stile è un gruppo `hair-<id>` con la sagoma (riempimento +
+frangia lunga passa dietro gli occhi e non li copre. La testa sta dietro a braccia, busto e pantaloni (vedi sopra): le
+ciocche che scendono sulle spalle non coprono mai le braccia. Ogni stile è un gruppo `hair-<id>` con la sagoma (riempimento +
 contorno) e qualche linea interna per ciocche e separazioni. Ne è visibile uno solo: per default quello del preset di
 quella sagoma.
 
@@ -142,8 +143,8 @@ se il cranio è un poco più alto o più basso di quello del foglio. Ogni livell
 | `coda-laterale` | Coda laterale bassa (cade a sinistra, con un laccio) | `#885d44` |
 
 **Capelli lunghi.** Gli ultimi cinque stili (`capelli-3`) scendono ai lati del viso fino alle spalle. Stanno nel gruppo
-della testa come gli altri, quindi la maglia (disegnata dopo la testa) li copre dove si sovrappongono: i capelli
-restano dietro le spalle e sporgono solo fuori dal busto. Come la `coda` hanno un'apertura per il viso: la testa di ogni
+della testa come gli altri, quindi braccia e maglia (disegnate dopo la testa) li coprono dove si sovrappongono: i capelli
+restano dietro le spalle e le braccia e si vedono solo fuori dal busto. Come la `coda` hanno un'apertura per il viso: la testa di ogni
 sagoma ci sta dentro e le ciocche a destra arrivano al contorno della faccia. Un po' di sfondo resta visibile fra le
 ciocche, il collo e le spalle (le "finestre" del foglio), per esempio fra la coda e la guancia.
 
