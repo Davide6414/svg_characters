@@ -1,0 +1,88 @@
+<div class="section" id="section-human" role="tabpanel" aria-labelledby="tab-human">
+<p class="lead">Sagome maschili e femminili in SVG, ricolorabili per parti e combinabili con <span id="hair-count">20</span> stili di capelli (quelli da anziani solo per ragazzi e adulti) e <span id="beard-count">5</span> barbe (per gli uomini). Stessa scala e stessa linea del suolo per tutte, così le altezze si confrontano.</p>
+
+<div class="layout">
+  <section aria-label="Anteprima">
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="Vista" id="view-seg">
+        <button type="button" data-view="single" aria-pressed="true">Singolo</button>
+        <button type="button" data-view="all" aria-pressed="false">Affiancati</button>
+      </div>
+      <div class="seg" role="group" aria-label="Gruppo" id="group-seg"></div>
+      <div class="seg" role="group" aria-label="Sfondo" id="bg-seg">
+        <button type="button" data-bg="white" aria-pressed="true"><i class="sw" data-bg="white"></i>Bianco</button>
+        <button type="button" data-bg="check" aria-pressed="false"><i class="sw" data-bg="check"></i>Quadretti</button>
+        <button type="button" data-bg="gray" aria-pressed="false"><i class="sw" data-bg="gray"></i>Grigio</button>
+        <button type="button" data-bg="dark" aria-pressed="false"><i class="sw" data-bg="dark"></i>Scuro</button>
+      </div>
+      <label class="zoom">Zoom
+        <input type="range" id="zoom" min="40" max="200" step="5" value="100">
+        <output id="zoom-out" for="zoom">100%</output>
+      </label>
+    </div>
+
+    <div class="stage" id="stage" data-bg="white">
+      <div class="figures single" id="figures"></div>
+    </div>
+
+    <div class="variants" id="variants" role="group" aria-label="Varianti"></div>
+  </section>
+
+  <aside class="panel card" aria-label="Personalizzazione">
+    <section>
+      <h2>Sagoma</h2>
+      <div class="bodies" id="body-list" role="radiogroup" aria-label="Sagoma"></div>
+    </section>
+    <section>
+      <h2>Capelli · stile</h2>
+      <div class="parts" id="hair-styles" role="radiogroup" aria-label="Stile dei capelli"></div>
+    </section>
+    <section id="beard-section" hidden>
+      <h2>Barba</h2>
+      <div class="parts" id="beard-styles" role="radiogroup" aria-label="Barba"></div>
+    </section>
+    <section>
+      <h2>Maglia</h2>
+      <div class="parts" id="top-list" role="radiogroup" aria-label="Maglia"></div>
+    </section>
+    <section>
+      <h2>Pantaloni</h2>
+      <div class="parts" id="bottom-list" role="radiogroup" aria-label="Pantaloni"></div>
+    </section>
+    <section>
+      <h2>Colori · <span id="variant-name"></span></h2>
+      <div class="color-actions" id="color-actions">
+        <button type="button" class="btn" data-colors="clothes">Vestiti a caso</button>
+        <button type="button" class="btn" data-colors="look">Pelle e capelli a caso</button>
+        <button type="button" class="btn" data-colors="default">Colori di default</button>
+      </div>
+      <div class="colors" id="colors"></div>
+    </section>
+    <section>
+      <h2>Contorno</h2>
+      <div class="row">
+        <input type="range" id="line-w" min="0" max="9" step="0.2" value="5.4" aria-label="Spessore del contorno">
+        <output id="line-w-out" for="line-w">5.4</output>
+      </div>
+    </section>
+    <section>
+      <h2>Parti visibili</h2>
+      <div class="parts" id="parts"></div>
+    </section>
+    <section>
+      <h2>Animazione</h2>
+      <div class="parts"><label><input type="checkbox" id="idle">Idle: respiro e battito di ciglia</label></div>
+    </section>
+    <section>
+      <h2>Esporta</h2>
+      <div class="actions">
+        <button type="button" class="btn primary" id="dl-svg">Scarica SVG</button>
+        <button type="button" class="btn" id="dl-png">Scarica PNG</button>
+        <button type="button" class="btn" id="copy-svg">Copia SVG</button>
+        <button type="button" class="btn" id="reset">Ripristina personaggio</button>
+      </div>
+      <p class="hint">Tasti <kbd>1</kbd>–<kbd>9</kbd>, <kbd>0</kbd> o <kbd>←</kbd> <kbd>→</kbd> per cambiare personaggio. Sagoma, capelli e colori si combinano a piacere: i colori che non hai toccato seguono la sagoma e lo stile scelti. L'export applica sagoma, colori, stile dei capelli, spessore e parti visibili correnti; l'SVG resta animato se l'idle è attivo, il PNG è sempre un fotogramma fermo.</p>
+    </section>
+  </aside>
+</div>
+</div>
