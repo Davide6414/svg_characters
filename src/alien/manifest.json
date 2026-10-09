@@ -1,7 +1,39 @@
 {
-  "palette": { "skin": "#b8c99c", "shirt": "#f7f3ea", "pants": "#58585a", "eye": "#15100c" },
-  "lineWidth": 4,
-  "groups": [{ "id": "maschio", "name": "Maschio" }],
-  "bodies": [],
-  "presets": []
+  "palette": {
+    "skin": "#b8c99c",
+    "shirt": "#f7f3ea",
+    "pants": "#58585a",
+    "eye": "#15100c"
+  },
+  "lineWidth": 3.5,
+  "groups": [
+    {
+      "id": "maschio",
+      "name": "Maschio"
+    }
+  ],
+  "bodies": [
+    "maschio/bambino",
+    "maschio/ragazzo",
+    "maschio/adulto",
+    "maschio/curvo"
+  ],
+  "presets": [
+    {
+      "body": "maschio/bambino",
+      "name": "Bambino"
+    },
+    {
+      "body": "maschio/ragazzo",
+      "name": "Ragazzo"
+    },
+    {
+      "body": "maschio/adulto",
+      "name": "Adulto"
+    },
+    {
+      "body": "maschio/curvo",
+      "name": "Curvo"
+    }
+  ]
 }

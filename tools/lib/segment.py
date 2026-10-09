@@ -62,7 +62,8 @@ def _eyes_and_fill(dark, box, dot_min=12, dot_aspect=2.2, eye_aspect=1.5):
             if area >= dot_min:                 # solo i puntini tondi: i frammenti di una linea sono allungati
                 ev = np.linalg.eigvalsh(np.cov(np.vstack([xs, ys]) / K))
                 if ev[1] <= dot_aspect * max(ev[0], 1e-6):
-                    dots.append(dict(cx=float(xs.mean() / K + x0), cy=float(ys.mean() / K + y0), r=float(np.sqrt(area / np.pi))))
+                    sd = np.sqrt(np.diag(np.cov(np.vstack([xs, ys]) / K)))
+                    dots.append(dict(cx=float(xs.mean() / K + x0), cy=float(ys.mean() / K + y0), r=float(np.sqrt(area / np.pi)), rx=float(2 * sd[0]), ry=float(2 * sd[1])))
             dark = dark & ~m
             continue
         ys, xs = np.nonzero(m)

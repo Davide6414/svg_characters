@@ -251,8 +251,11 @@ Come lavora (`lib/alien.py`, `lib/alien_export.py`; la segmentazione è quella d
    braccia; sinistra e destra per posizione). Una regione piccola che tocca **una sola** parte (un dito o una punta chiusi da una
    linea) ne fa parte, restando una regione a sé col suo contorno; la pelle fra testa e maglia (il collo) va alla testa. Lo sfondo
    racchiuso fra i piedi, che tocca più parti, resta fuori.
-3. Ogni parte è la cella di Voronoi della sua regione (il confine cade a metà del tratto) tracciata con potrace. Le linee interne
-   (dita, pieghe, tasche) sono i pixel scuri con una sola regione intorno, come per le sagome umane.
+3. Ogni parte è la cella di Voronoi della sua regione (il confine cade a metà del tratto) tracciata con potrace. I buchi chiari
+   minuscoli dentro il tratto (un granello dove due contorni si sovrappongono) sono tratto, non regioni: se no il confine fra due
+   parti ci gira intorno e il contorno viene un nodo. Le linee interne (dita, cuciture) sono i pixel scuri con una sola regione
+   intorno, come per le sagome umane; le pieghe grigie della maglia (più scure della stoffa, `find_folds`) sono linee `c-fold`.
+   Il riempimento della testa scende sotto il colletto (`NECK_FILL`) per non lasciare fessure quando la testa si alza.
 4. **Scala e suolo**: la stessa scala per tutte le figure del foglio (la più alta diventa alta `--height` px, 690 come un adulto
    umano, così le altezze restano confrontabili) e i piedi su y = 900. Alla fine lo strumento stampa lo spessore del contorno nella scala
    finale: si scrive in `lineWidth` di `src/alien/manifest.json`.

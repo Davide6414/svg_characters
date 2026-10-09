@@ -3,6 +3,7 @@
 .c-stroke   { stroke: var(--outline, #15100c); stroke-width: var(--line-w, {{line-w}}); stroke-linecap: round; stroke-linejoin: round }
 .c-fine     { stroke-width: calc(var(--line-w, {{line-w}}) * 0.75) }
 .c-open     { fill: none }
+.c-fold     { stroke-opacity: .4 }
 .c-skin     { fill: var(--skin, {{skin}}) }
 .c-shirt    { fill: var(--shirt, {{shirt}}) }
 .c-pants    { fill: var(--pants, {{pants}}) }

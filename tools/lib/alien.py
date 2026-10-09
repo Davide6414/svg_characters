@@ -8,12 +8,13 @@ sono scarpe (i piedi fanno parte delle gambe, con le linee delle dita).
 import numpy as np
 
 from .geom import dilate, erode, fill_small_holes, grow_labels, trace_paths, zhang_suen
-from .parts import _hex, find_seams, region_info
+from .parts import _hex, find_folds, find_seams, region_info
 from .segment import K, segment
 
 GROUND = 900.0            # y della linea del suolo, la stessa delle sagome umane
 CENTER_X = 975.0          # x del centro di ogni figura (le coordinate orizzontali non contano: la build centra il riquadro)
 HEIGHT = 690.0            # altezza (px) della figura più alta, come un adulto umano
+NECK_FILL = 10            # px: la pelle del collo scende tanto sotto il colletto (la testa che si alza non lascia fessure)
 ROLES = ('head', 'torso', 'arm-left', 'arm-right', 'pants', 'leg-left', 'leg-right')
 
 
@@ -117,12 +118,18 @@ def landmarks(cells, cls, to_xy):
 def trace_alien_body(sheet, box, scale, ground=GROUND, roles=None, bridge=(), seal=0, verbose=False):
     """Traccia la figura in `box`. Le coordinate del foglio vengono scalate di `scale` (la stessa per tutte le figure di un
     foglio, così le altezze restano confrontabili) e spostate in modo che i piedi poggino su y = `ground`."""
-    seg = segment(sheet, box, bridge=bridge, seal=seal, dots=(6, 3.5), eye_aspect=1.15)
+    seg = segment(sheet, box, bridge=bridge, seal=seal, dots=(6, 60), eye_aspect=1.15)
     if len(seg.eyes) < 2:
         raise ValueError(f'servono due occhi, trovati {len(seg.eyes)}')
     info, cls = classify_alien(seg, roles)
     x0, y0 = box[:2]
-    g = grow_labels(seg.lab, seg.dark)
+    # i buchi minuscoli nel tratto (un granello chiaro dove due contorni si sovrappongono) sono tratto, non regioni: se no il
+    # confine fra due parti ci gira intorno e il contorno viene un nodo
+    tiny = np.isin(seg.lab, [i for i in range(1, seg.n_lab + 1) if i not in info])
+    seg.dark = seg.dark | tiny
+    lab = seg.lab.copy()
+    lab[tiny] = 0
+    g = grow_labels(lab, seg.dark)
     cls = absorb_small(seg, g, info, cls)
     cells = {i: (g == i) for i in cls}
 
@@ -145,9 +152,17 @@ def trace_alien_body(sheet, box, scale, ground=GROUND, roles=None, bridge=(), se
             if i not in cls and not r['bg']:
                 print(f'  regione {i:2d} (non usata) area {r["area"]:6.0f} colore {_hex(r["rgb"])}')
 
+    # la pelle della testa continua sotto il colletto (sotto la maglia): quando la testa si alza nell'idle non si apre una fessura
+    shirt = max((i for i, c in cls.items() if c == 'torso'), key=lambda i: info[i]['area'])
+    head_id = max((i for i, c in cls.items() if c == 'head'), key=lambda i: info[i]['area'])
+    neck = cells[head_id] | (dilate(cells[head_id], NECK_FILL * K) & cells[shirt])
+    for p in parts['head']:
+        if p['area'] == info[head_id]['area']:
+            p['fill'] = trace_paths(fill_small_holes(neck, 30 * K * K), to_xy, opttol=1.6 * K / 2, alphamax=1.0, turd=20, smooth=1.0)
+
     # linee interne (dita delle mani e dei piedi, pieghe della maglia, tasche dei pantaloncini): pixel scuri con una sola
     # regione intorno; sulla maglia e sui pantaloncini sono sottili, sulla pelle come il contorno
-    seams = find_seams(seg, g, set(cls), to_xy)
+    seams = find_seams(seg, g, set(cls), to_xy) + find_folds(seg, g, shirt, to_xy, minlen=16.0)       # e le pieghe grigie della maglia
     for s in seams:
         s['part'] = cls[s['label']]
         s['fine'] = s['part'] in ('torso', 'pants')
@@ -156,13 +171,14 @@ def trace_alien_body(sheet, box, scale, ground=GROUND, roles=None, bridge=(), se
     for e in seg.eyes:
         ex, ey = to_xy((e['cx'] - x0) * K, (e['cy'] - y0) * K)
         eyes.append(dict(cx=ex, cy=ey, rx=sx(e['rx']), ry=sx(e['ry'])))
-    # le narici: puntini tondi sul viso, sotto gli occhi
+    # le narici: due segni scuri e piccoli sul viso, fra gli occhi e sotto di essi (sono ovali, non sempre tondi)
     eye_y = np.mean([e['cy'] for e in seg.eyes])
+    eye_x = sorted(e['cx'] for e in seg.eyes)
     nostrils = []
     for d in seg.dots:
-        if abs(d['cy'] - eye_y) < 90:
+        if 0 < d['cy'] - eye_y < 90 and eye_x[0] < d['cx'] < eye_x[-1]:
             nx, ny = to_xy((d['cx'] - x0) * K, (d['cy'] - y0) * K)
-            nostrils.append(dict(cx=nx, cy=ny, r=max(sx(d['r']), 1.3)))
+            nostrils.append(dict(cx=nx, cy=ny, rx=max(sx(d['rx']), 1.0), ry=max(sx(d['ry']), 1.0)))
     nostrils.sort(key=lambda n: n['cx'])
 
     hid = max((i for i, c in cls.items() if c == 'head'), key=lambda i: info[i]['area'])

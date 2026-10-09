@@ -25,7 +25,8 @@ def alien_svg(body, title):
         seams.setdefault(s['part'], []).append(s)
 
     def seam_paths(part, indent):
-        return [' ' * indent + f'<path class="c-open c-stroke{" c-fine" if s["fine"] else ""}" d="{s["d"]}"/>' for s in seams.get(part, [])]
+        return [' ' * indent + f'<path class="c-open c-stroke{" c-fine" if s["fine"] else ""}{" c-fold" if s["kind"] == "fold" else ""}" d="{s["d"]}"/>'
+                for s in seams.get(part, [])]
 
     def region(role, fill, indent):
         """Riempimento e contorno di ogni regione del ruolo, poi le sue linee interne."""
@@ -38,11 +39,11 @@ def alien_svg(body, title):
          f'  <title>{title}</title>',
          '  <g id="alien-head" class="c-alien-head">']
     # la testa (col collo, che sta sotto il colletto) in due passate: riempimento, poi contorno, come per gli umani
-    L += ['    ' + _path('c-skin', p['d']) for p in P['head']]
+    L += ['    ' + _path('c-skin', p.get('fill', p['d'])) for p in P['head']]           # il riempimento scende sotto il colletto
     L += ['    ' + _path('c-open c-stroke', p['d']) for p in P['head']]
     L += seam_paths('head', 4)
     for n in body['nostrils']:
-        L.append(f'    <circle class="c-dot" cx="{fmt(n["cx"])}" cy="{fmt(n["cy"])}" r="{fmt(n["r"])}"/>')
+        L.append(f'    <ellipse class="c-dot" cx="{fmt(n["cx"])}" cy="{fmt(n["cy"])}" rx="{fmt(n["rx"])}" ry="{fmt(n["ry"])}"/>')
     for e in body['eyes']:
         L.append(f'    <ellipse class="c-eye c-alien-blink" cx="{fmt(e["cx"])}" cy="{fmt(e["cy"])}" rx="{fmt(e["rx"])}" ry="{fmt(e["ry"])}"/>')
     L += ['  </g>', '  <g id="alien-arm-right" class="c-alien-arm">'] + region('arm-right', 'c-skin', 4)

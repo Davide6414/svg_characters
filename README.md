@@ -4,7 +4,7 @@ Personaggi in SVG pensati per essere **combinati**, in due sezioni separate:
 
 - **Umani**: dieci sagome (cinque maschili e cinque femminili, da bambino a adulto) × venti stili di capelli × cinque barbe
   (per gli uomini) × maglie e pantaloni × colori a piacere;
-- **Alieni**: sagome aliene con la loro maglia e i loro pantaloncini, ricolorabili per parti (vedi *Alieni*).
+- **Alieni**: quattro sagome aliene maschili (bambino, ragazzo, adulto, curvo) con la loro maglia e i loro pantaloncini, ricolorabili per parti (vedi *Alieni*).
 
 Un visualizzatore HTML (`index.html`, con una scheda per sezione) permette di provare gli incroci.
 
@@ -274,6 +274,12 @@ Gli alieni sono una sezione a parte: risorse in `src/alien/`, composizione in `b
 umani hanno in comune solo la scala (stessa linea del suolo `y = 900`, la figura più alta come un adulto) e le utilità della pagina.
 Non hanno capelli, barbe o capi da scegliere: ogni sagoma ha la sua maglia e i suoi pantaloncini, e i colori si scelgono a piacere.
 
+| Gruppo | Sagome | Dal foglio |
+| --- | --- | --- |
+| Maschio | `bambino` · `ragazzo` · `adulto` · `curvo` (spalle e testa piegate in avanti) | `reference/sagome-aliene-maschili.webp` |
+
+Il disegno di partenza dello stile (un alieno nudo) è `reference/alieno-modello.webp`.
+
 ```
 src/alien/manifest.json     palette di default (skin, shirt, pants, eye), lineWidth (spessore di partenza del contorno),
                             gruppi, sagome (`gruppo/nome`) e preset (sagoma + nome + colori di partenza)
@@ -285,15 +291,18 @@ src/alien/bodies/<gruppo>/  <nome>.svg (geometria) + <nome>.json (nome, misure d
 e contorno; poi narici `c-dot` e occhi `c-eye c-alien-blink`) → `alien-arm-right` → `alien-legs` (`alien-leg-left` e `alien-leg-right`, coi
 piedi e le linee delle dita) → `alien-pants` (i pantaloncini) → `alien-arm-left` → `alien-torso` (la maglia). Ogni parte è una regione
 chiusa col suo contorno; le regioni vicine si toccano a metà del tratto scuro del foglio, e le linee interne (dita delle mani e dei
-piedi, pieghe della maglia, tasche) sono linee aperte. Il sorgente contiene solo la geometria: colori, CSS e riquadro comune
-(stessa scala e stessa linea del suolo per tutte) li aggiunge la build.
+piedi, cucitura dei pantaloncini, cuciture della maglia) sono linee aperte. Le pieghe grigie della maglia (`c-fold`, per ora solo
+`curvo`) sono linee sottili col colore del contorno al 40%, così stanno bene su qualunque colore di maglia. Il riempimento della testa
+scende di 10 px sotto il colletto (nascosto dalla maglia): quando la testa si alza nell'idle non si apre una fessura. Il sorgente
+contiene solo la geometria: colori, CSS e riquadro comune (stessa scala e stessa linea del suolo per tutte) li aggiunge la build.
 
 **Variabili CSS.** `--skin`, `--shirt`, `--pants`, `--eye`, `--outline`, `--line-w`, `--idle-n` (`0` spegne l'animazione), `--idle-delay`, e la
 visibilità di ogni parte con `--show-alien-head`, `--show-alien-torso`, `--show-alien-arms`, `--show-alien-pants`, `--show-alien-legs`
 (`inline` | `none`). Le narici seguono `--outline`.
 
 **Animazione idle.** Come per gli umani: busto e braccia respirano (si allungano di ~1%, ancorati alla base), la testa si alza di 2 px con un
-piccolo ritardo, gli occhi sbattono ogni 4.6 s. Con `prefers-reduced-motion` l'SVG resta fermo.
+piccolo ritardo, gli occhi sbattono ogni 4.6 s. Con `prefers-reduced-motion` l'SVG resta fermo. Nel fotogramma estremo del respiro non si
+aprono vuoti fra le parti (controllato su tutte le sagome).
 
 **Tracciatura.** `tools/trace_alien.py` ricava le sagome da un foglio di figure affiancate (vedi `tools/README.md`):
 
