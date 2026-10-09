@@ -1,0 +1,9 @@
+{
+  "name": "Abito nero con spalline (corpetto)",
+  "colors": {
+    "main": "#292929"
+  },
+  "replaces": [
+    "arms"
+  ]
+}

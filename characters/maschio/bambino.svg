@@ -75,6 +75,7 @@
     /* Alcuni capi disegnano le braccia al posto di quelle della sagoma (spalle e braccia scoperte): le mettono nel gruppo
        .g-arms, e --show-body-arms nasconde quelle della sagoma. --show-arms (inline | none) nasconde tutte le braccia. */
     #arm-left, #arm-right { display: var(--show-body-arms, inline) }
+    .c-edgefill { display: var(--show-body-arms, inline) }
     .g-arms { display: var(--show-arms, inline) }
 
     /* Idle: respiro (busto e braccia si allungano di ~1%, la testa segue con un leggero ritardo)
@@ -112,14 +113,14 @@
     <path class="c-skin" d="M133.3,719.2C133.2,719 133,708.7 133,696.4L133,674L134.1,673.6C138.3,672 140.5,672.7 140.5,675.6C140.5,677.6 147.9,684.2 152.7,686.5C165.8,692.9 178.9,689.5 179.2,679.7C179.4,674.7 181.7,674.3 187.6,678.2L190.8,680.2L190.8,699.8L190.8,719.2L162.2,719.4C146.5,719.5 133.5,719.4 133.3,719.2Z"/>
   </g>
   <g id="pants-fill">
-    <use href="#fill-bottom-maschio-bambino" class="c-pants"/>
+    <use href="#fill-bottom-maschio-bambino" class="c-pants c-edgefill"/>
   </g>
   <g id="torso-fill" class="c-idle-torso c-origin-maschio-bambino">
     <use href="#fill-top-maschio-bambino" class="c-shirt"/>
   </g>
   <!-- Bermuda cargo: sotto le braccia -->
   <g id="bottom-bermuda-cargo-back">
-    <use href="#fill-bottom-maschio-bambino" class="c-main"/>
+    <use href="#fill-bottom-maschio-bambino" class="c-main c-edgefill"/>
 
   </g>
   <!-- Maglietta con riga: sotto le braccia -->

@@ -1,0 +1,9 @@
+{
+  "name": "Tuta blu senza maniche (corpetto)",
+  "colors": {
+    "main": "#2a2e3d"
+  },
+  "replaces": [
+    "arms"
+  ]
+}

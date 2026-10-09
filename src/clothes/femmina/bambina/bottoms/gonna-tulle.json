@@ -1,0 +1,17 @@
+{
+  "name": "Gonna a ruota con fiocco",
+  "colors": {
+    "main": "#f6b7c1",
+    "trim": "#f6b2be"
+  },
+  "landmarks": {
+    "pants-bl": [
+      82.5,
+      871.7
+    ],
+    "pants-br": [
+      210.5,
+      871.7
+    ]
+  }
+}

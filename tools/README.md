@@ -164,6 +164,7 @@ destra): id, nome e le correzioni `{indice regione: ruolo}`. Per vedere gli indi
 python3 tools/trace_outfits.py reference/vestiti-femminili.webp   --bodies src/bodies/femmina --out src/clothes/femmina
 python3 tools/trace_outfits.py reference/vestiti-femminili-2.webp --bodies src/bodies/femmina --out src/clothes/femmina
 python3 tools/trace_outfits.py reference/vestiti-femminili-3.webp --bodies src/bodies/femmina --out src/clothes/femmina
+python3 tools/trace_outfits.py reference/vestiti-femminili-4.webp --bodies src/bodies/femmina --out src/clothes/femmina
 python3 tools/trace_outfits.py reference/vestiti-maschili-outfit.webp --bodies src/bodies/maschio --out src/clothes/maschio
 ```
 
@@ -201,6 +202,10 @@ docstring del file, gestiscono i casi che i fogli maschili non avevano (`lib/out
   regione (la gonna della ragazza, vicino alle mani) si fonde con lo sfondo. `bridge=[((x1, y1), (x2, y2)), …]`
   disegna dei segmenti scuri, in px del foglio, che chiudono l'interruzione; `seal=1.0` ispessisce il tratto di quei
   px per chiudere le crepe di un pixel (si guardano le regioni con `-v` finché la gonna non è una regione sola);
+  Altre opzioni della figura: `dark` (soglia di luminanza del contorno, 34 di solito: con un tratto interno più chiaro, come il fiocco
+  marrone di un abito rosa, `dark=80` lo chiude in una regione) e `cuts=[(regione, y)]`: divide una regione con un taglio
+  orizzontale all'altezza `y` del foglio (un abito senza la linea della vita: la parte sotto prende l'indice successivo all'ultimo,
+  lo stampa `-v`);
 - `folds`: dove cercare anche le pieghe chiare (per i pantaloni, la regione principale, in automatico);
 - `widen`, `clip_top`, `to_waist`: allargare una regione sotto le vicine (la pancia sotto le braccia), togliere le strisce
   strette in alto (un pezzo di pantalone che risale lungo il braccio), far salire i pantaloni fino alla vita della

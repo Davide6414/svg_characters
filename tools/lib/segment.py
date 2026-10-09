@@ -28,6 +28,17 @@ class Seg:
         """Coordinate del bitmap → coordinate del foglio."""
         return self.box[0] + u / K, self.box[1] + v / K
 
+    def cut(self, i, y):
+        """Divide la regione `i` con un taglio orizzontale all'altezza `y` del foglio: la parte sotto diventa una regione
+        nuova (l'ultimo indice + 1) e il suo numero è il valore restituito. Serve per un abito intero senza la linea
+        della vita (corpetto e gonna sono una sola regione)."""
+        rows = np.arange(self.lab.shape[0])[:, None]
+        m = (self.lab == i) & (rows >= (y - self.box[1]) * K)
+        self.n_lab += 1
+        self.lab[m] = self.n_lab
+        self.sizes = np.bincount(self.lab.ravel(), minlength=self.n_lab + 1)
+        return self.n_lab
+
 
 def _eyes_and_fill(dark, box):
     """Separa gli occhi dalla rete del contorno: restituisce (maschera scura senza occhi, occhi, puntini).
@@ -135,15 +146,16 @@ def _split_merged_shoes(lab, dark, lum, box):
     return lab, dark | (lab == 0)
 
 
-def segment(sheet, box, bridge=(), seal=0):
+def segment(sheet, box, bridge=(), seal=0, dark=DARK):
     """Segmenta la figura inclusa in `box` del foglio. `bridge`: segmenti ((x1, y1), (x2, y2)), in px del foglio, che
     chiudono un'interruzione del contorno (nei fogli generati a volte manca un pezzo di tratto e la regione si fonde con
     lo sfondo): si disegnano come tratto scuro prima di dividere le regioni. `seal` (px del foglio): ispessisce il tratto
-    per chiudere le crepe di un pixel (un contorno sottile o sfumato, sopra la soglia di luminanza in qualche punto)."""
+    per chiudere le crepe di un pixel (un contorno sottile o sfumato, sopra la soglia di luminanza in qualche punto).
+    `dark`: soglia di luminanza del contorno, se un tratto interno (un fiocco, un risvolto) è più chiaro del contorno solito."""
     x0, y0, x1, y1 = box
     lum = upsample(sheet.lum[y0:y1, x0:x1], K)
     rgb = np.stack([upsample(sheet.rgb[y0:y1, x0:x1, c], K) for c in range(3)], -1)
-    dark0 = lum <= DARK
+    dark0 = lum <= dark
     if bridge:
         img = Image.new('L', (dark0.shape[1], dark0.shape[0]), 0)
         draw = ImageDraw.Draw(img)

@@ -1,0 +1,9 @@
+{
+  "name": "Abito rosa senza maniche",
+  "colors": {
+    "main": "#f6bbc3"
+  },
+  "replaces": [
+    "arms"
+  ]
+}

@@ -18,7 +18,7 @@ from PIL import Image, ImageFilter
 
 from .geom import catmull_d, dilate, erode, fill_small_holes, grow_labels, label_components, rdp, skeleton_lines, trace_paths
 from .parts import BACK, GROUND, PAD, back_strip, extend_bottom, extend_top, find_folds, find_seams, hdilate, hull, region_info
-from .segment import K, segment
+from .segment import DARK, K, segment
 
 SMALL_REGION = 60    # px²: le regioni più piccole non assegnate si uniscono alla regione del capo che le circonda
 SHOE_BAND = 45        # px sopra la cima delle suole: le regioni più in basso sono scarpe
@@ -118,7 +118,11 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
     """Traccia maglia e pantaloni della figura in `box`. `ref` = dati (testa, punti di riferimento) della sagoma su
     cui è disegnata. `spec` = {'top': capo, 'bottom': capo}, ogni capo con `regions` {indice: ruolo}.
     Restituisce {'top': garment, 'bottom': garment}."""
-    seg = segment(sheet, box, bridge=spec.get('bridge', ()), seal=spec.get('seal', 0))
+    seg = segment(sheet, box, bridge=spec.get('bridge', ()), seal=spec.get('seal', 0), dark=spec.get('dark', DARK))
+    for i, y in spec.get('cuts', ()):                              # regioni divise a una certa altezza (un abito senza vita)
+        new = seg.cut(i, y)
+        if verbose:
+            print(f'  taglio della regione {i} a y={y}: la parte sotto è la regione {new}')
     info = region_info(seg)
     x0, y0, x1, y1 = box
     e = seg.eyes
@@ -144,6 +148,8 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
         x, y = x0 + u / K, y0 + v / K - dy
         return rx + (x - eye_x) * s, rt + (y - head_t) * s
 
+    if verbose:
+        print(f'  coordinate finali: x = {rx:.1f} + (x_foglio - {eye_x:.1f}) * {s:.4f}, y = {rt:.1f} + (y_foglio - {dy:.1f} - {head_t:.1f}) * {s:.4f}')
     cells = {i: (g == i) for i in list(used) + shoes + [head]}
     shoe_cells = np.zeros_like(seg.dark)
     for i in shoes:
@@ -172,7 +178,7 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
     med = {}
     for i in used:
         core = erode(seg.lab == i, 2 * K)
-        med[i] = np.median(seg.rgb[core], axis=0) if core.any() else info[i]['rgb']
+        med[i] = np.median(seg.rgb[core], axis=0) if core.any() else seg.rgb[seg.lab == i].mean(0)
     v_idx = np.arange(g.shape[0])[:, None]
 
     out = {}
@@ -239,9 +245,10 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
             if i in cs.get('under_up', {}):                       # i pantaloni salgono sotto la maglia: nessun buco con altre maglie
                 add(base, role, extend_top(plain, cs['under_up'][i], band_only=True), med[i], 'under', stroke=True)
             if i in cs.get('under_down', {}):                     # la maglia scende sotto i pantaloni: nessun buco con altri pantaloni
-                down = cs['under_down'][i]                        # px, oppure (px, rientro ai lati[, larghezza minima dell'orlo])
-                px, inset, wide = (tuple(down) + (10, 0.0)[len(down) - 1:]) if isinstance(down, tuple) else (down, 10, 0.0)
-                add(base, role, extend_bottom(plain, px, inset=inset, band_only=True, wide=wide), med[i], 'under', stroke=True)
+                down = cs['under_down'][i]                        # px, oppure (px, rientro ai lati[, larghezza minima dell'orlo[, y dell'orlo]])
+                px, inset, wide, hem = (tuple(down) + (10, 0.0, None)[len(down) - 1:]) if isinstance(down, tuple) else (down, 10, 0.0, None)
+                add(base, role, extend_bottom(plain, px, inset=inset, band_only=True, wide=wide,
+                                              hem=None if hem is None else int((hem - y0) * K)), med[i], 'under', stroke=True)
             if details:
                 add(strokes, 'open', cell, med[i], layer, stroke=True)
             if verbose:

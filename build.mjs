@@ -216,10 +216,12 @@ function compose(body) {
   // dietro alle braccia: i riempimenti di fondo della sagoma (definiti una volta, richiamati col colore di ogni capo) e le
   // parti del capo sotto le braccia
   const fillRef = { top: body.fills.top, bottom: body.fills.bottom };
-  const use = (kind, cls) => (fillRef[kind] ? `    <use href="#${fillRef[kind]}" class="${cls}"/>\n` : '');
+  // (il riempimento dei pantaloni segue il bordo del busto vicino alle braccia della sagoma: con braccia sostituite da un capo non serve)
+  const use = (kind, cls) => (fillRef[kind] ? `    <use href="#${fillRef[kind]}" class="${cls}${kind === 'bottom' ? ' c-edgefill' : ''}"/>\n` : '');
   const backlay = [
     `  <g id="pants-fill">\n${use('bottom', 'c-pants')}  </g>`, `  <g id="torso-fill"${breathe('top')}>\n${use('top', 'c-shirt')}  </g>`,
-    ...ordered.map((g) => `  <!-- ${g.name}: sotto le braccia -->\n  <g id="${g.kind}-${g.id}-back"${breathe(g.kind)}>\n${use(g.kind, 'c-main')}${g.back}\n  </g>`),
+    // (un capo che disegna le braccia da sé non usa il riempimento: è sagomato sulle braccia della sagoma, che qui sono nascoste)
+    ...ordered.map((g) => `  <!-- ${g.name}: sotto le braccia -->\n  <g id="${g.kind}-${g.id}-back"${breathe(g.kind)}>\n${g.replaces?.includes('arms') ? '' : use(g.kind, 'c-main')}${g.back}\n  </g>`),
   ].join('\n');
   const x0 = Math.round((body.ext[0] + body.ext[2]) / 2 - W / 2);
   const hairXml = '\n    <!-- Capelli: nel gruppo della testa (così seguono il respiro), sotto gli occhi. Stile mostrato di default: ' + defaultHair + ' -->\n' +

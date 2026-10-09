@@ -24,9 +24,10 @@ Ogni capo ha:
              (la pancia sotto le braccia: così fra pancia e braccio non restano due tratti che si fondono in un cuneo nero)
   under_up   {indice: px} i pantaloni salgono di tanti px sotto la maglia (in un livello sotto), così con una maglia
              più corta o con un orlo diverso non resta un buco in vita
-  under_down {indice: px | (px, rientro[, larghezza])} lo stesso per una maglia corta o infilata: scende sotto i pantaloni
+  under_down {indice: px | (px, rientro[, larghezza[, y]])} lo stesso per una maglia corta o infilata: scende sotto i pantaloni
              (rientro ai lati in px, 10 se non detto). `larghezza` (0-1): l'orlo è l'ultima riga larga almeno quella
              frazione della più larga, non l'ultima riga della regione (la manica lunga unita al busto arriva più in basso)
+             e, come quarto valore, la y dell'orlo nel foglio (le maniche a sbuffo sono larghe quanto il busto: nessuna regola lo trova)
   join       {indice: (altre regioni,)} regioni da unire in una sola (le gambe dei leggings sotto un abito): il confine
              resta come cucitura
   absorb     {indice: (altre regioni,)} lo stesso senza cucitura (la fessura fra braccio e pancia che il foglio lascia
@@ -47,6 +48,9 @@ Ogni riga della tabella (figura) può avere anche, oltre a `top` e `bottom`:
   bridge     [((x1, y1), (x2, y2)), …] segmenti scuri, in px del foglio, che chiudono un'interruzione del contorno (nei fogli
              generati a volte manca un pezzo di tratto e la regione si fonde con lo sfondo)
   seal       px: ispessisce il tratto per chiudere le crepe di un pixel
+  dark       soglia di luminanza del contorno (34): più alta se un tratto interno è più chiaro (il fiocco di un abito rosa)
+  cuts       [(regione, y)] divide la regione con un taglio orizzontale a y (px del foglio): un abito senza la linea della vita;
+             la parte sotto è la regione numero (ultimo indice + 1), stampata con -v
 """
 import argparse
 import json
@@ -147,6 +151,38 @@ OUTFITS['vestiti-femminili-3'] = [
          bottom=dict(id='gonna-portafoglio', name='Gonna a portafoglio con fiocco',
                      regions={10: 'main', 8: 'trim', 9: 'trim', 11: 'trim', 12: 'trim', 13: 'trim', 14: 'skin', 15: 'skin'},
                      to_shoes=(14, 15), behind={10: (6, 7)}, under_up={10: 20})),
+]
+
+OUTFITS['vestiti-femminili-4'] = [
+    dict(body='bambina', dark=80,                                                                # il contorno del fiocco è più chiaro
+         top=dict(id='abito-rosa', name='Abito rosa senza maniche', regions={3: 'main', 4: 'skin', 5: 'skin'},
+                  parts={4: 'arms', 5: 'arms'}, neck=True, absorb={3: (10,)}, under_down={3: (70, 1, 0.5)}),
+         bottom=dict(id='gonna-tulle', name='Gonna a ruota con fiocco', regions={11: 'main', 9: 'trim', 7: 'trim', 8: 'trim', 6: 'trim',
+                                                                             16: 'skin', 17: 'skin'},
+                     absorb={11: (15,)}, to_shoes=(16, 17), behind={11: (4, 5)}, under_up={11: 20}, folds=(11,))),
+    dict(body='ragazza',
+         top=dict(id='abito-bordeaux', name='Abito bordeaux con spalline', regions={5: 'main', 4: 'skin', 6: 'skin', 8: 'skin'},
+                  parts={6: 'arms', 8: 'arms'}, neck=True, absorb={5: (10,)}, under_down={5: (55, 1, 0.5)}),
+         bottom=dict(id='gonna-bordeaux', name='Gonna a ruota con fiocco', regions={18: 'main', 16: 'main', 17: 'main', 11: 'trim', 12: 'trim',
+                                                                               13: 'trim', 14: 'trim', 20: 'skin', 22: 'skin'},
+                     absorb={20: (24,), 22: (23,)}, to_shoes=(20, 22), behind={18: (6, 8)}, under_up={18: 20})),
+    dict(body='slanciata', cuts=[(9, 497)],
+         top=dict(id='abito-nero', name='Abito nero con spalline (corpetto)', regions={9: 'main', 5: 'skin', 6: 'skin', 15: 'skin', 7: 'skin'},
+                  parts={6: 'arms', 15: 'arms'}, neck=True, absorb={9: (16,)}, under_down={9: (40, 1, 0.5)}),
+         bottom=dict(id='gonna-lunga-nera', name='Gonna lunga con spacco', regions={67: 'main', 21: 'main', 24: 'main', 18: 'skin'},
+                     absorb={67: (24, 25, 26), 21: (33,), 18: (29, 32)}, to_shoes=(18,), behind={67: (6, 15)}, under_up={67: 30})),
+    dict(body='adulta',
+         top=dict(id='camicetta-bluse', name='Camicetta a portafoglio', regions={4: 'main'}, arms=(22, 21), neck=True, folds=(4,),
+                  absorb={4: (5,)}, under_down={4: (60, 6, 0, 492)}),
+         bottom=dict(id='gonna-verde', name='Gonna verde con fiocco', regions={17: 'main', 19: 'main', 7: 'trim', 11: 'trim', 12: 'trim',
+                                                                            13: 'trim', 16: 'trim', 18: 'trim', 23: 'skin', 24: 'skin'},
+                     absorb={23: (27, 25), 24: (26,)}, to_shoes=(23, 24), behind={17: (22, 21)}, under_up={17: 20})),
+    dict(body='robusta', bridge=[((1391, 540.5), (1397, 540.5)), ((1410, 540), (1416, 540))],   # il tratto interno della fibbia ha due interruzioni
+         top=dict(id='tuta-blu', name='Tuta blu senza maniche (corpetto)', regions={5: 'main', 7: 'main', 6: 'skin', 9: 'skin', 8: 'skin'},
+                  parts={6: 'arms', 9: 'arms'}, neck=True, neck_up=40, absorb={5: (10,)}, under_down={5: (90, 1, 0.5)}),
+         bottom=dict(id='tuta-pantaloni', name='Pantaloni larghi con cintura', regions={16: 'main', 17: 'main', 15: 'main', 13: 'trim',
+                                                                              12: 'trim', 14: 'trim', 11: 'accent'},      # cintura e fibbia dorata
+                     join={16: (17,)}, to_shoes=(16,), behind={16: (6, 9)}, under_up={16: 20})),
 ]
 
 OUTFITS['vestiti-maschili-outfit'] = [

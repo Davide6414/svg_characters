@@ -97,6 +97,7 @@
     /* Alcuni capi disegnano le braccia al posto di quelle della sagoma (spalle e braccia scoperte): le mettono nel gruppo
        .g-arms, e --show-body-arms nasconde quelle della sagoma. --show-arms (inline | none) nasconde tutte le braccia. */
     #arm-left, #arm-right { display: var(--show-body-arms, inline) }
+    .c-edgefill { display: var(--show-body-arms, inline) }
     .g-arms { display: var(--show-arms, inline) }
 
     /* Idle: respiro (busto e braccia si allungano di ~1%, la testa segue con un leggero ritardo)
@@ -134,14 +135,14 @@
     <path class="c-skin" d="M671.8,457.2C671,456.4 671.5,408.1 672.3,407.8C674.7,406.9 676.5,408 676.5,410.4C676.5,413.1 684.1,420.6 689.6,423.4C704,430.5 715.8,427.3 716.5,416.1C716.9,409.3 717.9,409.1 725.9,414.4L728.5,416.1L728.4,436.7L728.2,457.2L700.2,457.4C684.8,457.5 672,457.4 671.8,457.2Z"/>
   </g>
   <g id="pants-fill">
-    <use href="#fill-bottom-maschio-slanciato" class="c-pants"/>
+    <use href="#fill-bottom-maschio-slanciato" class="c-pants c-edgefill"/>
   </g>
   <g id="torso-fill" class="c-idle-torso c-origin-maschio-slanciato">
     <use href="#fill-top-maschio-slanciato" class="c-shirt"/>
   </g>
   <!-- Pantaloni kaki: sotto le braccia -->
   <g id="bottom-pantaloni-kaki-back">
-    <use href="#fill-bottom-maschio-slanciato" class="c-main"/>
+    <use href="#fill-bottom-maschio-slanciato" class="c-main c-edgefill"/>
 
   </g>
   <!-- Camicia con maniche arrotolate: sotto le braccia -->

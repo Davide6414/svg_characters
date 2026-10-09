@@ -129,6 +129,7 @@
     /* Alcuni capi disegnano le braccia al posto di quelle della sagoma (spalle e braccia scoperte): le mettono nel gruppo
        .g-arms, e --show-body-arms nasconde quelle della sagoma. --show-arms (inline | none) nasconde tutte le braccia. */
     #arm-left, #arm-right { display: var(--show-body-arms, inline) }
+    .c-edgefill { display: var(--show-body-arms, inline) }
     .g-arms { display: var(--show-arms, inline) }
 
     /* Idle: respiro (busto e braccia si allungano di ~1%, la testa segue con un leggero ritardo)
@@ -166,39 +167,39 @@
     <path class="c-skin" d="M953.3,467.7C952.9,467.2 952.9,418 953.4,418C953.6,418 954.4,419 955.1,420.2C962.8,432.3 987.3,442 997,436.8C1002.9,433.6 1005.8,429.2 1005.2,423.9C1004.5,417.3 1005.9,416.7 1013.1,420.3L1016.5,422L1016.4,444.9L1016.2,467.8L985,467.9C967.8,467.9 953.5,467.9 953.3,467.7Z"/>
   </g>
   <g id="pants-fill">
-    <use href="#fill-bottom-maschio-adulto" class="c-pants"/>
+    <use href="#fill-bottom-maschio-adulto" class="c-pants c-edgefill"/>
   </g>
   <g id="torso-fill" class="c-idle-torso c-origin-maschio-adulto">
     <use href="#fill-top-maschio-adulto" class="c-shirt"/>
   </g>
   <!-- Jeans: sotto le braccia -->
   <g id="bottom-jeans-back">
-    <use href="#fill-bottom-maschio-adulto" class="c-main"/>
+    <use href="#fill-bottom-maschio-adulto" class="c-main c-edgefill"/>
 
   </g>
   <!-- Chino: sotto le braccia -->
   <g id="bottom-chino-back">
-    <use href="#fill-bottom-maschio-adulto" class="c-main"/>
+    <use href="#fill-bottom-maschio-adulto" class="c-main c-edgefill"/>
 
   </g>
   <!-- Jogger: sotto le braccia -->
   <g id="bottom-jogger-back">
-    <use href="#fill-bottom-maschio-adulto" class="c-main"/>
+    <use href="#fill-bottom-maschio-adulto" class="c-main c-edgefill"/>
 
   </g>
   <!-- Cargo: sotto le braccia -->
   <g id="bottom-cargo-back">
-    <use href="#fill-bottom-maschio-adulto" class="c-main"/>
+    <use href="#fill-bottom-maschio-adulto" class="c-main c-edgefill"/>
 
   </g>
   <!-- Pantaloni larghi: sotto le braccia -->
   <g id="bottom-larghi-back">
-    <use href="#fill-bottom-maschio-adulto" class="c-main"/>
+    <use href="#fill-bottom-maschio-adulto" class="c-main c-edgefill"/>
 
   </g>
   <!-- Pantaloni con cintura: sotto le braccia -->
   <g id="bottom-pantaloni-cintura-back">
-    <use href="#fill-bottom-maschio-adulto" class="c-main"/>
+    <use href="#fill-bottom-maschio-adulto" class="c-main c-edgefill"/>
 
   </g>
   <!-- Felpa: sotto le braccia -->

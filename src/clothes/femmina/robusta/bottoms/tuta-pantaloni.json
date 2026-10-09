@@ -1,0 +1,18 @@
+{
+  "name": "Pantaloni larghi con cintura",
+  "colors": {
+    "main": "#2b2f3e",
+    "trim": "#292d3c",
+    "accent": "#f0c480"
+  },
+  "landmarks": {
+    "pants-bl": [
+      1188.5,
+      865.1
+    ],
+    "pants-br": [
+      1352.5,
+      865.1
+    ]
+  }
+}

@@ -80,6 +80,7 @@
     /* Alcuni capi disegnano le braccia al posto di quelle della sagoma (spalle e braccia scoperte): le mettono nel gruppo
        .g-arms, e --show-body-arms nasconde quelle della sagoma. --show-arms (inline | none) nasconde tutte le braccia. */
     #arm-left, #arm-right { display: var(--show-body-arms, inline) }
+    .c-edgefill { display: var(--show-body-arms, inline) }
     .g-arms { display: var(--show-arms, inline) }
 
     /* Idle: respiro (busto e braccia si allungano di ~1%, la testa segue con un leggero ritardo)
@@ -117,14 +118,14 @@
     <path class="c-skin" d="M398.8,559.7C398,558.8 398.5,514 399.4,513.6C402.4,512 404.3,512.4 405.2,514.7C411.7,531.8 445,535.3 445,518.9C445,513.8 446.5,513.6 452.9,517.4L456.8,519.8L456.8,539.8L456.8,559.8L428,559.9C412.1,559.9 399,559.9 398.8,559.7Z"/>
   </g>
   <g id="pants-fill">
-    <use href="#fill-bottom-maschio-ragazzo" class="c-pants"/>
+    <use href="#fill-bottom-maschio-ragazzo" class="c-pants c-edgefill"/>
   </g>
   <g id="torso-fill" class="c-idle-torso c-origin-maschio-ragazzo">
     <use href="#fill-top-maschio-ragazzo" class="c-shirt"/>
   </g>
   <!-- Jeans grigi: sotto le braccia -->
   <g id="bottom-jeans-grigi-back">
-    <use href="#fill-bottom-maschio-ragazzo" class="c-main"/>
+    <use href="#fill-bottom-maschio-ragazzo" class="c-main c-edgefill"/>
 
   </g>
   <!-- Felpa con cappuccio: sotto le braccia -->

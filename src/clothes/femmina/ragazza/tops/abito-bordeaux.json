@@ -1,0 +1,9 @@
+{
+  "name": "Abito bordeaux con spalline",
+  "colors": {
+    "main": "#752c30"
+  },
+  "replaces": [
+    "arms"
+  ]
+}

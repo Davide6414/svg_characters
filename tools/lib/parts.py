@@ -216,14 +216,17 @@ def extend_top(cell, up, notch=35, inset=5, taper=0.3, band_only=False):
     return band if band_only else cell | band
 
 
-def extend_bottom(cell, down, notch=25, inset=10, band_only=False, wide=0.0):
+def extend_bottom(cell, down, notch=25, inset=10, band_only=False, wide=0.0, hem=None):
     """Parte bassa di una maglia (in un livello sotto i pantaloni): un rettangolo largo come l'orlo, `down` px più in
     basso. Con pantaloni che cominciano più in basso dell'orlo non resta un buco in vita.
     `wide` (frazione 0-1): l'orlo è l'ultima riga larga almeno quella frazione della riga più larga, non l'ultima riga
-    della regione. Serve quando la manica è unita al busto e arriva più in basso (il polsino non è l'orlo)."""
+    della regione. Serve quando la manica è unita al busto e arriva più in basso (il polsino non è l'orlo).
+    `hem`: riga del bitmap dell'orlo, quando nessuna regola lo trova (le maniche a sbuffo sono larghe come il busto)."""
     rows = np.nonzero(cell.any(1))[0]
     last = rows.max()
-    if wide:
+    if hem is not None:
+        last = hem
+    elif wide:
         width = cell.sum(1)
         last = np.nonzero(width >= wide * width.max())[0].max()
     band = band_rect(cell, slice(last + 1 - int(notch * K), last + 1), -down, notch, inset=inset)

@@ -97,6 +97,7 @@
     /* Alcuni capi disegnano le braccia al posto di quelle della sagoma (spalle e braccia scoperte): le mettono nel gruppo
        .g-arms, e --show-body-arms nasconde quelle della sagoma. --show-arms (inline | none) nasconde tutte le braccia. */
     #arm-left, #arm-right { display: var(--show-body-arms, inline) }
+    .c-edgefill { display: var(--show-body-arms, inline) }
     .g-arms { display: var(--show-arms, inline) }
 
     /* Idle: respiro (busto e braccia si allungano di ~1%, la testa segue con un leggero ritardo)
@@ -134,14 +135,14 @@
     <path class="c-skin" d="M1263.8,497.7C1263.3,497.2 1263.4,447.5 1263.9,447.5C1264.1,447.5 1265.2,448.7 1266.2,450.3C1281.3,472.1 1309,474.1 1309.2,453.2C1309.3,447.4 1311.3,447.3 1317.7,453.1L1320.5,455.6L1320.4,476.7L1320.2,497.8L1292.2,497.9C1276.8,498 1264,497.9 1263.8,497.7Z"/>
   </g>
   <g id="pants-fill">
-    <use href="#fill-bottom-maschio-robusto" class="c-pants"/>
+    <use href="#fill-bottom-maschio-robusto" class="c-pants c-edgefill"/>
   </g>
   <g id="torso-fill" class="c-idle-torso c-origin-maschio-robusto">
     <use href="#fill-top-maschio-robusto" class="c-shirt"/>
   </g>
   <!-- Jeans chiari: sotto le braccia -->
   <g id="bottom-jeans-chiari-back">
-    <use href="#fill-bottom-maschio-robusto" class="c-main"/>
+    <use href="#fill-bottom-maschio-robusto" class="c-main c-edgefill"/>
 
   </g>
   <!-- Cardigan grigio: sotto le braccia -->
