@@ -20,12 +20,16 @@ Ogni capo ha:
   to_shoes   regioni che scendono sotto le scarpe (pantaloni, calze, gambe), così l'orlo non si vede
   layers     {indice: 'under'} regioni che stanno sotto i pantaloni (la pancia scoperta di un top corto)
   pad_under  {indice: dict(near=regioni vicine, up=, down=)} allunga in verticale quelle regioni sotto le regioni vicine
-  widen      {indice: (regioni vicine,)} allarga la regione in orizzontale sotto le regioni vicine (la pancia sotto le braccia)
+  widen      {indice: (regioni vicine,)} allarga la regione in orizzontale fino alle regioni vicine, se distano meno di 25 px
+             (la pancia sotto le braccia: così fra pancia e braccio non restano due tratti che si fondono in un cuneo nero)
   under_up   {indice: px} i pantaloni salgono di tanti px sotto la maglia (in un livello sotto), così con una maglia
              più corta o con un orlo diverso non resta un buco in vita
   under_down {indice: px | (px, rientro)} lo stesso per una maglia corta o infilata: scende sotto i pantaloni (rientro ai
              lati in px, 10 se non detto)
-  join       {indice: (altre regioni,)} regioni da unire in una sola (le gambe dei leggings sotto un abito)
+  join       {indice: (altre regioni,)} regioni da unire in una sola (le gambe dei leggings sotto un abito): il confine
+             resta come cucitura
+  absorb     {indice: (altre regioni,)} lo stesso senza cucitura (la fessura fra braccio e pancia che il foglio lascia
+             vuota diventa pelle della pancia: niente linea fra le due)
   extend_top {indice: px | (px, rientro)} la regione sale di tanti px, con i bordi alti pieni (i fianchi nascosti da un
              abito, una vita da raddrizzare); il rientro tiene gli angoli dentro il profilo
   clip_top   regioni da cui togliere le strisce strette in alto (un pezzo di pantalone che risale lungo un braccio)
@@ -62,8 +66,8 @@ OUTFITS['vestiti-femminili'] = [
          bottom=dict(id='jeans-scuri', name='Jeans scuri', regions={7: 'main'}, to_shoes=(7,),
                      behind={7: (3, 4, 5, 6)}, under_up={7: 30})),
     dict(body='slanciata',
-         top=dict(id='top-corto', name='Top corto', regions={3: 'main', 4: 'skin', 5: 'skin', 6: 'skin', 7: 'skin', 8: 'skin'},
-                  layers={7: 'under', 8: 'under'}, pad_under={7: dict(near=(4, 9), up=0, down=45), 8: dict(near=(3, 9), up=14, down=60)}, widen={8: (4, 6)}, parts={4: 'arms', 5: 'arms', 6: 'arms'}, neck=True),   # braccia e pancia scoperte
+         top=dict(id='top-corto', name='Top corto', regions={3: 'main', 4: 'skin', 5: 'skin', 6: 'skin', 8: 'skin'}, absorb={8: (7,)},
+                  layers={8: 'under'}, pad_under={8: dict(near=(3, 4, 9), up=14, down=60)}, widen={8: (4, 6)}, parts={4: 'arms', 5: 'arms', 6: 'arms'}, neck=True),   # braccia e pancia scoperte
          bottom=dict(id='jeans-a-zampa', name='Jeans a zampa', regions={9: 'main'}, to_shoes=(9,))),
     dict(body='adulta',
          top=dict(id='maglietta-v', name='Maglietta scollo a V', regions={3: 'main'}, arms=(6, 7), neck=True),
@@ -95,7 +99,7 @@ OUTFITS['vestiti-femminili-2'] = [
                   neck=True, under_down={7: (30, 0), 5: (20, 4), 6: (20, 4)}),                        # il top e i lembi scendono sotto i pantaloni
          bottom=dict(id='jeans-neri', name='Jeans neri risvoltati', regions={18: 'main', 14: 'main', 15: 'main', 16: 'main',
                                                                              19: 'trim', 20: 'trim', 21: 'skin', 22: 'skin'},
-                     to_shoes=(21, 22), behind={18: (5, 6, 7)}, extend_top={18: (16, 6)}, under_up={18: 12})),     # la vita arriva alla cintura (nel foglio la giacca copre i fianchi)
+                     to_shoes=(21, 22), behind={18: (5, 6, 7)}, extend_top={18: (16, 12)}, under_up={18: 12})),     # la vita arriva alla cintura (nel foglio la giacca copre i fianchi)
     dict(body='adulta',
          top=dict(id='maglione-v', name='Maglione a coste', regions={3: 'main'}, arms=(4, 6), neck=True, folds=(3,)),
          bottom=dict(id='pantaloni-oliva', name='Pantaloni oliva', regions={5: 'main', 7: 'skin'}, to_shoes=(5, 7),

@@ -79,6 +79,24 @@ def _smooth_mask(mask, sigma, min_area, close=0):
     return fill_small_holes(m, 12 * K * K) if m.any() else m
 
 
+WIDEN_GAP = 25        # px: `widen` colma la distanza fra la regione e le regioni vicine se è minore di tanto
+
+
+def _bridge(cell, near, gap):
+    """Riga per riga, riempie lo spazio fra la regione e le regioni vicine (a destra e a sinistra) se è largo meno di
+    `gap`: la regione arriva fino al bordo del braccio e fra i due non restano due tratti che si fondono in un cuneo."""
+    out = cell.copy()
+    for r in np.nonzero(cell.any(1))[0]:
+        xs, ns = np.nonzero(cell[r])[0], np.nonzero(near[r])[0]
+        lo, hi = xs.min(), xs.max()
+        right, left = ns[ns > hi], ns[ns < lo]
+        if right.size and right.min() - hi <= gap:
+            out[r, hi:right.min() + 1] = True
+        if left.size and lo - left.max() <= gap:
+            out[r, left.max():lo + 1] = True
+    return out
+
+
 def _extend_rows(mask, up, down):
     """Allunga una maschera in verticale: ogni pixel si ripete `up` righe sopra e `down` righe sotto."""
     out = mask.copy()
@@ -107,7 +125,7 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
     head = int(seg.lab[int((e[0]['cy'] - y0) * K), int((e[0]['cx'] - x0) * K)])
     g = grow_labels(seg.lab, seg.dark)
     used = {i for kind in ('top', 'bottom') for i in spec[kind]['regions']}
-    used |= {j for kind in ('top', 'bottom') for js in spec[kind].get('join', {}).values() for j in js}
+    used |= {j for kind in ('top', 'bottom') for key in ('join', 'absorb') for js in spec[kind].get(key, {}).values() for j in js}
 
     # suolo e allineamento alla sagoma: testa e linea del suolo
     cand = [i for i, r in info.items() if not r['bg'] and i != head and r['area'] >= 350]
@@ -160,7 +178,7 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
     out = {}
     for kind in ('top', 'bottom'):
         cs = spec[kind]
-        labels = set(cs['regions']) | {j for js in cs.get('join', {}).values() for j in js}
+        labels = set(cs['regions']) | {j for key in ('join', 'absorb') for js in cs.get(key, {}).values() for j in js}
         base, overlays, strokes = [], [], []          # ordine di disegno: regioni, dettagli senza contorno, tratti sopra i dettagli
         shape, joined_seams = {}, []
 
@@ -180,6 +198,8 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
                 for pts in skeleton_lines(touch, 9 * K):
                     joined_seams.append(dict(d=catmull_d(rdp(pts, 1.1 * K), to_xy), label=i, kind='seam', length=len(pts) / K, thick=5.0))
                 cell = cell | cells[j]
+            for j in cs.get('absorb', {}).get(i, ()):            # regioni assorbite: una sola regione, senza cucitura
+                cell = cell | cells[j]
             layer = cs.get('layers', {}).get(i, 'main')
             plain = cell                                          # la regione prima delle estensioni (per le fasce sotto)
             if i in cs.get('pad_under', {}):                      # pelle del livello sotto: si estende in verticale sotto i capi vicini
@@ -192,7 +212,7 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
                 near = np.zeros_like(seg.dark)
                 for j in cs['widen'][i]:
                     near |= cells[j]
-                cell = cell | (hdilate(cell, BACK * K) & dilate(near, 2 * K))
+                cell = _bridge(cell, near, WIDEN_GAP * K)                # fino alle regioni vicine (a meno di 25 px)
             if i in cs.get('behind', {}):                         # prosegue dietro le braccia (un pugno sui pantaloni)
                 arms = np.zeros_like(seg.dark)
                 for j in cs['behind'][i]:
