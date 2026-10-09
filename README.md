@@ -71,7 +71,7 @@ riscritte, quindi lo spessore del contorno resta uguale ovunque.
 ## Struttura dell'SVG di una sagoma
 
 Parti separate in gruppi con `id`, dal fondo al primo piano (uguali in tutte le sagome):
-`neck-fill` e i livelli dietro (`pants-fill`, `torso-fill`, `bottom-<id>-back`, `top-<id>-back`) → `arm-right` → parti sotto i pantaloni (`pants-under`, `bottom-<id>-under`, `top-<id>-under`) → `pants` (e i `bottom-<id>`) → `shoes` (`shoe-left`, `shoe-right`) → `arm-left` → `head` (con `hair` dentro, sotto gli occhi) → `torso` (e i `top-<id>`).
+`neck-fill` e i livelli dietro (`pants-fill`, `torso-fill`, `bottom-<id>-back`, `top-<id>-back`) → `arm-right` → parti sotto i pantaloni (`pants-under`, `bottom-<id>-under`, `top-<id>-under`) → `pants` (e i `bottom-<id>`) → `shoes` (`shoe-left`, `shoe-right`) → `arm-left` → `head` (riempimento e contorno separati, con i capelli in tre livelli, vedi *Capelli*; gli occhi per ultimi) → `torso` (e i `top-<id>`).
 
 - Ogni parte è una regione chiusa col suo contorno, e le regioni vicine si toccano a metà del tratto scuro del foglio, quindi non ci sono buchi né sovrapposizioni fra le linee.
 - Dentro le regioni ci sono le linee aperte: orecchio, cuciture delle maniche e del busto, cucitura interna e pieghe all'orlo dei pantaloni. Nei bambini c'è anche la tasca (un dettaglio dei pantaloni).
@@ -85,7 +85,7 @@ Parti separate in gruppi con `id`, dal fondo al primo piano (uguali in tutte le 
   con pantaloni disegnati su un altro foglio, o con la maglietta e i pantaloni base): l'audit li ha tenuti perché senza
   tornano buchi piccoli sul collo, sotto le braccia e in vita.
 - Scarpe, come regioni riempite: suola, tomaia (`c-upper-l` / `c-upper-r`), linguetta a sinistra, punta e zona lacci (`c-toe`, `c-lace`) a destra. Alcune sagome non hanno la punta come regione a parte: `--shoe-toe` non ha effetto su di loro (il visualizzatore non mostra quel campo).
-- Il sorgente in `src/bodies/` contiene solo la geometria e il segnaposto `<!-- @hair -->` dentro `head`; colori, capelli e vestiti li aggiunge la build.
+- Il sorgente in `src/bodies/` contiene solo la geometria e i segnaposto `<!-- @hair-back -->`, `<!-- @hair-skin -->` e `<!-- @hair -->` dentro `head`; colori, capelli e vestiti li aggiunge la build.
 
 ### Scala e riquadro
 
@@ -93,8 +93,29 @@ Le coordinate sono quelle dei fogli di riferimento, uguali per tutte le sagome: 
 
 ## Capelli
 
-Il gruppo `hair` sta **dentro** `head`, così i capelli seguono il movimento idle della testa, ed è disegnato prima degli
-occhi: una frangia lunga passa dietro gli occhi e non li copre. Ogni stile è un gruppo `hair-<id>` con la sagoma (riempimento + contorno) e qualche linea interna per ciocche e separazioni. Ne è visibile uno solo: per default quello del preset di quella sagoma.
+I capelli stanno **dentro** `head`, così seguono il movimento idle della testa, e sono disegnati prima degli occhi: una
+frangia lunga passa dietro gli occhi e non li copre. Ogni stile è un gruppo `hair-<id>` con la sagoma (riempimento +
+contorno) e qualche linea interna per ciocche e separazioni. Ne è visibile uno solo: per default quello del preset di
+quella sagoma.
+
+**Tre livelli nella testa.** Le parti dei capelli che devono stare attaccate al cranio non si possono disegnare come il
+resto: la testa di ogni sagoma ha un contorno un poco diverso da quello del foglio, e una striscia o un ciuffo
+disegnati "a occhio" resterebbero staccati. Perciò la testa è disegnata in due passate (riempimento della pelle, poi
+contorno) e un'acconciatura può avere parti in tre livelli, scelti dalla classe del percorso nel suo `.svg`:
+
+- `c-behind`, **dietro la testa** (`hair-back`, prima del riempimento): un ciuffo che spunta oltre il cranio, come quelli
+  della calvizie dal lato degli occhi. Il tracciatore lo prolunga dentro il cranio, dove la testa lo copre, quindi
+  resta attaccato qualunque sia la testa; ha il tratto solo sul bordo esterno, dalla parte della testa c'è il contorno
+  della testa;
+- `c-shaved`, **sulla pelle ma sotto il contorno** (`hair-skin`): la zona rasata, trasparente. Il tracciatore la allarga
+  oltre il contorno della testa e non disegna il suo tratto verso l'esterno; la build la ritaglia sulla testa di ogni
+  sagoma (`clip-path` con il riempimento della testa, `head-clip-<gruppo>-<sagoma>` in `<defs>`), quindi arriva sempre
+  fino al contorno e non resta una striscia di pelle né un doppio contorno;
+- tutto il resto, **davanti** (`hair`).
+
+I capelli sparsi della calvizie partono da dentro il cranio e oltrepassano il contorno, quindi toccano la testa anche
+se il cranio è un poco più alto o più basso di quello del foglio. Ogni livello ha un gruppo per stile
+(`hair-<id>-back`, `hair-<id>-skin`) con la stessa visibilità dello stile.
 
 | Stile (`id`) | Nome | Colore di default |
 | --- | --- | --- |

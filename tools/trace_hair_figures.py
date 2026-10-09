@@ -14,7 +14,10 @@ Ogni stile ha:
   ages       età delle sagome a cui si applica (vedi `ages` nel manifest); senza: tutte
   strays     True: cerca anche i capelli sparsi sopra una testa calva
   fit_top    True: la cima del cranio si vede (testa calva) e si allinea anche quella (scala verticale a parte)
-  shaved     differenza di luminosità oltre la quale i capelli più chiari sono una zona rasata (disegnata trasparente)
+  shaved     differenza di luminosità oltre la quale i capelli più chiari sono una zona rasata (disegnata trasparente,
+             sotto il contorno della testa: la build la ritaglia sulla testa di ogni sagoma)
+  behind     'right': i ciuffi a destra degli occhi stanno dietro la testa (la testa li copre col suo contorno): si
+             disegnano prima della testa, prolungati dentro il cranio, così restano attaccati a ogni testa
   scale, kx, ky, dy   correzioni dell'allineamento (scala, solo x, solo y, spostamento verticale) se servono
 Per l'allineamento e l'isolamento vedi `lib/hair_figures.py`; il colore si cambia poi con --hair come gli altri stili.
 """
@@ -30,7 +33,7 @@ from lib.sheet import Sheet                         # noqa: E402
 ADULTS, NOT_KIDS = ('adulto',), ('ragazzo', 'adulto')
 HAIRS = {
     'capelli-anziani': [
-        dict(id='calvizie', name='Calvizie con ciuffi', ages=ADULTS, strays=True, fit_top=True),
+        dict(id='calvizie', name='Calvizie con ciuffi', ages=ADULTS, strays=True, fit_top=True, behind='right'),
         dict(id='coda-grigia', name='Coda bassa', ages=NOT_KIDS),
         dict(id='chignon-grigio', name='Chignon basso', ages=NOT_KIDS),
         dict(id='stempiato', name='Stempiato', ages=ADULTS),
@@ -47,8 +50,17 @@ HAIRS = {
 
 
 def hair_svg(h, r):
+    """Righe di `<g id="hair-<id>">`. Le classi `c-behind` (ciuffi dietro la testa) e `c-shaved` (zona rasata: sulla pelle,
+    sotto il contorno della testa) dicono a `build.mjs` in quale livello della testa vanno; le altre stanno davanti."""
     c = f'c-hair-{h["id"]}'
-    rows = [f'    <path class="{c}" d="{"".join(r["fill"])}"' + (' fill-rule="evenodd"' if len(r['fill']) > 1 else '') + '/>']
+    rows = []
+    if r['behind']:
+        rows.append(f'    <path class="{c} c-behind" d="{"".join(r["behind"])}"' + (' fill-rule="evenodd"' if len(r['behind']) > 1 else '') + '/>')
+        rows += [f'    <path class="c-open c-stroke c-behind" d="{d}"/>' for d in r['behind_outline']]
+        for ln in r['behind_lines']:
+            width = '' if ln['thick'] >= 4.6 else ' c-fine' if ln['thick'] >= 3.2 else ' c-hair'
+            rows.append(f'    <path class="c-open c-stroke{width} c-behind" d="{ln["d"]}"/>')
+    rows.append(f'    <path class="{c}" d="{"".join(r["fill"])}"' + (' fill-rule="evenodd"' if len(r['fill']) > 1 else '') + '/>')
     if r['shaved']:
         rows.append(f'    <path class="{c} c-shaved" d="{"".join(r["shaved"])}"/>')
     rows += [f'    <path class="c-open c-stroke" d="{d}"/>' for d in r['outline']]

@@ -15,6 +15,7 @@ import numpy as np
 
 from .geom import (catmull_d, components_pts, dilate, erode, fill_small_holes, grow_labels, label_components,
                    longest_path, rdp, skeleton_lines, trace_paths, zhang_suen)
+from .parts import hdilate
 from .segment import DARK, K, segment
 
 EYE_X, EYE_Y = 199.4, 357.0     # occhi nella testa di riferimento (media delle sagome riportate nel riquadro)
@@ -140,35 +141,89 @@ def trace_hair_figure(sheet, box, spec, verbose=False):
         ky = (EYE_Y - TOP_Y) / ((eye_y - top) * s)
         if verbose:
             print(f'  cima del cranio {top:.0f}: ky {ky:.3f}')
-    cell = fill_small_holes(g == HAIR, 60 * K * K)
+    cell_all = fill_small_holes(g == HAIR, 60 * K * K)
     cell_shaved = g == SHAVED
-    # contorno: il bordo della sagoma dove nel foglio c'è un tratto scuro
+    outside = g == REST                          # fuori dalla figura (sfondo e resto del foglio)
+    near_out = dilate(outside, 3.0 * K)
+    # ciuffi dietro la testa: la testa li copre con il suo contorno. Si disegnano prima della testa e si prolungano
+    # dentro il cranio (nascosto), così restano attaccati qualunque sia la testa; senza tratto verso la testa.
+    behind = np.zeros_like(cell_all)
+    if spec.get('behind') == 'right':
+        lab_c, n_c = label_components(cell_all, conn=8)
+        for i in range(1, n_c + 1):
+            ys, xs = np.nonzero(lab_c == i)
+            if len(ys) >= 400 * K * K and xs.mean() / K + x0 > eye_x + 5:
+                behind |= lab_c == i
+    cell = cell_all & ~behind
+    behind_ext = behind | (dilate(behind, 14 * K) & (g == SKIN) & (np.arange(h)[:, None] < (eye_y - y0 - 15) * K))
+    # la zona rasata mostra la pelle: si allarga oltre il contorno della testa e la build la ritaglia sulla testa
+    # (altrimenti, su una testa diversa, resterebbe una striscia fra la zona e il contorno)
+    shaved_ext = cell_shaved | (hdilate(cell_shaved, 16 * K) & outside & ~dilate(cell_all, 3.0 * K)) if cell_shaved.any() else cell_shaved
+    # contorno: il bordo della sagoma dove nel foglio c'è un tratto scuro. Non quello della zona rasata verso l'esterno
+    # (è il contorno della testa, lo disegna la testa) né quello dei ciuffi dietro verso la testa
     near_dark = dilate(seg.dark, 2.5 * K)
-    edge = (cell | cell_shaved) & ~erode(cell | cell_shaved, 1.0)
-    outlined = dilate(edge & near_dark, 1.5 * K)
+    union = cell | cell_shaved
+    edge = union & ~erode(union, 1.0)
+    head_edge = dilate(cell_shaved, 1.5 * K) & near_out & ~dilate(cell, 3.0 * K)
+    outlined = dilate(edge & near_dark & ~head_edge, 1.5 * K)
     outline = [catmull_d(rdp(p, 1.1 * K), to_xy) for p in all_lines(outlined, 6 * K)]
+    # (dei ciuffi dietro: tutto il bordo, anche quello dentro il cranio che la testa nasconde, così la punta che spunta
+    # oltre il contorno ha il suo tratto)
+    edge_b = behind_ext & ~erode(behind_ext, 1.0)
+    outline_behind = [catmull_d(rdp(p, 1.1 * K), to_xy) for p in all_lines(dilate(edge_b, 1.5 * K), 6 * K)]
     # linee interne: tratti scuri dentro la sagoma, lontani dal bordo
-    inner = seg.dark & erode(cell | cell_shaved, 4.5 * K)
-    lines = []
-    for p in all_lines(inner, spec.get('min_line', 10) * K):
-        pm = np.zeros((h, w), bool)
-        for x, y in p:
-            pm[int(y), int(x)] = True
-        thick = float((dilate(pm, 3 * K) & seg.dark).sum() / len(p) / K)
-        lines.append(dict(d=catmull_d(rdp(p, 1.1 * K), to_xy), thick=thick, length=len(p) / K))
-    # capelli sparsi sopra una testa calva: tratti scuri sottili fuori dalla sagoma, sopra la testa
+    def inner_lines(mask):
+        out = []
+        for p in all_lines(seg.dark & erode(mask, 4.5 * K), spec.get('min_line', 10) * K):
+            pm = np.zeros((h, w), bool)
+            for x, y in p:
+                pm[int(y), int(x)] = True
+            thick = float((dilate(pm, 3 * K) & seg.dark).sum() / len(p) / K)
+            out.append(dict(d=catmull_d(rdp(p, 1.1 * K), to_xy), thick=thick, length=len(p) / K))
+        return out
+    lines = inner_lines(union)
+    lines_behind = inner_lines(behind) if behind.any() else []
+    # capelli sparsi sopra una testa calva: tratti scuri sottili sopra la testa; partono da dentro il cranio (si prolungano
+    # oltre il contorno), così restano attaccati alla testa di qualunque sagoma
     strays = []
     if spec.get('strays'):
         others = (g != REST)
-        loose = seg.dark & (g == REST) & ~dilate(others, 3.0 * K) & (rows < (eye_y - y0 - 40) * K)
-        for p in skeleton_lines(dilate(loose, 0.5 * K), 8 * K, max_lines=12):
-            strays.append(catmull_d(rdp(p, 1.1 * K), to_xy))
+        crown = rows < (eye_y - y0 - 40) * K
+        loose = seg.dark & (g == REST) & ~dilate(others, 3.0 * K) & crown
+        deep = seg.dark & erode(g == SKIN, 5.0 * K) & crown        # i capelli che stanno sul cranio
+        edge_zone = dilate(g != SKIN, 9.0 * K)
+        centre = np.array([(eye_x - x0) * K, (eye_y - y0) * K])
+
+        def reach(pts, toward_head):
+            """Prolunga di ~11 px l'estremo vicino al contorno della testa (lungo la direzione della linea)."""
+            pts = [np.array(q, float) for q in pts]
+            ends = [(0, 5), (len(pts) - 1, len(pts) - 6)]
+            if toward_head:
+                i, j = min(ends, key=lambda e: np.linalg.norm(pts[e[0]] - centre))
+            else:
+                near = [e for e in ends if edge_zone[int(pts[e[0]][1]), int(pts[e[0]][0])]]
+                if not near:
+                    return [tuple(q) for q in pts]
+                i, j = near[0]
+            d = pts[i] - pts[max(0, min(len(pts) - 1, j))]
+            if np.linalg.norm(d) > 0:
+                tip = pts[i] + d / np.linalg.norm(d) * 11 * K
+                pts = [tip] + pts if i == 0 else pts + [tip]
+            return [tuple(q) for q in pts]
+
+        for pts in skeleton_lines(dilate(loose, 0.5 * K), 8 * K, max_lines=12):
+            strays.append(catmull_d(rdp(reach(pts, True), 1.1 * K), to_xy))
+        for pts in skeleton_lines(dilate(deep, 0.5 * K), 22 * K, max_lines=12):          # solo i capelli lunghi: i pezzetti sono rumore
+            strays.append(catmull_d(rdp(reach(pts, False), 1.1 * K), to_xy))
     fill = trace_paths(cell, to_xy, opttol=1.6 * K / 2, alphamax=1.0, turd=20 * K, smooth=1.0)
-    fill_shaved = trace_paths(cell_shaved, to_xy, opttol=1.6 * K / 2, alphamax=1.0, turd=20 * K, smooth=1.0) if cell_shaved.any() else []
+    fill_behind = trace_paths(behind_ext, to_xy, opttol=1.6 * K / 2, alphamax=1.0, turd=20 * K, smooth=1.0) if behind.any() else []
+    fill_shaved = trace_paths(shaved_ext, to_xy, opttol=1.6 * K / 2, alphamax=1.0, turd=20 * K, smooth=1.0) if cell_shaved.any() else []
     core = erode(hair, 3 * K)
     vals = seg.rgb[core if core.any() else hair]
     color = '#%02x%02x%02x' % tuple(int(round(v)) for v in np.median(vals, axis=0))
     if verbose:
         print(f'  occhi ({eye_x:.0f}, {eye_y:.0f}) distanza {span:.1f} → scala {s:.3f}; pelle {skin.astype(int)}; '
-              f'sagoma {len(fill)} percorsi, contorno {len(outline)}, linee {len(lines)}, sparsi {len(strays)}, colore {color}')
-    return dict(fill=fill, shaved=fill_shaved, outline=outline, lines=lines, strays=strays, color=color)
+              f'sagoma {len(fill)} percorsi, contorno {len(outline)}, linee {len(lines)}, sparsi {len(strays)}, '
+              f'dietro {len(fill_behind)}, colore {color}')
+    return dict(fill=fill, shaved=fill_shaved, outline=outline, lines=lines, strays=strays, color=color,
+                behind=fill_behind, behind_outline=outline_behind, behind_lines=lines_behind)

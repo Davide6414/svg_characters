@@ -21,7 +21,7 @@
 
 /* Capelli: uno stile alla volta (default: {{hair-default}}). Il visualizzatore sceglie lo stile con
    --show-hair-NOME (inline | none) e può nascondere tutto con --show-hair. */
-#hair { display: var(--show-hair, inline) }
+#hair, #hair-back, #hair-skin { display: var(--show-hair, inline) }
 {{hair-show}}
 
 /* Vestiti: uno per tipo alla volta (default: {{outfit-default}}). Il visualizzatore sceglie con

@@ -545,13 +545,14 @@
       .replace(/calc\(([\d.]+) \* ([\d.]+)\)/g, (_, a, b) => String(+(a * b).toFixed(2)))
       .replace(/calc\((-?[\d.]+)s \+ ([\d.]+)s\)/g, (_, a, b) => `${+(+a + +b).toFixed(2)}s`);
     root.querySelector('title').textContent = `Personaggio – ${v.body.name}`;
-    const hidden = { head: ['head'], hair: ['hair'], torso: ['torso', 'torso-fill', 'neck-fill'], arms: ['arm-left', 'arm-right'], pants: ['pants', 'pants-under', 'pants-fill'], shoes: ['shoes'] };
+    const hidden = { head: ['head'], hair: ['hair', 'hair-back', 'hair-skin'], torso: ['torso', 'torso-fill', 'neck-fill'], arms: ['arm-left', 'arm-right'], pants: ['pants', 'pants-under', 'pants-fill'], shoes: ['shoes'] };
     for (const p of PARTS) {
       if (state.parts[p.key]) continue;
       for (const id of hidden[p.key]) root.querySelector(`#${id}`)?.remove();
     }
     // di capelli, maglie e pantaloni resta solo ciò che è scelto (Illustrator e Figma non rispettano display:none)
-    for (const h of HAIR) if (h.id !== v.hair) root.querySelector(`#hair-${h.id}`)?.remove();
+    for (const h of HAIR) if (h.id !== v.hair) root.querySelectorAll(`#hair-${h.id}, #hair-${h.id}-back, #hair-${h.id}-skin`).forEach(n => n.remove());
+    root.querySelectorAll('#hair-back, #hair-skin').forEach(n => { if (!n.children.length) n.remove(); });   // livelli vuoti: lo stile scelto non li usa
     const parts = (kind, id) => `#${kind}-${id}, #${kind}-${id}-under, #${kind}-${id}-back`;      // il capo e i suoi livelli
     for (const t of ALL_TOPS) if (t.id !== v.top) root.querySelectorAll(parts('top', t.id)).forEach(n => n.remove());
     for (const b of ALL_BOTTOMS) if (b.id !== v.bottom) root.querySelectorAll(parts('bottom', b.id)).forEach(n => n.remove());

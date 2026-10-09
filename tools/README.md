@@ -77,6 +77,16 @@ testa:
    linee aperte; il riempimento è senza tratto. Le **linee interne** (ciocche) sono i tratti scuri dentro la sagoma, con
    tre spessori; i **capelli sparsi** (`strays`) quelli sottili sopra una testa calva; la **zona rasata** (`shaved`)
    i capelli più chiari della media, disegnati con lo stesso colore trasparente (`.c-shaved`).
+4. **Parti attaccate al cranio.** La testa di ogni sagoma ha un contorno diverso da quello del foglio, quindi ciò che
+   deve toccare il cranio non si disegna "a occhio" ma in modo che la build lo faccia combaciare con ogni testa:
+   - la zona rasata si allarga in orizzontale oltre il contorno della testa del foglio e non ha tratto verso l'esterno
+     (quello è il contorno della testa); la build la ritaglia sulla testa della sagoma (livello `hair-skin`, classe
+     `c-shaved`);
+   - `behind='right'`: i ciuffi a destra degli occhi stanno dietro la testa (livello `hair-back`, classe `c-behind`): si
+     prolungano dentro il cranio, dove la testa li copre, e hanno il tratto lungo tutto il bordo;
+   - i capelli sparsi partono da dentro il cranio (si prolungano di ~11 px oltre il contorno) e solo i capelli lunghi
+     che stanno sul cranio si tengono.
+   Il resto (la massa dei capelli) sta davanti e può sporgere oltre la testa.
 
 La tabella `HAIRS[nome del foglio]` ha una riga per figura: id, nome, età (`ages`) e le opzioni sopra. L'età dice a quali
 sagome si applica lo stile (`ages` nel manifest): gli stili da anziani non vanno ai bambini.

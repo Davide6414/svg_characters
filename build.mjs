@@ -31,15 +31,20 @@ const styleTemplate = await read('src/style.css');
 
 const hair = await Promise.all(manifest.hair.map(async (id) => {
   const svg = await read(`src/hair/${id}.svg`);
-  const group = svg.match(/<g id="hair-[\s\S]*<\/g>/)?.[0];
-  if (!group) throw new Error(`src/hair/${id}.svg: gruppo <g id="hair-…"> non trovato`);
-  return { id, ...(await readJson(`src/hair/${id}.json`)), group };
+  const whole = svg.match(/<g id="hair-[\s\S]*<\/g>/)?.[0];
+  if (!whole) throw new Error(`src/hair/${id}.svg: gruppo <g id="hair-…"> non trovato`);
+  // tre livelli nella testa: i percorsi `c-behind` stanno dietro la testa (un ciuffo che spunta oltre il cranio), quelli
+  // `c-shaved` sulla pelle ma sotto il contorno della testa (zona rasata, ritagliata sulla testa), gli altri davanti
+  const rows = whole.split('\n'), layer = (cls) => rows.filter((l) => l.includes(`${cls}"`) || l.includes(`${cls} `)).join('\n');
+  const back = layer('c-behind'), skin = layer('c-shaved');
+  const group = rows.filter((l) => !back.split('\n').includes(l) && !skin.split('\n').includes(l)).join('\n');
+  return { id, ...(await readJson(`src/hair/${id}.json`)), group, back, skin };
 }));
 
 const bodies = await Promise.all(manifest.bodies.map(async (path) => {
   const [group, file] = path.split('/');
   const svg = await read(`src/bodies/${path}.svg`);
-  if (!svg.includes('<!-- @hair -->')) throw new Error(`src/bodies/${path}.svg: manca il segnaposto <!-- @hair -->`);
+  for (const mark of ['@hair-back', '@hair-skin', '@hair']) if (!svg.includes(`<!-- ${mark} -->`)) throw new Error(`src/bodies/${path}.svg: manca il segnaposto <!-- ${mark} -->`);
   const inner = svg.slice(svg.indexOf('</title>') + '</title>'.length, svg.lastIndexOf('</svg>'));
   // i riempimenti di fondo hanno un id per sagoma (il visualizzatore mette tutte le sagome nella stessa pagina)
   const fills = {};
@@ -116,13 +121,13 @@ function hairFor(body) {
   const { L, R, T, eyeY } = body.head;
   const sx = (R - L) / (F.R - F.L), sy = (eyeY - T) / (F.eyeY - F.T);
   const f = (x, y) => [L + sx * (x - F.L), T + sy * (y - F.T)];
-  return hair.filter((h) => !h.ages || h.ages.includes(ageOf(body.id))).map((h) => ({ ...h, group: mapPaths(h.group, f) }));
+  return hair.filter((h) => !h.ages || h.ages.includes(ageOf(body.id))).map((h) => ({ ...h, group: mapPaths(h.group, f), back: mapPaths(h.back, f), skin: mapPaths(h.skin, f) }));
 }
 for (const b of bodies) b.hair = hairFor(b);
 
 // ---- riquadro comune: stessa scala e linea del suolo, spazio per i capelli ------------
 const ext = (b) => {
-  const pts = [...coords(b.inner), ...b.hair.flatMap((h) => coords(h.group)), ...b.clothes.flatMap((g) => coords(g.content + g.under + g.back))];
+  const pts = [...coords(b.inner), ...b.hair.flatMap((h) => coords(h.group + h.back + h.skin)), ...b.clothes.flatMap((g) => coords(g.content + g.under + g.back))];
   const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
   return [Math.min(...xs) - 3.5, Math.min(...ys) - 3.5, Math.max(...xs) + 3.5, Math.max(...ys) + 3.5];
 };
@@ -161,7 +166,7 @@ function css(body, defaultHair, defaults, preset) {
   const cl = clothesCss(body, defaults);
   let out = styleTemplate.replace(/\{\{([\w-]+)\}\}/g, (m, k) => {
     if (k === 'hair-fills') return body.hair.map((h) => `.c-hair-${h.id} { fill: var(--hair, ${preset?.colors?.hair ?? h.color}) }`).join('\n');
-    if (k === 'hair-show') return body.hair.map((h) => `#hair-${h.id} { display: var(--show-hair-${h.id}, ${h.id === defaultHair ? 'inline' : 'none'}) }`).join('\n');
+    if (k === 'hair-show') return body.hair.map((h) => `${[`#hair-${h.id}`, ...(h.back ? [`#hair-${h.id}-back`] : []), ...(h.skin ? [`#hair-${h.id}-skin`] : [])].join(', ')} { display: var(--show-hair-${h.id}, ${h.id === defaultHair ? 'inline' : 'none'}) }`).join('\n');
     if (k === 'hair-default') return defaultHair;
     if (k === 'outfit-default') return `${defaults.top} + ${defaults.bottom}`;
     if (k === 'body-arms-default') return body.clothes.some((g) => defaults[g.kind] === g.id && g.replaces?.includes('arms')) ? 'none' : 'inline';
@@ -196,8 +201,20 @@ function compose(body) {
   const x0 = Math.round((body.ext[0] + body.ext[2]) / 2 - W / 2);
   const hairXml = '\n    <!-- Capelli: nel gruppo della testa (così seguono il respiro), sotto gli occhi. Stile mostrato di default: ' + defaultHair + ' -->\n' +
     '    <g id="hair">\n' + body.hair.map((h) => `      <!-- ${h.name} -->\n` + h.group.split('\n').map((l) => '    ' + l).join('\n')).join('\n') + '\n    </g>';
+  // i livelli dei capelli nella testa: dietro il riempimento (ciuffi che spuntano oltre il cranio) e fra riempimento e contorno
+  // (zona rasata, ritagliata sulla testa della sagoma: se il disegno non combacia non resta nessuna striscia di pelle)
+  const layerXml = (id, key, attrs = '') => {
+    const parts = body.hair.filter((h) => h[key]).map((h) => `      <g id="hair-${h.id}-${id}">\n${h[key].split('\n').map((l) => '    ' + l).join('\n')}\n      </g>`);
+    return parts.length ? `    <g id="hair-${id}"${attrs}>\n${parts.join('\n')}\n    </g>` : '';
+  };
+  const clipId = `head-clip-${body.group}-${body.file}`;
+  const headFill = body.inner.match(/<!-- @hair-back -->\s*<path class="c-skin" d="([^"]*)"/)?.[1];
+  if (!headFill) throw new Error(`src/bodies/${body.id}.svg: riempimento della testa non trovato`);
   // i pantaloni vanno prima delle scarpe, le maglie dopo il busto
   let inner = body.inner.replace('    <!-- @hair -->', hairXml.replace(/^\n/, '\n'))
+    .replace('    <!-- @hair-back -->', layerXml('back', 'back'))
+    .replace('    <!-- @hair-skin -->', layerXml('skin', 'skin', ` clip-path="url(#${clipId})"`))
+    .replace('  </defs>', `    <clipPath id="${clipId}"><path d="${headFill}"/></clipPath>\n  </defs>`)
     .replace('<g id="torso" class="c-idle-torso">', `<g id="torso"${breathe('top')}>`)
     .replace('<g id="neck-fill">', `<g id="neck-fill"${breathe('top')}>`);
   // dietro al braccio lontano: prima i riempimenti e le parti dietro, poi le parti sotto (fasce in vita, pancia scoperta)

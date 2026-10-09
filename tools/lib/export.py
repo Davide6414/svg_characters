@@ -27,7 +27,8 @@ def _extent(body):
 
 def body_svg(body, title):
     """SVG della sola sagoma: stessi gruppi in tutte le sagome, dal fondo al primo piano. I colori e i capelli
-    li aggiunge `build.mjs` (il segnaposto `<!-- @hair -->` dice dove vanno i capelli, dentro `head`)."""
+    li aggiunge `build.mjs` (i segnaposto `<!-- @hair-back -->`, `<!-- @hair-skin -->` e `<!-- @hair -->` dicono dove vanno i
+    capelli, dentro `head`)."""
     P = body['parts']
     seams = {}
     for s in body['seams']:
@@ -65,8 +66,12 @@ def body_svg(body, title):
     L += ['      ' + _path('c-lace c-stroke c-fine', p['d']) for p in P.get('lace', [])]
     L += ['    </g>', '  </g>', '  <g id="arm-left" class="c-idle-arm">']
     L += ['    ' + _path('c-skin c-stroke', p['d']) for p in P['arm-left']]
-    L += ['  </g>', '  <g id="head" class="c-idle-head">']
-    L += ['    ' + _path('c-skin c-stroke', p['d']) for p in P['head']]
+    # la testa è disegnata in due passate (riempimento, poi contorno) per dare ai capelli tre livelli: dietro la testa
+    # (un ciuffo che spunta oltre il cranio), sulla pelle ma sotto il contorno (una zona rasata) e davanti
+    L += ['  </g>', '  <g id="head" class="c-idle-head">', '    <!-- @hair-back -->']
+    L += ['    ' + _path('c-skin', p['d']) for p in P['head']]
+    L += ['    <!-- @hair-skin -->']
+    L += ['    ' + _path('c-open c-stroke', p['d']) for p in P['head']]
     L += seam_paths('head', 4)
     L += ['    <!-- @hair -->']                     # i capelli sotto gli occhi: una frangia lunga non li copre mai
     for e in body['eyes']:

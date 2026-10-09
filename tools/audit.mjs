@@ -34,7 +34,7 @@ for (const id of manifest.bodies) {
   const svg = await read(`characters/${id}.svg`);
   const meta = await json(`src/bodies/${id}.json`);
   bodies.push({ id, group: id.split('/')[0], name: meta.name, svg, landmarks: meta.landmarks,
-                hair: [...svg.matchAll(/<g id="hair-([a-z0-9-]+)">/g)].map((m) => m[1]) });
+                hair: manifest.hair.filter((h) => svg.includes(`<g id="hair-${h}">`)) });
 }
 const clothes = {};
 for (const b of bodies) {
@@ -456,7 +456,6 @@ const flagged = {};
 for (const r of results) for (const [k, v] of Object.entries(r.out)) {
   if (!(k in LIMITS)) continue;
   const bad = k === 'eyes' ? v < LIMITS.eyes : v >= LIMITS[k];
-  if (k === 'floating' && r.hair === 'calvizie') continue;           // i capelli sparsi della calvizie sono staccati apposta
   if (bad) (flagged[k] ??= []).push(r);
 }
 for (const k of Object.keys(flagged)) flagged[k].sort((a, b) => (k === 'eyes' ? a.out[k] - b.out[k] : b.out[k] - a.out[k]));
