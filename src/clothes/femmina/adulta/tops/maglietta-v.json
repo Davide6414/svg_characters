@@ -1,0 +1,24 @@
+{
+  "name": "Maglietta scollo a V",
+  "colors": {
+    "main": "#6b6e53"
+  },
+  "landmarks": {
+    "armL-tl": [
+      877.0,
+      476.0
+    ],
+    "armL-tr": [
+      944.5,
+      476.0
+    ],
+    "armR-tl": [
+      1035.0,
+      482.7
+    ],
+    "armR-tr": [
+      1079.0,
+      482.7
+    ]
+  }
+}

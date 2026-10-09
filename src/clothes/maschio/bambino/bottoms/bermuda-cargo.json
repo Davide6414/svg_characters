@@ -1,0 +1,25 @@
+{
+  "name": "Bermuda cargo",
+  "colors": {
+    "main": "#a89172",
+    "under": "#f6f4ef"
+  },
+  "landmarks": {
+    "pants-tl": [
+      88.0,
+      771.5
+    ],
+    "pants-tr": [
+      222.5,
+      771.5
+    ],
+    "pants-bl": [
+      88.0,
+      865.5
+    ],
+    "pants-br": [
+      222.5,
+      865.5
+    ]
+  }
+}

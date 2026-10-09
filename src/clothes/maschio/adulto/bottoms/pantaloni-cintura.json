@@ -1,0 +1,18 @@
+{
+  "name": "Pantaloni con cintura",
+  "colors": {
+    "main": "#42403f",
+    "trim": "#c8bfb7",
+    "accent": "#4b372c"
+  },
+  "landmarks": {
+    "pants-bl": [
+      887.5,
+      859.0
+    ],
+    "pants-br": [
+      1060.5,
+      859.0
+    ]
+  }
+}

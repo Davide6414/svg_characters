@@ -1,0 +1,24 @@
+{
+  "name": "Jeans grigi",
+  "colors": {
+    "main": "#4d4f53"
+  },
+  "landmarks": {
+    "pants-tl": [
+      351.5,
+      676.7
+    ],
+    "pants-tr": [
+      501.0,
+      676.7
+    ],
+    "pants-bl": [
+      351.5,
+      865.0
+    ],
+    "pants-br": [
+      501.0,
+      865.0
+    ]
+  }
+}

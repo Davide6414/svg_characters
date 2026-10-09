@@ -2,14 +2,14 @@
 """Traccia gli outfit di un foglio in cui ogni figura indossa maglia e pantaloni sul proprio corpo.
 
 Uso:
-  python3 tools/trace_outfits.py reference/vestiti-femminili.webp --group femmina \\
+  python3 tools/trace_outfits.py reference/vestiti-femminili.webp \\
       --bodies src/bodies/femmina --out src/clothes/femmina
 
 La tabella delle figure si sceglie dal nome del foglio (OUTFITS[nome senza estensione]).
 
-Per ogni figura (da sinistra a destra) scrive in --out `tops/<id>.svg + .json` e `bottoms/<id>.svg + .json`. Ogni capo
-è disegnato sulla sagoma della figura (stesso nome in --bodies): il suo json dice su quale (`on`) e `build.mjs` lo
-adatta alle altre. A differenza di `trace_clothes.py` (stesso corpo, capi diversi) qui le regioni di ogni figura si
+Per ogni figura (da sinistra a destra) scrive in `--out/<sagoma>/` i file `tops/<id>.svg + .json` e
+`bottoms/<id>.svg + .json`. Ogni capo resta alla sagoma su cui è disegnato (stesso nome in --bodies): non si adatta ad
+altre corporature. A differenza di `trace_clothes.py` (stesso corpo, capi diversi) qui le regioni di ogni figura si
 assegnano a mano nelle tabelle OUTFITS: per vedere gli indici si lancia con -v.
 
 Ogni capo ha:
@@ -62,8 +62,8 @@ OUTFITS['vestiti-femminili'] = [
          bottom=dict(id='jeans-scuri', name='Jeans scuri', regions={7: 'main'}, to_shoes=(7,),
                      behind={7: (3, 4, 5, 6)}, under_up={7: 30})),
     dict(body='slanciata',
-         top=dict(id='top-corto', name='Top corto', regions={3: 'main', 4: 'skin', 5: 'skin', 6: 'skin', 8: 'skin'},
-                  layers={8: 'under'}, pad_under={8: dict(near=(3, 9), up=14, down=60)}, widen={8: (4, 6)}, parts={4: 'arms', 5: 'arms', 6: 'arms'}, neck=True),   # braccia e pancia scoperte
+         top=dict(id='top-corto', name='Top corto', regions={3: 'main', 4: 'skin', 5: 'skin', 6: 'skin', 7: 'skin', 8: 'skin'},
+                  layers={7: 'under', 8: 'under'}, pad_under={7: dict(near=(4, 9), up=0, down=45), 8: dict(near=(3, 9), up=14, down=60)}, widen={8: (4, 6)}, parts={4: 'arms', 5: 'arms', 6: 'arms'}, neck=True),   # braccia e pancia scoperte
          bottom=dict(id='jeans-a-zampa', name='Jeans a zampa', regions={9: 'main'}, to_shoes=(9,))),
     dict(body='adulta',
          top=dict(id='maglietta-v', name='Maglietta scollo a V', regions={3: 'main'}, arms=(6, 7), neck=True),
@@ -71,7 +71,7 @@ OUTFITS['vestiti-femminili'] = [
                      behind={9: (3,)}, under_up={9: 30})),
     dict(body='robusta',
          top=dict(id='cardigan', name='Cardigan', regions={3: 'main', 4: 'main', 5: 'under', 6: 'main', 9: 'main'}, neck=True,
-                  folds=(3, 4), under_down={5: (25, 0)}),                                             # la maglietta sotto scende sotto i pantaloni
+                  folds=(3, 4), under_down={5: (25, 6)}),                                             # la maglietta sotto scende sotto i pantaloni
          bottom=dict(id='pantaloni-marroni', name='Pantaloni marroni', regions={10: 'main'}, to_shoes=(10,), behind={10: (7, 8)},
                      clip_top=(10,), to_waist=(10,), under_up={10: 12})),                          # via la striscia lungo il braccio; vita piatta
 ]
@@ -102,7 +102,7 @@ OUTFITS['vestiti-femminili-2'] = [
                      behind={5: (3,)}, under_up={5: 30})),
     dict(body='robusta',
          top=dict(id='cardigan-fiori', name='Cardigan e maglia a fiori', regions={3: 'main', 4: 'main', 6: 'main', 9: 'main', 5: 'under'},
-                  split={5: [('accent', 'lilac')]}, neck=True, folds=(3, 4), under_down={5: (25, 0)}),  # fiori sulla maglia
+                  split={5: [('accent', 'lilac')]}, neck=True, folds=(3, 4), under_down={5: (25, 6)}),  # fiori sulla maglia
          bottom=dict(id='pantaloni-scuri', name='Pantaloni marrone scuro', regions={10: 'main'}, to_shoes=(10,),
                      behind={10: (7, 8)}, clip_top=(10,), to_waist=(10,), under_up={10: 12})),
 ]
@@ -141,9 +141,8 @@ OUTFITS['vestiti-maschili-outfit'] = [
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('sheet', help='foglio con gli outfit')
-    ap.add_argument('--group', required=True, help='gruppo delle sagome (es. femmina)')
     ap.add_argument('--bodies', required=True, help='cartella delle sagome tracciate (es. src/bodies/femmina)')
-    ap.add_argument('--out', required=True, help='cartella di destinazione (es. src/clothes/femmina)')
+    ap.add_argument('--out', required=True, help='cartella dei capi del gruppo (es. src/clothes/femmina): uno strato per sagoma')
     ap.add_argument('-v', '--verbose', action='store_true')
     a = ap.parse_args()
 
@@ -163,7 +162,7 @@ def main():
         res = trace_outfit(sheet, box, ref, spec, verbose=a.verbose)
         for kind, folder in (('top', 'tops'), ('bottom', 'bottoms')):
             cs, garment = spec[kind], res[kind]
-            write_garment(os.path.join(a.out, folder), cs['id'], cs['name'], garment, on=f'{a.group}/{spec["body"]}')
+            write_garment(os.path.join(a.out, spec['body'], folder), cs['id'], cs['name'], garment)
             print(f'{folder}/{cs["id"]}: {len(garment["regions"])} regioni, {len(garment["seams"])} linee, {len(garment["dots"])} puntini, colori {garment["colors"]}')
 
 

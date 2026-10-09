@@ -1,0 +1,17 @@
+{
+  "name": "Jeans neri risvoltati",
+  "colors": {
+    "main": "#3c3c3c",
+    "trim": "#5f5f5f"
+  },
+  "landmarks": {
+    "pants-bl": [
+      602.5,
+      864.3
+    ],
+    "pants-br": [
+      766.5,
+      864.3
+    ]
+  }
+}

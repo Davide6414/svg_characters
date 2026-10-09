@@ -1,0 +1,24 @@
+{
+  "name": "Pantaloni oliva",
+  "colors": {
+    "main": "#63604d"
+  },
+  "landmarks": {
+    "pants-tl": [
+      884.0,
+      556.5
+    ],
+    "pants-tr": [
+      1063.0,
+      556.5
+    ],
+    "pants-bl": [
+      884.0,
+      872.6
+    ],
+    "pants-br": [
+      1063.0,
+      872.6
+    ]
+  }
+}

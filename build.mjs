@@ -2,11 +2,11 @@
 //
 //   src/bodies/<gruppo>/<sagoma>.svg + .json   sagome (solo geometria + dati misurati)
 //   src/hair/<stile>.svg + .json               stili di capelli (coordinate del riquadro dei capelli)
-//   src/clothes/<gruppo>/{tops,bottoms}/…      vestiti, disegnati su un corpo di riferimento (reference.json del gruppo o `on` del capo)
+//   src/clothes/<gruppo>/<sagoma>/{tops,bottoms}/…   vestiti di quella sagoma (e solo di quella)
 //   src/style.css                              classi dei colori, visibilità di capelli e vestiti, animazione idle
 //   src/manifest.json                          gruppi, ordine, palette comune, vestiti, preset
 //
-//   → characters/<gruppo>/<sagoma>.svg         ogni sagoma con TUTTI i capelli e i vestiti del suo gruppo, file autonomo
+//   → characters/<gruppo>/<sagoma>.svg         ogni sagoma con i capelli della sua età e i SUOI vestiti, file autonomo
 //   → index.html                               visualizzatore (src/viewer/template.html + dati)
 //
 // Uso: node build.mjs
@@ -48,38 +48,48 @@ const bodies = await Promise.all(manifest.bodies.map(async (path) => {
 }));
 
 // ---- vestiti -----------------------------------------------------------------
-// Un capo ('top' = sopra il busto, 'bottom' = pantaloni) è disegnato su un corpo di riferimento: quello del gruppo
-// (src/clothes/<gruppo>/reference.json) oppure la sagoma indicata dal capo (`on`, per esempio "femmina/ragazza").
+// Ogni capo ('top' = sopra il busto, 'bottom' = pantaloni) appartiene a UNA sagoma: sta in src/clothes/<gruppo>/<sagoma>/
+// e si vede solo su quella. Non si adatta ad altre corporature (la deformazione fra corpi diversi dava troppi difetti di
+// vestibilità): il capo è disegnato sulla sagoma stessa. Fa eccezione un capo disegnato su un corpo di riferimento
+// (`"ref": "reference"` nel suo .json, con `reference.json` nella cartella): lo si adatta alla sagoma, che deve avere
+// proporzioni simili. Un capo può correggere alcuni punti di partenza (`landmarks`, per esempio l'orlo di una manica
+// corta) e dichiarare le parti del corpo che disegna da sé (`replaces`).
 // `<g id="garment">` è il capo; `<g id="underlay">`, se c'è, sta sotto i pantaloni (pelle scoperta da una maglia corta,
 // fasce che salgono o scendono sotto un altro capo); `<g id="backlay">` dietro a tutto (il capo sotto le braccia).
 const KINDS = { tops: 'top', bottoms: 'bottom' };
 const bodyById = Object.fromEntries(bodies.map((b) => [b.id, b]));
 const groupContent = (svg, id) => svg.match(new RegExp(`<g id="${id}">\\n([\\s\\S]*?)\\n  </g>`))?.[1];
 const clothes = {};
-for (const [group, lists] of Object.entries(manifest.clothes ?? {})) {
-  const groupRef = await read(`src/clothes/${group}/reference.json`).then(JSON.parse, () => null);
-  clothes[group] = { items: [] };
+for (const [bodyId, lists] of Object.entries(manifest.clothes ?? {})) {
+  if (!bodyById[bodyId]) throw new Error(`manifest.clothes: sagoma sconosciuta ${bodyId}`);
+  const dir = `src/clothes/${bodyId}`;
+  const reference = await read(`${dir}/reference.json`).then(JSON.parse, () => null);
+  clothes[bodyId] = [];
   for (const [folder, kind] of Object.entries(KINDS)) {
     for (const id of lists[folder] ?? []) {
-      const path = `src/clothes/${group}/${folder}/${id}`;
+      const path = `${dir}/${folder}/${id}`;
       const svg = await read(`${path}.svg`);
       const content = groupContent(svg, 'garment');
       if (!content) throw new Error(`${path}.svg: gruppo <g id="garment"> non trovato`);
       const meta = await readJson(`${path}.json`);
-      const ref = meta.on ? { landmarks: { ...bodyById[meta.on].landmarks, ...meta.landmarks } } : groupRef;
-      if (!ref) throw new Error(`${path}: serve src/clothes/${group}/reference.json oppure "on" nel json`);
-      clothes[group].items.push({ id, kind, group, ref, ...meta, content, under: groupContent(svg, 'underlay') ?? '', back: groupContent(svg, 'backlay') ?? '' });
+      if (meta.ref === 'reference' && !reference) throw new Error(`${path}: serve ${dir}/reference.json`);
+      const ref = meta.ref === 'reference' ? reference : { landmarks: { ...bodyById[bodyId].landmarks, ...meta.landmarks } };
+      clothes[bodyId].push({ id, kind, ...meta, ref, content, under: groupContent(svg, 'underlay') ?? '', back: groupContent(svg, 'backlay') ?? '' });
     }
   }
 }
 
-// Adattamento: thin-plate spline dai punti di riferimento del corpo di riferimento a quelli della sagoma.
-// Le coordinate vengono riscritte (lo spessore del contorno resta uguale); la rigidità tiene la deformazione dolce.
+// Adattamento: thin-plate spline dai punti di riferimento del corpo su cui è disegnato il capo a quelli della sagoma
+// (per un capo disegnato sulla sagoma stessa cambiano solo i punti corretti dal capo). Le coordinate vengono riscritte
+// (lo spessore del contorno resta uguale); la rigidità tiene la deformazione dolce.
 const FIT_STIFFNESS = 0.02;
-// Ogni capo si adatta partendo dal corpo su cui è stato disegnato (`ref`). Gli id sono unici fra i gruppi.
-const allIds = Object.values(clothes).flatMap((c) => c.items.map((g) => `${g.kind}-${g.id}`));
-if (new Set(allIds).size !== allIds.length) throw new Error('src/clothes: id di capo ripetuto fra gruppi diversi');
-const wardrobe = (group) => clothes[group]?.items ?? [];
+// Gli id dei capi sono unici dentro la sagoma (stesso id su sagome diverse va bene: il visualizzatore mostra solo i capi
+// della sagoma scelta, con variabili CSS --show-top-<id> / --show-bottom-<id>).
+for (const [bodyId, items] of Object.entries(clothes)) {
+  const ids = items.map((g) => `${g.kind}-${g.id}`);
+  if (new Set(ids).size !== ids.length) throw new Error(`src/clothes/${bodyId}: id di capo ripetuto`);
+}
+const wardrobe = (bodyId) => clothes[bodyId] ?? [];
 function clothesFor(body) {
   const fits = new Map();
   const fit = (ref) => {
@@ -90,7 +100,7 @@ function clothesFor(body) {
     return fits.get(ref);
   };
   const map = (xml, f) => mapCircles(mapPaths(xml, f), f);
-  return wardrobe(body.group).map((g) => { const f = fit(g.ref); return { ...g, content: map(g.content, f), under: map(g.under, f), back: map(g.back, f) }; });
+  return wardrobe(body.id).map((g) => { const f = fit(g.ref); return { ...g, content: map(g.content, f), under: map(g.under, f), back: map(g.back, f) }; });
 }
 for (const b of bodies) b.clothes = clothesFor(b);
 
@@ -218,8 +228,8 @@ const data = {
   groups: manifest.groups,
   hair: hair.map(({ id, name, color }) => ({ id, name, color })),
   bodies: bodies.map(({ id, group, name, svg, hair: hs }) => ({ id, group, name, svg, hair: hs.map((h) => h.id) })),
-  clothes: Object.fromEntries(manifest.groups.filter((g) => wardrobe(g.id).length).map((g) => [g.id, Object.fromEntries(Object.keys(KINDS).map((folder) =>
-    [folder, wardrobe(g.id).filter((i) => i.kind === KINDS[folder]).map(({ id, name, replaces }) => ({ id, name, replaces: replaces ?? [] }))]))])),
+  clothes: Object.fromEntries(bodies.map((b) => [b.id, Object.fromEntries(Object.keys(KINDS).map((folder) =>
+    [folder, b.clothes.filter((i) => i.kind === KINDS[folder]).map(({ id, name, replaces }) => ({ id, name, replaces: replaces ?? [] }))]))])),
   presets: manifest.presets,
 };
 const template = await read('src/viewer/template.html');
@@ -227,4 +237,4 @@ const token = '"__DATA__"';
 if (!template.includes(token)) throw new Error(`Segnaposto ${token} non trovato in src/viewer/template.html`);
 // "<" escapato per non chiudere per sbaglio il tag <script>
 await writeFile(new URL('index.html', root), template.replace(token, () => JSON.stringify(data).replace(/</g, '\\u003c')));
-console.log(`characters/: ${bodies.length} sagome, ${hair.length} stili di capelli (${Math.min(...bodies.map((b) => b.hair.length))}-${Math.max(...bodies.map((b) => b.hair.length))} per sagoma), vestiti: ${Object.entries(clothes).map(([g, c]) => `${g} ${c.items.length}`).join(', ') || 'nessuno'} (riquadro ${W}×${H}) · index.html generato`);
+console.log(`characters/: ${bodies.length} sagome, ${hair.length} stili di capelli (${Math.min(...bodies.map((b) => b.hair.length))}-${Math.max(...bodies.map((b) => b.hair.length))} per sagoma), vestiti: ${Object.values(clothes).reduce((n, items) => n + items.length, 0)} capi, ognuno sulla sua sagoma (riquadro ${W}×${H}) · index.html generato`);

@@ -1,0 +1,24 @@
+{
+  "name": "Jeans cargo",
+  "colors": {
+    "main": "#758fab"
+  },
+  "landmarks": {
+    "pants-tl": [
+      343.0,
+      634.3
+    ],
+    "pants-tr": [
+      486.0,
+      634.3
+    ],
+    "pants-bl": [
+      343.0,
+      875.0
+    ],
+    "pants-br": [
+      486.0,
+      875.0
+    ]
+  }
+}

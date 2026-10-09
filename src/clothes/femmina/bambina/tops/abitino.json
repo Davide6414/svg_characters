@@ -1,0 +1,27 @@
+{
+  "name": "Abitino con colletto",
+  "colors": {
+    "main": "#fddd9a",
+    "trim": "#faf7f3",
+    "accent": "#fefdfc",
+    "accent2": "#f8ba8c"
+  },
+  "landmarks": {
+    "armL-tl": [
+      76.0,
+      706.5
+    ],
+    "armL-tr": [
+      120.0,
+      706.5
+    ],
+    "armR-tl": [
+      193.0,
+      708.9
+    ],
+    "armR-tr": [
+      223.0,
+      708.9
+    ]
+  }
+}

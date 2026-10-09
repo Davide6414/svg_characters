@@ -1,0 +1,9 @@
+{
+  "name": "Top corto",
+  "colors": {
+    "main": "#3b3835"
+  },
+  "replaces": [
+    "arms"
+  ]
+}

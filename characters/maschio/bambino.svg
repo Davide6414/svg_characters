@@ -12,29 +12,29 @@
     .c-shirt    { fill: var(--shirt, #f5f1ee) }
     .c-pants    { fill: var(--pants, #576371) }
     #neck-fill { display: var(--show-torso, inline) }
-    .c-upper-l  { fill: var(--shoe-upper-l, #332e2a) }
-    .c-upper-r  { fill: var(--shoe-upper-r, #37322d) }
-    .c-toe      { fill: var(--shoe-toe, #2f2b25) }
-    .c-tongue   { fill: var(--shoe-tongue, #f5f3f0) }
-    .c-lace     { fill: var(--shoe-lace, #f7f6f6) }
-    .c-sole     { fill: var(--shoe-sole, #f4f0ed) }
+    .c-upper-l  { fill: var(--shoe-upper-l, #303848) }
+    .c-upper-r  { fill: var(--shoe-upper-r, #323b4c) }
+    .c-toe      { fill: var(--shoe-toe, #2f3646) }
+    .c-tongue   { fill: var(--shoe-tongue, #f5f5f4) }
+    .c-lace     { fill: var(--shoe-lace, #f6f6f6) }
+    .c-sole     { fill: var(--shoe-sole, #f8f5f2) }
     .c-eye      { fill: var(--eye, #1a1613) }
     .c-dot      { fill: var(--outline, #15100c) }
-    .c-hair-spettinati { fill: var(--hair, #462e21) }
-    .c-hair-coda { fill: var(--hair, #683a26) }
-    .c-hair-chignon { fill: var(--hair, #39241c) }
-    .c-hair-ciuffo-scuro { fill: var(--hair, #362b26) }
-    .c-hair-ciuffo-castano { fill: var(--hair, #5d3523) }
-    .c-hair-arruffati { fill: var(--hair, #423123) }
-    .c-hair-due-chignon { fill: var(--hair, #523625) }
-    .c-hair-caschetto { fill: var(--hair, #473327) }
-    .c-hair-rasati-lato { fill: var(--hair, #3b322b) }
-    .c-hair-ricci { fill: var(--hair, #4e3424) }
+    .c-hair-spettinati { fill: var(--hair, #b5562a) }
+    .c-hair-coda { fill: var(--hair, #b5562a) }
+    .c-hair-chignon { fill: var(--hair, #b5562a) }
+    .c-hair-ciuffo-scuro { fill: var(--hair, #b5562a) }
+    .c-hair-ciuffo-castano { fill: var(--hair, #b5562a) }
+    .c-hair-arruffati { fill: var(--hair, #b5562a) }
+    .c-hair-due-chignon { fill: var(--hair, #b5562a) }
+    .c-hair-caschetto { fill: var(--hair, #b5562a) }
+    .c-hair-rasati-lato { fill: var(--hair, #b5562a) }
+    .c-hair-ricci { fill: var(--hair, #b5562a) }
 
-    /* Capelli: uno stile alla volta (default: spettinati). Il visualizzatore sceglie lo stile con
+    /* Capelli: uno stile alla volta (default: ricci). Il visualizzatore sceglie lo stile con
        --show-hair-NOME (inline | none) e può nascondere tutto con --show-hair. */
     #hair { display: var(--show-hair, inline) }
-    #hair-spettinati { display: var(--show-hair-spettinati, inline) }
+    #hair-spettinati { display: var(--show-hair-spettinati, none) }
     #hair-coda { display: var(--show-hair-coda, none) }
     #hair-chignon { display: var(--show-hair-chignon, none) }
     #hair-ciuffo-scuro { display: var(--show-hair-ciuffo-scuro, none) }
@@ -43,70 +43,19 @@
     #hair-due-chignon { display: var(--show-hair-due-chignon, none) }
     #hair-caschetto { display: var(--show-hair-caschetto, none) }
     #hair-rasati-lato { display: var(--show-hair-rasati-lato, none) }
-    #hair-ricci { display: var(--show-hair-ricci, none) }
+    #hair-ricci { display: var(--show-hair-ricci, inline) }
 
-    /* Vestiti: uno per tipo alla volta (default: felpa + jeans). Il visualizzatore sceglie con
+    /* Vestiti: uno per tipo alla volta (default: maglietta-riga + bermuda-cargo). Il visualizzatore sceglie con
        --show-top-NOME / --show-bottom-NOME (inline | none); "base" è la maglietta e i pantaloni della sagoma.
        Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under. */
-    #top-felpa-back .c-main, #top-felpa .c-main { fill: var(--shirt, #ccc6c3) }
-    #top-felpa-back .c-trim, #top-felpa .c-trim { fill: var(--shirt-trim, #bdb7b2) }
-    #top-felpa-back .c-accent, #top-felpa .c-accent { fill: var(--shirt-accent, #b8b3b0) }
-    #top-giacca-back .c-main, #top-giacca .c-main { fill: var(--shirt, #403b37) }
-    #top-giacca-back .c-trim, #top-giacca .c-trim { fill: var(--shirt-trim, #3a3432) }
-    #top-giacca-back .c-accent, #top-giacca .c-accent { fill: var(--shirt-accent, #b0aaa8) }
-    #top-giacca-back .c-under, #top-giacca .c-under { fill: var(--shirt-under, #f5f1eb) }
-    #top-polo-back .c-main, #top-polo .c-main { fill: var(--shirt, #475162) }
-    #top-polo-back .c-trim, #top-polo .c-trim { fill: var(--shirt-trim, #3e4658) }
-    #top-maglione-back .c-main, #top-maglione .c-main { fill: var(--shirt, #4e6152) }
-    #top-maglione-back .c-trim, #top-maglione .c-trim { fill: var(--shirt-trim, #4b5f4f) }
-    #top-camicia-back .c-main, #top-camicia .c-main { fill: var(--shirt, #906c5a) }
-    #top-camicia-back .c-under, #top-camicia .c-under { fill: var(--shirt-under, #f9f2eb) }
     #top-maglietta-riga-back .c-main, #top-maglietta-riga .c-main { fill: var(--shirt, #f9f3ec) }
     #top-maglietta-riga-back .c-accent, #top-maglietta-riga .c-accent { fill: var(--shirt-accent, #485c72) }
-    #top-felpa-rossa-back .c-main, #top-felpa-rossa .c-main { fill: var(--shirt, #aa5c50) }
-    #top-camicia-risvoltata-under .c-main, #top-camicia-risvoltata-back .c-main, #top-camicia-risvoltata .c-main { fill: var(--shirt, #6e7057) }
-    #top-camicia-risvoltata-under .c-under, #top-camicia-risvoltata-back .c-under, #top-camicia-risvoltata .c-under { fill: var(--shirt-under, #faf4ee) }
-    #top-polo-blu-under .c-main, #top-polo-blu-back .c-main, #top-polo-blu .c-main { fill: var(--shirt, #404556) }
-    #top-polo-blu-under .c-trim, #top-polo-blu-back .c-trim, #top-polo-blu .c-trim { fill: var(--shirt-trim, #d9d1ca) }
-    #top-cardigan-grigio-under .c-main, #top-cardigan-grigio-back .c-main, #top-cardigan-grigio .c-main { fill: var(--shirt, #959290) }
-    #top-cardigan-grigio-under .c-under, #top-cardigan-grigio-back .c-under, #top-cardigan-grigio .c-under { fill: var(--shirt-under, #f9f4ee) }
-    #bottom-jeans-under .c-main, #bottom-jeans-back .c-main, #bottom-jeans .c-main { fill: var(--pants, #627087) }
-    #bottom-chino-under .c-main, #bottom-chino-back .c-main, #bottom-chino .c-main { fill: var(--pants, #c8af97) }
-    #bottom-jogger-under .c-main, #bottom-jogger-back .c-main, #bottom-jogger .c-main { fill: var(--pants, #bfbab6) }
-    #bottom-jogger-under .c-trim, #bottom-jogger-back .c-trim, #bottom-jogger .c-trim { fill: var(--pants-trim, #b9b4b0) }
-    #bottom-jogger-under .c-accent, #bottom-jogger-back .c-accent, #bottom-jogger .c-accent { fill: var(--pants-accent, #908d8b) }
-    #bottom-cargo-under .c-main, #bottom-cargo-back .c-main, #bottom-cargo .c-main { fill: var(--pants, #706b56) }
-    #bottom-larghi-under .c-main, #bottom-larghi-back .c-main, #bottom-larghi .c-main { fill: var(--pants, #4a4641) }
     #bottom-bermuda-cargo-under .c-main, #bottom-bermuda-cargo-back .c-main, #bottom-bermuda-cargo .c-main { fill: var(--pants, #a89172) }
     #bottom-bermuda-cargo-under .c-under, #bottom-bermuda-cargo-back .c-under, #bottom-bermuda-cargo .c-under { fill: var(--pants-under, #f6f4ef) }
-    #bottom-jeans-grigi-under .c-main, #bottom-jeans-grigi-back .c-main, #bottom-jeans-grigi .c-main { fill: var(--pants, #4d4f53) }
-    #bottom-pantaloni-kaki-under .c-main, #bottom-pantaloni-kaki-back .c-main, #bottom-pantaloni-kaki .c-main { fill: var(--pants, #8c7e66) }
-    #bottom-pantaloni-cintura-under .c-main, #bottom-pantaloni-cintura-back .c-main, #bottom-pantaloni-cintura .c-main { fill: var(--pants, #42403f) }
-    #bottom-pantaloni-cintura-under .c-trim, #bottom-pantaloni-cintura-back .c-trim, #bottom-pantaloni-cintura .c-trim { fill: var(--pants-trim, #c8bfb7) }
-    #bottom-pantaloni-cintura-under .c-accent, #bottom-pantaloni-cintura-back .c-accent, #bottom-pantaloni-cintura .c-accent { fill: var(--pants-accent, #4b372c) }
-    #bottom-jeans-chiari-under .c-main, #bottom-jeans-chiari-back .c-main, #bottom-jeans-chiari .c-main { fill: var(--pants, #657480) }
     #torso, #torso-fill { display: var(--show-top-base, none) }
-    #top-felpa, #top-felpa-back { display: var(--show-top-felpa, inline) }
-    #top-giacca, #top-giacca-back { display: var(--show-top-giacca, none) }
-    #top-polo, #top-polo-back { display: var(--show-top-polo, none) }
-    #top-maglione, #top-maglione-back { display: var(--show-top-maglione, none) }
-    #top-camicia, #top-camicia-back { display: var(--show-top-camicia, none) }
-    #top-maglietta-riga, #top-maglietta-riga-back { display: var(--show-top-maglietta-riga, none) }
-    #top-felpa-rossa, #top-felpa-rossa-back { display: var(--show-top-felpa-rossa, none) }
-    #top-camicia-risvoltata, #top-camicia-risvoltata-under, #top-camicia-risvoltata-back { display: var(--show-top-camicia-risvoltata, none) }
-    #top-polo-blu, #top-polo-blu-under, #top-polo-blu-back { display: var(--show-top-polo-blu, none) }
-    #top-cardigan-grigio, #top-cardigan-grigio-under, #top-cardigan-grigio-back { display: var(--show-top-cardigan-grigio, none) }
+    #top-maglietta-riga, #top-maglietta-riga-back { display: var(--show-top-maglietta-riga, inline) }
     #pants, #pants-under, #pants-fill { display: var(--show-bottom-base, none) }
-    #bottom-jeans, #bottom-jeans-under, #bottom-jeans-back { display: var(--show-bottom-jeans, inline) }
-    #bottom-chino, #bottom-chino-under, #bottom-chino-back { display: var(--show-bottom-chino, none) }
-    #bottom-jogger, #bottom-jogger-under, #bottom-jogger-back { display: var(--show-bottom-jogger, none) }
-    #bottom-cargo, #bottom-cargo-under, #bottom-cargo-back { display: var(--show-bottom-cargo, none) }
-    #bottom-larghi, #bottom-larghi-under, #bottom-larghi-back { display: var(--show-bottom-larghi, none) }
-    #bottom-bermuda-cargo, #bottom-bermuda-cargo-under, #bottom-bermuda-cargo-back { display: var(--show-bottom-bermuda-cargo, none) }
-    #bottom-jeans-grigi, #bottom-jeans-grigi-under, #bottom-jeans-grigi-back { display: var(--show-bottom-jeans-grigi, none) }
-    #bottom-pantaloni-kaki, #bottom-pantaloni-kaki-under, #bottom-pantaloni-kaki-back { display: var(--show-bottom-pantaloni-kaki, none) }
-    #bottom-pantaloni-cintura, #bottom-pantaloni-cintura-under, #bottom-pantaloni-cintura-back { display: var(--show-bottom-pantaloni-cintura, none) }
-    #bottom-jeans-chiari, #bottom-jeans-chiari-under, #bottom-jeans-chiari-back { display: var(--show-bottom-jeans-chiari, none) }
+    #bottom-bermuda-cargo, #bottom-bermuda-cargo-under, #bottom-bermuda-cargo-back { display: var(--show-bottom-bermuda-cargo, inline) }
     /* Alcuni capi disegnano le braccia al posto di quelle della sagoma (spalle e braccia scoperte): le mettono nel gruppo
        .g-arms, e --show-body-arms nasconde quelle della sagoma. --show-arms (inline | none) nasconde tutte le braccia. */
     #arm-left, #arm-right { display: var(--show-body-arms, inline) }
@@ -151,160 +100,22 @@
   <g id="torso-fill" class="c-idle-torso c-origin-maschio-bambino">
     <use href="#fill-top-maschio-bambino" class="c-shirt"/>
   </g>
-  <!-- Jeans: sotto le braccia -->
-  <g id="bottom-jeans-back">
-    <use href="#fill-bottom-maschio-bambino" class="c-main"/>
-
-  </g>
-  <!-- Chino: sotto le braccia -->
-  <g id="bottom-chino-back">
-    <use href="#fill-bottom-maschio-bambino" class="c-main"/>
-
-  </g>
-  <!-- Jogger: sotto le braccia -->
-  <g id="bottom-jogger-back">
-    <use href="#fill-bottom-maschio-bambino" class="c-main"/>
-
-  </g>
-  <!-- Cargo: sotto le braccia -->
-  <g id="bottom-cargo-back">
-    <use href="#fill-bottom-maschio-bambino" class="c-main"/>
-
-  </g>
-  <!-- Pantaloni larghi: sotto le braccia -->
-  <g id="bottom-larghi-back">
-    <use href="#fill-bottom-maschio-bambino" class="c-main"/>
-
-  </g>
   <!-- Bermuda cargo: sotto le braccia -->
   <g id="bottom-bermuda-cargo-back">
     <use href="#fill-bottom-maschio-bambino" class="c-main"/>
 
-  </g>
-  <!-- Jeans grigi: sotto le braccia -->
-  <g id="bottom-jeans-grigi-back">
-    <use href="#fill-bottom-maschio-bambino" class="c-main"/>
-
-  </g>
-  <!-- Pantaloni kaki: sotto le braccia -->
-  <g id="bottom-pantaloni-kaki-back">
-    <use href="#fill-bottom-maschio-bambino" class="c-main"/>
-
-  </g>
-  <!-- Pantaloni con cintura: sotto le braccia -->
-  <g id="bottom-pantaloni-cintura-back">
-    <use href="#fill-bottom-maschio-bambino" class="c-main"/>
-
-  </g>
-  <!-- Jeans chiari: sotto le braccia -->
-  <g id="bottom-jeans-chiari-back">
-    <use href="#fill-bottom-maschio-bambino" class="c-main"/>
-
-  </g>
-  <!-- Felpa: sotto le braccia -->
-  <g id="top-felpa-back" class="c-idle-torso c-origin-maschio-bambino">
-    <use href="#fill-top-maschio-bambino" class="c-main"/>
-    <path class="c-main c-stroke" d="M120.9,779.7C120.2,779.1 117.9,776.1 118,775.6C118.2,774.9 119.6,775.5 120.6,777.2C121.2,778.2 121.9,779.3 122.1,779.4C123.1,780.3 122,780.5 120.9,779.7ZM201.6,778C201.6,777.8 201.9,777.7 202.4,777.6C203.6,777.4 205.7,776.3 206.4,775.4C207.1,774.7 208.1,774.7 208.4,775.2C208.8,776.3 202.4,778.9 201.6,778Z" fill-rule="evenodd"/>
-  </g>
-  <!-- Giacca: sotto le braccia -->
-  <g id="top-giacca-back" class="c-idle-torso c-origin-maschio-bambino">
-    <use href="#fill-top-maschio-bambino" class="c-main"/>
-    <path class="c-main c-stroke" d="M115.5,778.1C113.7,776.9 113.4,776 115.1,775.9C115.5,775.9 115.8,776.2 115.9,776.6C115.9,776.9 116.4,777.5 117,777.9C117.5,778.3 117.9,778.7 117.9,778.8C117.7,779.3 116.8,779 115.5,778.1ZM200.3,777.2C200.3,777 200.6,776.8 201.2,776.9C201.6,776.9 202.7,776.6 203.5,776.2C205,775.5 205.9,775.3 206.2,775.7C206.3,775.8 205.4,776.3 204.4,776.7C202.2,777.6 200.1,777.8 200.3,777.2Z" fill-rule="evenodd"/>
-  </g>
-  <!-- Polo: sotto le braccia -->
-  <g id="top-polo-back" class="c-idle-torso c-origin-maschio-bambino">
-    <use href="#fill-top-maschio-bambino" class="c-main"/>
-    <path class="c-main c-stroke" d="M116.4,775.8L115.5,775L116.2,771.9C116.3,762.1 114.7,748.5 114.7,743C114.8,741.4 114.7,740.8 114.4,740.6C113.5,740.1 114.4,740 115.6,740.4C116.6,740.8 116.8,741 116.7,741.6C116.5,742.3 116.7,748.6 117.3,754.4C117.6,757.5 118.4,766.6 118.1,771.8C117.4,774.6 117.4,774.9 117.9,775.5C118.9,776.8 117.7,777 116.4,775.8ZM199.7,776.1C199.3,775.9 199.6,775.6 200.2,775.6C200.5,775.6 201.3,775.4 201.9,775.2C202.6,774.9 203.5,774.7 204,774.5C205,774.1 205.4,772.2 205.2,767.5C204.5,760.8 202.5,736.1 202.8,735.7C203,735.3 204,735.3 204.3,735.7C204.3,735.9 204.9,741.5 205.4,747.1C206.5,760.3 206.8,764.1 207.1,767.5C207.3,769.1 207.3,771.3 207.1,772.3L206.8,774.3L205.3,774.7C204.5,774.9 203.4,775.4 203.1,775.6C202.4,776 200.1,776.4 199.7,776.1Z" fill-rule="evenodd"/>
-  </g>
-  <!-- Maglione: sotto le braccia -->
-  <g id="top-maglione-back" class="c-idle-torso c-origin-maschio-bambino">
-    <use href="#fill-top-maschio-bambino" class="c-main"/>
-    <path class="c-main c-stroke" d="M123,780.5C123,780.4 122.8,780.2 122.4,780.1C121.6,779.8 119.6,776.9 120.2,776.5C120.8,776.2 121.4,776.6 122.5,778.4C123.1,779.3 123.7,780.1 124,780.2C124.6,780.4 124.4,780.8 123.6,780.8C123.2,780.7 122.9,780.6 123,780.5ZM203.3,778.5C203.1,778.3 203.6,778.2 205.4,777.7C206.1,777.5 207.1,777 207.7,776.6C208.7,775.9 210.2,775.7 210,776.2C209.8,777.1 203.8,779.1 203.3,778.5Z" fill-rule="evenodd"/>
-  </g>
-  <!-- Camicia aperta: sotto le braccia -->
-  <g id="top-camicia-back" class="c-idle-torso c-origin-maschio-bambino">
-    <use href="#fill-top-maschio-bambino" class="c-main"/>
-    <path class="c-main c-stroke" d="M118.1,780.5C117.7,780.1 117,779.3 116.4,778.6C115.8,777.9 115.2,777.2 115.1,776.9C114.6,776.1 115.8,761.3 114.6,748.7C114.3,746.4 114.3,745.9 113.8,745.6C113,745.1 113,744.9 113.8,744.9C115.6,745 116.1,745.8 116.4,748.7C117,754.8 118.1,765.7 117.9,770.5C116.4,776.9 116.4,777 118,778.4C119.5,779.8 120.2,781.3 119.3,781.2C118.9,781.2 118.4,780.9 118.1,780.5ZM202.6,779.3C202.3,779.1 202.5,778.9 203.1,778.9C204.3,778.9 208.4,777.4 208.6,776.9C208.8,776.1 208.7,759.6 208.4,757.4C208,754.7 206.9,742.9 207,741.9C207,741 207.9,740.3 208.5,740.8C208.6,741 209,743.9 209.3,747.2C209.5,750.3 209.9,754.3 210.1,756.1C210.6,759.6 210.8,776.1 210.6,776.9C210.5,777.2 209.9,777.5 208.6,777.9C207.6,778.2 206.4,778.6 206.1,778.8C205.6,779.1 203,779.5 202.6,779.3Z" fill-rule="evenodd"/>
   </g>
   <!-- Maglietta con riga: sotto le braccia -->
   <g id="top-maglietta-riga-back" class="c-idle-torso c-origin-maschio-bambino">
     <use href="#fill-top-maschio-bambino" class="c-main"/>
     <path class="c-main c-stroke" d="M122.4,774.7C121.9,774.5 121.4,773.8 121.2,773.2C121,772.6 120.6,771.8 120.3,771.4C119.9,771 119.4,769.8 119,768.7C118.7,767.6 117.7,765.7 116.9,764.4C114,759.7 114,761.4 116.8,747.3C117.5,744 117.9,740.9 117.8,740.4C117.4,739.3 118.3,739.1 119.7,740C120.7,740.5 120.8,740.3 117.4,756.9C116.8,759.9 117,760.5 119.4,764.4C120.2,765.7 121.2,767.6 121.5,768.7C122.4,771.1 124,773.5 124.8,773.5C125.2,773.5 125.5,773.8 125.5,774.2C125.5,775 124.2,775.1 122.4,774.7ZM202.8,772.7C202.6,772.2 203,771.7 203.8,771.3C207.4,769.6 207.5,769 205.4,756.4C205.1,754.9 204.7,752.3 204.5,750.8C204.2,749.1 203.7,746.2 203.4,744.3C202.4,738.9 202.5,736.8 203.9,736.6C204.9,736.5 205,736.6 205,738.1C205,739.1 205.2,740.8 205.4,742C205.7,743.2 206.1,745.7 206.5,747.6C207.6,754.9 208,757.2 208.7,761.3C209.7,767.1 209.7,768.2 208.2,769.9C207.5,770.7 207,771.7 207,772.1C207,773.4 203.3,774 202.8,772.7ZM103,736.8C100.6,736.2 98.3,735.4 97.9,735.1C97.4,734.9 96.5,734.7 96,734.7C95.4,734.8 95,734.6 95,734.3C95,733.8 96.6,733.6 97.3,734.2C97.5,734.3 100,735.2 102.9,735.9C105.7,736.7 108,737.5 108,737.6C108,738.2 107.7,738.1 103,736.8ZM207,736.2C207,736 213.3,733.6 214.1,733.6C215.5,733.6 213.9,734.6 210.9,735.5C207,736.7 207,736.8 207,736.2Z" fill-rule="evenodd"/>
   </g>
-  <!-- Felpa con cappuccio: sotto le braccia -->
-  <g id="top-felpa-rossa-back" class="c-idle-torso c-origin-maschio-bambino">
-    <use href="#fill-top-maschio-bambino" class="c-main"/>
-    <path class="c-main c-stroke" d="M121.3,783C121.1,782.9 120.9,782.7 120.9,782.7C120.9,782.6 120.3,782 119.6,781.1C118.1,779.2 118,778.9 119.3,778.9C120.2,779 123,782.2 123.3,783C123.5,783.3 122.1,783.3 121.3,783ZM203.2,780.4C203.2,780.3 203.5,780.3 203.9,780.3C204.7,780.2 207.6,779.1 208.3,778.5C208.6,778.1 209.3,777.9 209.9,777.9C211.5,777.8 211.1,778.4 209,779.3C207.9,779.7 207.1,780.1 207.1,780.2C207.1,780.2 206.3,780.3 205.2,780.4C204.1,780.5 203.3,780.5 203.2,780.4Z" fill-rule="evenodd"/>
-  </g>
-  <!-- Camicia con maniche arrotolate: sotto le braccia -->
-  <g id="top-camicia-risvoltata-back" class="c-idle-torso c-origin-maschio-bambino">
-    <use href="#fill-top-maschio-bambino" class="c-main"/>
-    <path class="c-main c-stroke" d="M119.1,783.2C118.4,783.3 117,783.3 115.9,783.2L113.8,782.8L114.8,774.3C114.1,768.3 113.8,765.4 114.1,765.4C116.1,765.4 116.1,765.4 117.3,774.3L116.3,783.1L118.3,783.4C120.2,783.3 122.3,782.9 122.1,782.9C121.9,782.8 120.2,783 119.1,783.2ZM212.9,777.7C212.9,777.8 213.7,777.7 214.9,777.5C218.4,776.9 218.5,777 217.8,772.9C216.9,766.4 216.9,765.6 218,765.1C219.2,764.5 220.6,764.3 220,764.9C219.4,765.3 219.5,768.7 220.1,772.7C220.6,776.8 220.5,776.5 219.8,776.6C219.1,776.7 212.9,777.6 212.9,777.7Z" fill-rule="evenodd"/>
-  </g>
-  <!-- Polo blu: sotto le braccia -->
-  <g id="top-polo-blu-back" class="c-idle-torso c-origin-maschio-bambino">
-    <use href="#fill-top-maschio-bambino" class="c-main"/>
-    <path class="c-main c-stroke" d="M120.3,764.5C119.4,763.9 118.7,759.2 118.3,749.9C118.2,748.4 118.1,746.3 117.9,745.1C117.6,742.8 117.6,742.6 118.9,742.9C119.7,743.2 120.1,745.7 120.3,750C120.8,761.3 121.1,763.7 122.6,764.3L123.7,764.7L122.1,764.7C121.3,764.7 120.4,764.6 120.3,764.5ZM204.2,765.3C204.2,765.2 204.4,765.1 204.8,765.1C205.1,765.1 205.6,764.9 205.8,764.6C206.1,764.4 207.1,763.8 207.9,763.3C210.2,762 210.4,761.5 209.1,758.9C206.6,753.5 205.3,741 207.1,741.1C207.8,741.1 207.9,741.5 208.2,745.7C208.7,751.5 209.8,756.1 211,758.8C212.3,761.4 212.1,761.9 209.9,763.2C209,763.7 207.9,764.4 207.6,764.8C206.9,765.4 204.2,765.8 204.2,765.3Z" fill-rule="evenodd"/>
-  </g>
-  <!-- Cardigan grigio: sotto le braccia -->
-  <g id="top-cardigan-grigio-back" class="c-idle-torso c-origin-maschio-bambino">
-    <use href="#fill-top-maschio-bambino" class="c-main"/>
-    <path class="c-main c-stroke" d="M121.8,782.4C121.4,782.1 120.9,781.2 120.5,780.4C120.1,779.6 119.5,778.5 119.1,778C118.4,777 118.5,776.4 119.4,776.5C120.2,776.5 120.9,777.5 122.4,781C123,782 123.6,782.6 123.7,782.7C124.3,782.8 123.8,783 123.1,783C122.7,782.9 122.1,782.8 121.8,782.4ZM205.7,780.1C205.7,780 206.3,779.9 207.1,779.8C210.3,779.1 212.3,778.4 212.7,777.7C213.3,776.7 214,776.3 215.3,776.3C217.8,776.2 213.4,778.8 210.5,779.2C210.2,779.3 209.4,779.5 208.6,779.6C207.1,779.9 205.7,780.1 205.7,780.1Z" fill-rule="evenodd"/>
-  </g>
   <g id="pants-under">
     <path class="c-pants c-stroke" d="M105.8,809.2C105.7,809 105.5,806.9 105.5,804.5L105.5,800.1L113.5,790.2L121.5,780.3L121.6,762.5L121.8,744.8L159.5,744.8L197.2,744.8L197.5,762.8C197.8,782.9 197.7,782.2 201.6,786.7C203.1,788.4 204.3,789.2 205.5,789.4L207.2,789.8L207.2,799.5L207.2,809.2L156.7,809.4C128.9,809.4 106,809.4 105.8,809.2Z"/>
-  </g>
-  <!-- Jeans: parti sotto i pantaloni -->
-  <g id="bottom-jeans-under">
-    <path class="c-main c-stroke" d="M122.2,788.3C122.1,788.2 122.4,784.8 123.5,782.8L126.2,774.3L129.7,767.7L132.1,761.5L164.6,761.9L198.9,762.1L201.6,768.1L204,774L202.3,780.4L203.5,786.2L163.2,789.5C140.5,788.9 122.3,788.4 122.2,788.3Z"/>
-  </g>
-  <!-- Chino: parti sotto i pantaloni -->
-  <g id="bottom-chino-under">
-    <path class="c-main c-stroke" d="M120.5,788.3C120.3,788.2 120.7,784.9 121.8,782.7L124.6,773.9L128,767.3L130.3,761.3L163.9,761.7L199.3,761.9L202.1,767.9L204.5,773.9L202.7,780.3L203.9,785.8L162.4,789.3C139.1,788.5 120.5,788.3 120.5,788.3Z"/>
-  </g>
-  <!-- Jogger: parti sotto i pantaloni -->
-  <g id="bottom-jogger-under">
-    <path class="c-main c-stroke" d="M126.5,791.9C126.3,791.8 126.4,787.4 126.9,783.6L129.2,778.2L133.5,771.1L136.5,764.7L166.9,765.1L198.9,765L201.5,771L203.3,777.3L203,781.3L204.5,790.2L165.8,792.6C144.1,792.3 126.6,792 126.5,791.9Z"/>
-  </g>
-  <!-- Cargo: parti sotto i pantaloni -->
-  <g id="bottom-cargo-under">
-    <path class="c-main c-stroke" d="M124.5,788.1C124.3,788 124.7,784.4 125.7,782.6L128.2,774.4L131.8,767.8L134.3,761.5L166.4,761.9L200.1,762L202.9,768.1L205.3,774L203.4,780.3L204.8,786L165,789.5C142.7,789 124.6,788.2 124.5,788.1Z"/>
-  </g>
-  <!-- Pantaloni larghi: parti sotto i pantaloni -->
-  <g id="bottom-larghi-under">
-    <path class="c-main c-stroke" d="M123.3,788.2C123.2,788.1 123.5,784.6 124.5,782.8L127.2,774.4L130.7,767.7L133.2,761.5L165.8,761.9L200,762L202.8,768.1L205.2,774L203.4,780.3L204.7,786L164.4,789.5C141.7,788.9 123.4,788.3 123.3,788.2Z"/>
   </g>
   <!-- Bermuda cargo: parti sotto i pantaloni -->
   <g id="bottom-bermuda-cargo-under">
     <path class="c-main c-stroke" d="M121.8,808.1C121.2,807.4 121.4,788.5 122.1,787.3C122.4,786.7 122.8,782.5 123,776.3L123.3,766.3L126.8,755L130.3,743.7L162.9,743.1L195.5,743.4L196,744.7C196.3,745.4 196.5,752.9 196.5,762.5C196.5,780.1 196.8,782.1 199.5,783.1C200,783.2 201.4,784.5 202.5,785.8L204.5,788.1L204.4,798.1L204.2,808L163.2,806.8C140.6,807.5 122,808.3 121.8,808.1Z"/>
-  </g>
-  <!-- Jeans grigi: parti sotto i pantaloni -->
-  <g id="bottom-jeans-grigi-under">
-    <path class="c-main c-stroke" d="M116.7,800.9C115.7,800.2 116.4,797.8 118,796.4C119,795.6 120.4,793.7 121.2,792.3L122.7,789.9L124.7,781.5C127.3,770.6 127.4,768.6 128,767.9L128.6,767L163.8,768L199.8,766.9L202.7,773.6L205.3,780.1L206.7,789L208.3,801L162.6,800.1C137.3,800.8 116.8,801.1 116.7,800.9Z"/>
-  </g>
-  <!-- Pantaloni kaki: parti sotto i pantaloni -->
-  <g id="bottom-pantaloni-kaki-under">
-    <path class="c-main c-stroke" d="M124.1,784.6C124,784.4 124.5,782.9 125.3,782.2L127.2,782.3L135.9,781.9C147.2,782.1 145.5,782.5 148.4,777.6L149.3,770.7L172.1,771.3L195.5,770.9L194.1,778.7C194.5,780.9 193.8,781 199.3,779.8L203.4,778.8L204.2,780.4L205.1,786.3L165.4,789.3C131.9,785.5 124.2,784.8 124.1,784.6Z"/>
-  </g>
-  <!-- Pantaloni con cintura: parti sotto i pantaloni -->
-  <g id="bottom-pantaloni-cintura-under">
-    <path class="c-main c-stroke" d="M134.3,778.7C133.9,778.5 134.8,775.9 135.4,775.2C135.8,774.9 136.3,774.1 136.4,773.5C136.8,772.5 136.8,772.5 137.8,772.4C139.4,772.3 139.4,772.4 139.4,764.3L138.3,756.5L139.1,754.6L139.9,752.5L168.4,752.6L197,753.1L198.1,755.2L199.3,757L199.2,764.4C198.1,772.1 198,771.7 200.7,771.7L202.7,771.6L201.8,775L200.8,778.7L167.4,777.9C149.1,777.7 134.4,778.7 134.3,778.7Z"/>
-  </g>
-  <!-- Jeans chiari: parti sotto i pantaloni -->
-  <g id="bottom-jeans-chiari-under">
-    <path class="c-main c-stroke" d="M127,785.2C127,785 127.1,784 127.4,783.3L128.2,782.4L139.7,781.6L151.2,781.6L151.9,781.1C153.5,780.2 154.6,777.2 156.1,768.9L156.8,760.8L176.1,761L196.5,761.3L195.1,770.5C192.5,780.9 192,780 197.7,779.9L202,780L202.2,781.2L203,784.3L165,787.5C134,786.1 127.2,785.4 127,785.2Z"/>
-  </g>
-  <!-- Camicia con maniche arrotolate: parti sotto i pantaloni -->
-  <g id="top-camicia-risvoltata-under" class="c-idle-torso c-origin-maschio-bambino">
-    <path class="c-under c-stroke" d="M145.1,784.3C145.1,784.1 146.3,781.8 147.8,779.6L149.3,772.7L171.2,773.3L193.6,773.5L193.7,774.7C193.8,775.4 193.2,779.3 193,780.8L194.5,784L170.3,786.3C150.6,785.1 145.3,784.4 145.1,784.3Z"/>
-  </g>
-  <!-- Polo blu: parti sotto i pantaloni -->
-  <g id="top-polo-blu-under" class="c-idle-torso c-origin-maschio-bambino">
-    <path class="c-main c-stroke" d="M128.8,778.4C128.8,778.2 129.6,772.2 129.5,766.3L127.8,756.1L164.7,756.2L202.1,756.5L201.8,767.2L199.5,777.9L163.8,777.2C136,777.9 128.9,778.6 128.8,778.4Z"/>
-  </g>
-  <!-- Cardigan grigio: parti sotto i pantaloni -->
-  <g id="top-cardigan-grigio-under" class="c-idle-torso c-origin-maschio-bambino">
-    <path class="c-under c-stroke" d="M154.6,784.2C154.5,784 155,779.5 155.9,774.2L157.2,764.1L175.8,764.2L195.8,763.9L193.5,773.6L192,782.9L173.4,784.4C158.7,784.5 154.7,784.4 154.6,784.2Z"/>
   </g>
   <g id="arm-right" class="c-idle-arm">
     <path class="c-skin c-stroke" d="M212.1,801.3C211.2,799.9 208.9,790.4 208.7,787.2C208.6,785.3 208.3,783.1 208,782.2C207.8,781.4 207.2,778.9 206.8,776.6L206,772.4L207.3,771.3L208.7,770.2L208,766.2C207.7,764 207,759.9 206.4,757C205.9,754.1 205.2,750.4 205,748.8C204.7,747.1 204.2,744.8 204,743.7C202.9,738.9 203.7,736 206,736C206.5,736 207.9,735.6 209.1,735.1C210.3,734.6 212.4,734 213.9,733.8L216.5,733.5L217.3,735.4C218.7,738.7 222.5,750.1 223.8,754.7C224.6,757.9 225.4,759.5 226.6,760.9C237.5,773 234.7,794.4 221.6,800.1C218.4,801.5 212.7,802.3 212.1,801.3Z"/>
@@ -315,68 +126,6 @@
     <path class="c-open c-stroke" d="M164,826C163.3,825 160.2,823.5 160,820C159.8,816.5 160.7,808.3 162.5,805C164.3,801.7 169.6,800.8 171,800"/>
     <path class="c-open c-stroke c-fine" d="M133.5,846.5C132.1,845.8 128.7,843.2 125,842.5C121.3,841.8 113.8,842.1 111.5,842"/>
     <path class="c-open c-stroke c-fine" d="M183.5,848.5C186.7,847.1 199.3,841.4 202.5,840"/>
-  </g>
-  <!-- Jeans -->
-  <g id="bottom-jeans">
-    <path class="c-main c-stroke" d="M139.5,876.3C137.3,876 135,874.8 131.5,872.1C129.8,870.8 128.3,869.8 128,869.8C127.8,869.8 126.4,869.2 125,868.4C119.1,865.4 108,866.4 104,870.1C100,873.9 90.9,877 86.8,876.1C84.3,875.5 84.3,875.5 87.9,871.5C91.3,868 91.7,867.2 90.8,866C90,864.9 88.8,860.1 88.8,858.3C89,856.2 89.2,855.7 91.8,852.9C93.8,850.8 93.9,850.7 94.2,848.5C94.4,847.3 95,845 95.5,843.5C96,842.1 96.6,840.3 96.9,839.5C97.2,838.6 97.6,837.6 97.8,837.1C98,836.6 98.5,835.4 98.9,834.4C99.3,833.4 100.4,830.6 101.4,828.2C103.3,823.5 104.3,821.3 104.7,820.2C104.8,819.7 105.2,818.6 105.5,817.7C105.7,816.9 105.9,815.6 105.9,814.9C105.8,814.2 105.7,813.2 105.7,812.6C105.6,811.4 105.5,807.7 105.5,805.4C105.5,803.5 105.8,803.3 108.7,802.9C123.9,800.7 130.4,784.9 123,778.9C122.6,778 122.4,775.6 122.8,775.2C123,774.9 125.9,775.2 127.5,775.6C128.1,775.8 130.8,776.2 133.4,776.3C135.9,776.5 139.7,776.6 141.6,776.6C147.7,777 177.5,776.8 184.1,776.2C186.9,776 190.5,775.7 191.9,775.6C193.5,775.5 195.6,775.3 196.8,775.2C200.1,774.7 203.7,774.5 204.2,774.6C204.9,774.7 204.9,776.3 204.6,780.2C205,780.1 205.8,781 206.5,782.4C207.1,784.1 208.3,787.8 209,790.6C209.7,793.6 210.4,796.7 210.6,797.7C210.8,798.6 211.1,799.6 211.4,799.9C211.6,800.2 211.7,800.7 211.7,801C211.6,801.2 211.7,802.6 211.8,803.9C212.2,806.9 212.5,809.1 212.6,810.4C212.7,811 212.8,811.9 212.8,812.4C212.9,812.9 213,813.7 213.1,814.2C213.3,815.3 214,818.7 214.7,821.2C214.9,822.1 215.2,823.6 215.5,824.5C215.7,825.5 216,827.3 216.3,828.5C216.7,830.9 217,832.6 217.9,837.5C218.2,838.9 218.3,841.4 218.3,842.9L218.3,845.8L219.7,847.4C222.3,850.5 222.7,852.3 221.2,855.9C220.3,858.6 220.7,860 223.2,861.5C223.9,861.9 225,862.7 225.6,863.2C226.1,863.7 226.7,864.1 226.9,864.2C228.2,864.5 228.4,865.9 227.3,866.5C224.1,868.3 220,868.1 215.2,865.6C211.3,863.8 206,863.8 203.7,865.7C201.4,867.7 189.5,872.5 183.3,874.4C177.5,876.1 166.6,876.3 167.6,874.3C168.3,873.2 168.7,865.4 168.2,864.8C167.9,864.5 167.6,863.1 167.4,861.5C167.2,859.4 166.9,858.5 165.8,856.8C163.8,854.1 163.9,852.3 166,848.9L167.5,846.6L167.4,843C167.3,841.2 167.2,833.8 167.1,828C165.4,815.7 164.3,812.6 163.6,812.4C162,811.8 160.3,812.4 159.9,813.6C159.1,816 158.8,816.8 158.4,817.4C158.2,818 157.9,818.5 156.9,820.8C156.4,822.2 156.1,822.9 155.5,824.2C154.9,825.3 154.8,825.5 153.7,828.5C153.3,829.5 152.8,830.8 152.6,831.4C152.4,831.9 152.1,832.8 151.9,833.4C151.4,835.1 151,836.5 149.3,841.9C148,846.4 147.9,847.2 148.8,849.3C150.1,853.1 149.7,855.6 147.2,858.6C146.5,859.5 145.5,861.3 145.1,862.6C144.3,864.9 143.3,866.1 142.1,866.6C141.7,866.7 141.8,867.8 142.9,873.2C143.5,876.4 143.1,876.7 139.5,876.3Z"/>
-    <path class="c-open c-stroke" d="M158.5,811.9C159.1,811.6 161.9,811 162.5,810.1C163.1,809.1 161.7,807.7 161.9,805.6C162.2,803.2 163.6,797.9 164.3,795.9C165,793.8 164.5,795.2 165.8,794.8C167.1,794.4 171.3,793.5 172.4,793.2"/>
-    <path class="c-open c-stroke c-fine" d="M173.1,860.1C172.7,859 170.9,855.6 170.9,853.5C170.9,851.5 173,849.6 173.2,847.8C173.4,846.1 172.1,853.3 172,843.2C171.7,834.9 170.4,816.9 169.7,813.9"/>
-    <path class="c-open c-stroke c-fine" d="M184.9,848.6C186.8,847.9 193.8,845.4 196.9,844.7C200,844 201.5,844 203.7,844.1C205.8,844.2 208.8,845 209.8,845.2"/>
-    <path class="c-open c-stroke c-fine" d="M133.6,848.1C132.8,847.7 130.9,846.8 128.9,846.3C127,845.8 124.3,845.4 121.6,845.4C118.9,845.5 114.3,846.5 112.8,846.8"/>
-    <path class="c-open c-stroke c-fine" d="M173.7,790.3C173.8,788.5 174.7,781.2 175,779.5"/>
-    <path class="c-open c-stroke c-fine" d="M130.9,783.1C131.7,782.8 134.6,782.1 135.9,781.5C137.2,780.9 138.2,779.7 138.7,779.3"/>
-    <path class="c-open c-stroke c-fine" d="M100.5,846.2C100.7,845.2 101.6,841.6 101.9,840.8"/>
-    <path class="c-open c-stroke c-fine" d="M164.6,787.8C164.7,787 164.9,783.9 165,783.1"/>
-    <path class="c-open c-stroke c-fine" d="M98.1,855.2C97.9,854.9 97,854.5 97.3,853.7C97.7,852.9 99.8,850.8 100.3,850.2"/>
-  </g>
-  <!-- Chino -->
-  <g id="bottom-chino">
-    <path class="c-main c-stroke" d="M174.8,877.3C174.3,876.8 174.3,876.6 174.7,875.6C175.7,872.9 176,868.1 175.1,866.9C174.6,866.2 174.2,865.1 174,863.8C173.9,862.8 173.2,860.9 172.6,859.7C171.4,857.5 171.2,855.8 172,854.3C173.1,851.9 173.4,850.4 173.2,848.1C172.9,845.3 170.8,823.9 169,817.2C167.1,812.4 166.7,812.1 164.3,812.8C163.3,813 163.1,813.4 162.6,815.4C162.5,815.9 162.1,817.1 161.8,818.1C161.5,819.1 160.9,820.8 160.6,822C160.2,823.3 159.6,825 159.4,825.9C158.6,828.4 157.6,832 156.3,837.2C155.7,839.9 155,843.1 154.8,844C153.9,847.8 153.8,850.3 154.6,852.5C155.9,856.7 153.7,863.6 150.2,866.5C149.2,867.4 149.2,868.4 150.4,871.7C151.7,875.1 151.6,876.1 150.2,876.5C147.2,877.3 143.4,876 140.6,873.4C134.9,868.3 121.7,867 115.7,871.2C115,871.7 113.7,872.4 112.9,872.8C111.9,873.3 110.7,874.1 110,874.8C106,878.3 99.2,880.3 95.9,879.1L94.9,878.7L95.7,877.2C96.1,876.5 97.3,874.5 98.4,873C100.7,869.8 100.7,869.8 99.9,868.9C97.1,865.8 96.9,859.2 99.2,855.4C100.9,853 100.9,852.6 101,850.6C101.1,849.4 101.5,847.1 101.9,845.6C103.2,840.2 104,837.5 104.4,836.2C105.2,834 110.1,816.6 109.7,814.6C109.3,813.6 108.9,812.5 108.8,812.1C108.5,810.6 107.8,804.9 107.6,804.1C107.5,803.2 107.4,803.1 111.8,801.6C122.8,796.8 126.2,784.5 121.2,779.4C119.5,775.4 120.6,774 125.1,774.8C148.4,777.2 179.9,777.2 196.1,775C204.9,773.7 204.5,773.5 204.5,778.3C204.6,779.7 205.3,780.1 205.7,780.1C207.5,784.3 211.7,798.8 212.1,799.7C212.4,800.2 212.5,800.8 212.4,801C212.2,801.4 212.4,802.6 213.4,808.1C213.8,810.2 214,811.7 214.3,813.9C214.5,814.9 215.4,818 216.3,821.1C216.6,822.2 217.2,824 217.5,825C217.8,826 218.2,827.6 218.5,828.5C218.7,829.4 219.2,831.6 219.6,833.5C220.1,835.4 220.6,838.5 221,840.3C221.3,842.2 221.8,845 221.9,846.6L222.2,849.6L223.8,851.6C226.7,855.4 227.4,859.7 225.6,862.6C224.9,863.9 225.3,864.7 227.8,866.5C228.5,867 229.4,868 229.9,868.7C230.3,869.4 231.1,870.2 231.5,870.4C232.6,871.1 232.6,871.4 231.2,872.3C228.2,874 224.4,873.8 219.9,871.6C215.7,869.5 210.8,869.3 206.7,871.4C205.6,872 204.3,872.5 203.8,872.6C203.4,872.6 200.7,873.3 197.9,874.1C191.3,876.3 187.1,877.1 181.6,877.3C179.2,877.5 176.8,877.6 176.3,877.7C175.7,877.8 175.2,877.6 174.8,877.3Z"/>
-    <path class="c-open c-stroke" d="M168.6,812C168,811.8 165.6,812.2 164.9,810.8C164.3,809.2 164.6,803.1 164.7,800.2C164.9,797 164.6,796.4 165.8,795.2C167.1,794.1 171.3,793.8 172.4,793.4"/>
-    <path class="c-open c-stroke c-fine" d="M193.6,850.4C195.5,849.8 201.5,847.8 205,847.5C208.6,847.3 213.3,848.5 214.9,848.7"/>
-    <path class="c-open c-stroke c-fine" d="M172.6,790.8C172.9,790.2 174.3,789.4 174.6,787.4C175.1,785.5 175.2,780.6 175.4,779.3"/>
-    <path class="c-open c-stroke c-fine" d="M140.7,850.5C139.2,850 134.7,848 131.5,847.7C128.2,847.4 122.9,848.4 121.1,848.7"/>
-    <path class="c-open c-stroke c-fine" d="M165,788.9C165,787.7 165,783.2 165,782.1"/>
-    <path class="c-open c-stroke c-fine" d="M128.1,783.6C129.3,783.1 134.2,780.4 135.4,779.5"/>
-  </g>
-  <!-- Jogger -->
-  <g id="bottom-jogger">
-    <path class="c-main c-stroke" d="M143.9,847.8C138.6,847.6 136.2,847.3 132.6,846.3C131.8,846.1 130.5,845.9 129.7,846C128.8,846 128.1,846 127.9,845.8C127.8,845.7 127.1,845.7 126.3,845.8C125.6,846 121.1,846.3 116.3,846.8L107.5,848L105.3,847C99.4,844.4 98.5,840.2 102.6,834.3C103.8,832.6 104.6,831.2 105,830.2C107.5,821.6 108,813.8 107.1,810C106.9,808.5 106.7,806.4 106.6,805.5C106.4,803.5 106.5,803.4 110.4,802.9C123.1,800.8 129.4,788.2 125.2,782.4C124.5,780.2 125.3,779.6 129.2,779.9C130.3,779.9 131.8,779.8 132.4,779.8C133,779.7 133.8,779.7 134.1,779.8C134.9,779.9 143.3,780 151.2,780.1L158,780.3L157.5,786.6C157.5,793.8 157.5,793.9 159.9,793.9C162.4,793.9 162.3,794.2 162.3,786.7L162.9,780.2L167.6,780.2L172.2,780.1L172.2,786.4C172.7,793.5 172.6,793.4 174.8,793.4C177.5,793.4 177.6,793.2 176.6,786L176.4,779.9L179.6,779.7C184.8,779.3 191.1,778.7 195.8,778.3C204.7,777.7 203.8,777.5 203.8,779.9C203.9,780.2 204.7,780.2 205.4,781.2C207,785 208.9,791.5 209.9,796.1C210.2,797.5 210.7,799.1 210.9,799.5C211.2,799.8 211.4,800.9 211.4,801.7C211.4,802.6 211.7,806.8 211.9,809.9C212.3,816.4 212.5,817.6 213.8,825.4C214.1,827.8 214.6,830.2 214.8,830.6C217.9,836.2 217.5,839.9 213.1,843.1C210.9,844.8 210,845.2 208.4,845.1C207.6,845 205.7,844.8 204.1,844.7C202.5,844.6 200,844.6 198.6,844.6C193.5,845 191.3,845.1 190.3,844.9C189.6,844.8 189.2,844.9 188.3,845.3C187.7,845.7 186.9,846 186.5,846.1C184.3,846.3 179.1,846.6 176,846.6L172.5,846.6L170.4,845C166.1,841.9 165.2,838.4 167,833.3C167.8,831 167.8,830.6 166.6,821.7C165,816.4 164.9,816.3 163.1,816.3C161.2,816.4 160.8,816.8 159.7,820C159.4,820.8 159,822.1 158.7,822.7C156.3,829.9 156,831.5 156,835.1C155.8,840.9 154.8,842.7 149.9,846C147.1,848 147.2,848 143.9,847.8Z"/>
-    <path class="c-trim c-stroke" d="M136.6,869.1C135.2,869 132.6,868.3 130.8,867.8C125.6,866.1 124.7,866 119.1,867C108.6,869.1 106.2,869.3 103.2,867.9C101,867 102.4,865 106.2,863.4C109.1,862.2 110.7,858.9 108.6,858.4C106.1,858 106.1,857.7 106.4,853.5C106.6,851.5 106.9,849.6 107.2,849L107.5,848.1L112.4,847.3C115,847 119.5,846.5 122.5,846.1C125.4,845.9 127.9,845.9 128,845.9C128.1,846 128.9,846 129.7,846C130.5,845.9 131.8,846.1 132.6,846.3C135.6,847.1 137,847.4 139.8,847.6C141.3,847.6 143.6,847.8 144.7,847.9L146.8,848.1L146.7,849.7C146.4,854.8 144.7,858.4 142.1,859.2C139.9,860 140.1,861.2 142.9,864.4C145.3,867.4 145.4,867.7 144.1,868.3C142.2,869.1 139.3,869.4 136.6,869.1Z"/>
-    <path class="c-trim c-stroke" d="M173.7,866.9C171.3,866.4 170.4,866 170.4,865.2C170.5,863.9 172,861.6 173.1,861.1C175.1,860.3 175.4,858.4 173.8,856.8C172.8,855.7 172.3,852.8 172.4,848.6C172.5,846.5 172.6,846.5 177.2,846.6C179.4,846.6 184,846.4 186.5,846.1C186.9,846 187.7,845.7 188.3,845.3C189.2,844.9 189.6,844.8 190.3,844.9C191.3,845.1 193.6,845 198.6,844.6C203.5,844.5 209.5,845.1 210.2,845.7C210.3,845.8 210.4,847.8 210.5,850.3L210.6,855.4L213.2,857.2C214.6,858.2 216.2,859.6 216.8,860.3C217.4,860.9 218,861.5 218.2,861.6C222.1,862.6 213.4,865.6 208.8,865C205.5,864.7 203.6,865 198.5,866.5C194.2,868 191.8,868.2 188.9,867.4C187,866.9 176.5,866.6 175,867C174.7,867 174.1,867 173.7,866.9Z"/>
-    <path class="c-trim c-stroke" d="M176.8,779.7C176.6,779.6 176.4,778.9 176.4,778L176.4,776.5L183,776C186.7,775.7 192.1,775.2 195.1,774.9C204,773.8 204.4,773.9 203.7,776.4C203.2,777.9 203.5,777.9 196.4,778.3C188.1,779 177.7,780 176.8,779.7Z"/>
-    <path class="c-trim c-stroke" d="M140.8,779.9C133.8,779.9 133.9,780 134.5,778.4C135.2,776.1 135.5,776.1 142.5,776.4C144.2,776.5 148.5,776.6 152.1,776.8L158.7,777L158.4,778.5C158.3,779.3 158,780 158,780C157.7,780.3 147.8,780.1 140.8,779.9Z"/>
-    <path class="c-accent c-stroke" d="M158.2,793.5C157.5,793.2 157.8,780.5 158.7,777.8L159,776.9L160.9,777L162.8,777L162.3,785C162.3,792.5 162.2,793.4 161.7,793.7C160.8,794.1 159,794 158.2,793.5Z"/>
-    <path class="c-accent c-stroke" d="M173.1,793.1C172.7,792.9 172.5,790.5 172.2,784.6L172.6,776.8L174.4,776.8L176,776.7L176.2,777.6C176.7,780.3 177.4,792.5 176.8,792.9C176,793.5 173.8,793.6 173.1,793.1Z"/>
-    <path class="c-trim c-stroke" d="M123.7,779C123.2,777.8 123.1,777 123.3,776.3C123.8,774.3 123.8,774.3 129.4,775.4C136,776.1 135.5,775.9 134.9,777.7C134.1,779.7 134.2,779.7 131.3,779.8C128,780 125.9,780.1 125.1,780.4C124.6,780.5 124.2,780.3 123.7,779Z"/>
-    <path class="c-trim c-stroke" d="M163.3,780.1C163,780 162.8,779.5 162.9,778.5L163.1,777L167.4,776.9C169.9,776.8 172,776.8 172.2,776.8C172.8,777 172.3,779.9 171.6,780C170.9,780.2 163.9,780.2 163.3,780.1Z"/>
-    <path class="c-open c-stroke" d="M166.4,815.9C165.8,815.7 163.5,815.9 162.9,814.8C162.2,813.6 162.1,810.5 162.3,808.1C162.5,805.2 162.8,801.3 164.1,799.2C165.4,797.1 168.9,797.5 169.9,797.1"/>
-    <path class="c-open c-stroke c-fine" d="M191.2,842.6C192.9,842.2 199.5,840.7 201.2,840.3"/>
-    <path class="c-open c-stroke c-fine" d="M125.3,843.7C124.1,843.3 119.3,841.9 118.2,841.6"/>
-  </g>
-  <!-- Cargo -->
-  <g id="bottom-cargo">
-    <path class="c-main c-stroke" d="M171.4,874.1C171.2,873.9 171.5,871.7 172,869.3C172.8,865.4 172.8,864.9 172.4,864.3C171.8,863.6 171.1,860.9 171.1,859.7C171.1,859.2 170.7,858.2 170,857.2C167.9,854.7 167.7,853.3 169.2,849.7C170.1,847.7 170.1,847.5 170,843C169.8,840.6 169.6,833.4 169.3,828C169,823.5 168.2,819.2 167.9,817.7C167.5,816.3 167,815 167,814.7C166.9,814.2 166.7,814.1 165.8,813.9L164.6,813.6L163.7,813.8C162.7,814 162.2,814.3 162.3,814.7C162.3,814.8 162.2,815.2 162,815.6C161.8,816 161.4,816.9 161.2,817.7C160.5,819.8 160.3,820.3 159.4,822.7C158.3,825.7 157.9,827 157.5,828.3C157.3,829 157.1,830 156.9,830.6C156.4,832 155.3,836.1 154.5,839.1C153.7,842.6 152.7,846.4 152.5,846.5C152.5,846.6 152.7,847.8 153,849.1C153.9,853.2 153.8,853.7 150.9,857.6C150.1,858.6 149.6,859.8 149.4,860.9C149.2,861.8 148.7,862.9 148.3,863.5C147.2,864.9 147.2,865.4 148.5,868C151.1,873.4 150.9,874 146.7,874C143.3,874 141.1,873.1 137.7,870.4C129.9,864.3 123.6,864.5 111.1,871.9C100.9,878.4 92.9,878.4 98.3,872C101.5,868.2 102.1,867.1 101.3,865.9C98.9,862.3 98.3,857.3 100,854.8C102.8,850.8 102.7,851.2 102.3,849.5C101.8,847.9 104.3,837.3 106.6,831.2C106.8,830.7 107.3,829.4 107.7,828.4C108.6,826 107.2,826.3 120.9,825.5C132.5,825.3 133.8,825.1 134.2,823.2C134.3,822.8 134.7,821.5 135.3,820.4C135.7,819.3 136,818.1 136,817.7C136.1,817.3 136.2,816.7 136.3,816.4C136.4,816.1 136.4,815.5 136.3,815.2C136.3,814.8 136.3,814.3 136.3,814C136.7,809.9 136.4,809.5 131.6,809.7C130,809.7 126.6,809.7 124.1,809.7C121.6,809.6 118,809.4 116.1,809.3C108.6,809 108.6,809 108.5,807.3C108.5,806.6 108.4,805.5 108.3,805.1C108,804 109,803.3 111.1,803.1C125.8,801.8 132.2,786.7 125.4,780.4C123.3,775.1 124,774.4 130.2,775.8C137.7,776.4 142.2,776.6 149.5,776.7C158.3,777 177.4,776.7 183.3,776.2C185.7,776 189.6,775.7 192.3,775.5C194.9,775.3 198.2,775 199.7,774.8C205.2,774 205.8,774.2 205.6,776.2C205.6,776.9 205.4,778.4 205.4,779.5C205.6,780.1 206.2,780 206.7,780.3C207.1,781.2 208.2,784 209,786.7C209.9,789.6 210.9,793.7 211.3,795.6C211.7,797.5 212.2,799.1 212.4,799.4C212.7,799.7 213,801.6 213.2,803.4C213.3,804.9 213.3,806.5 213.3,806.9C213.3,807.6 213.3,807.6 212.1,807.8C210.5,807.9 202.6,808.2 201.2,808.2C198.9,808.1 198.7,808.3 199.3,811C199.6,812 199.8,813.1 199.7,813.4C199.7,813.8 199.9,814.8 200.2,815.7C200.5,816.8 200.9,818.4 201.1,819.3C202.6,825.1 202.1,824.7 208.6,824.9C211.3,825 214.2,825.2 215,825.4L216.4,825.6L216.7,826.8C216.9,828 218.1,832.8 219,837C220,842.2 220.2,843.3 220.1,845.3C220,847.4 220,847.5 221.2,849.1C223.1,851.6 223.5,855.6 221.9,858L221.2,859L222.2,859.9C222.7,860.4 223.7,861.4 224.4,862.1C225.1,862.8 226.6,863.9 227.7,864.5C230,865.8 230,866.2 228.2,867.3C225.4,869 223.3,869 216.3,866.6C212.2,865.4 208.5,865.6 206,867.3C204.7,868.2 196,871.3 192.4,872.3C185.8,874.2 172.1,875.6 171.4,874.1Z"/>
-    <path class="c-main c-stroke" d="M126.7,825.3C123.4,825.4 119.3,825.6 114.4,825.8C112.5,825.9 110.3,826.1 109.7,826.3C107.1,826.7 104,826.4 104,825.6C104,824.6 105.6,819 106.5,816.6C106.6,816 106.7,815.5 106.7,815.3C106.6,814.9 106.9,814.9 114.3,814.6C119.2,814.6 131.5,814.7 133.7,814.7L135.9,814.7L136.2,815C136.4,815.2 136.4,815.7 136.3,816.1C136.2,816.6 136.1,817.3 136,817.7C136,818.1 135.7,819.3 135.3,820.3C134.8,821.5 134.3,822.8 134.2,823.2C133.8,825 133.4,825.1 126.7,825.3Z"/>
-    <path class="c-main c-stroke" d="M127.5,814.7C124.9,814.6 116.1,814.5 110.3,814.7C108.2,814.8 106.1,814.9 106,814.9C104.9,814.8 104.3,810 105.3,809.4C106.1,808.9 108.7,808.6 109.4,808.8C110.3,809 110.8,809.1 116.1,809.3C118,809.4 121.6,809.6 124.1,809.7C126.6,809.7 130,809.7 131.6,809.7C135.8,809.6 135.9,809.6 136.1,810.9C136.4,812.6 136.4,814.5 136.2,814.6C136,814.7 131.1,814.8 127.5,814.7Z"/>
-    <path class="c-main c-stroke" d="M203.1,824.4C202.8,824.3 202.4,823.4 202.1,822.5C201.6,821 201.4,820.2 200.2,815.8C200,814.8 199.7,814 199.7,813.9C199.3,813.5 199.9,813.3 201.6,813.4C202.4,813.4 204.4,813.4 205.9,813.4C216.8,813.7 216.8,813.7 216.9,814.5C217,814.8 217.2,815.7 217.4,816.4C217.7,817.2 218.1,818.6 218.4,819.4C218.6,820.3 219,821.5 219.1,822C219.3,822.4 219.5,823.3 219.5,824L219.5,825.2L217.9,825.4C216.7,825.5 215.6,825.4 214.5,825.3C213.6,825.2 211.1,825 208.9,824.9C204.2,824.8 203.6,824.7 203.1,824.4Z"/>
-    <path class="c-main c-stroke" d="M201.2,813.4C199.8,813.3 199.8,813.2 199.3,811C198.8,808.3 198.9,808.1 201.2,808.2C202.7,808.2 210.1,807.9 212.1,807.7C216.2,807.3 216.7,807.7 217.4,811.4C218,814 218.2,813.9 213.9,813.6C212.4,813.5 209.4,813.4 207.2,813.4C204.9,813.4 202.9,813.4 202.7,813.4C202.4,813.4 201.8,813.4 201.2,813.4Z"/>
-    <path class="c-open c-stroke" d="M167.8,813.2C167.2,813 165.2,812.9 164.6,812C163.9,811.1 163.8,809.3 163.9,807.2C163.9,804.7 164.8,799.4 165.3,797.1C165.8,794.8 165.3,795.6 166.7,795C168,794.4 172.2,793.7 173.3,793.4"/>
-    <path class="c-open c-stroke c-fine" d="M139.8,848.4C138,848 132.4,846.2 129,846C125.5,845.9 120.6,847.3 119,847.6"/>
-    <path class="c-open c-stroke c-fine" d="M189.5,848.5C191,848 196.3,846.1 199.1,845.6C201.8,845.1 204.7,845.3 205.9,845.3"/>
-    <path class="c-open c-stroke c-fine" d="M201.7,781.2C200.4,780.9 196.1,778.8 195.2,778"/>
-    <path class="c-open c-stroke c-fine" d="M175.2,788.3C175.2,787.3 175.6,783.4 175.7,782.5"/>
-  </g>
-  <!-- Pantaloni larghi -->
-  <g id="bottom-larghi">
-    <path class="c-main c-stroke" d="M168.3,885.6C168.2,885.3 168.3,883.1 168.5,880.5C168.8,876.4 168.8,876.1 168.2,875.9C166.4,875.2 166.4,874.7 167.4,832.3C166.4,816.9 166.5,817.3 164.8,817C163.2,816.7 162,817.5 161.7,819C161.6,819.6 161.5,820.5 161.3,821.1C160.3,825.1 157.9,836.4 157.3,840.4C156.1,848.4 155.2,855.9 154.9,858.4C153.5,872.3 152.9,874.7 150.5,875.1C148.5,875.4 148.3,875.7 148.7,878.2C148.9,879.3 149,881.4 149,882.8L148.9,885.3L147.6,885.3C144.8,885.5 141.9,883.3 139.8,879.5C138.4,876.9 135.5,874.1 133,872.8C132.1,872.3 130.8,871.6 130.1,871.2C122.7,866.5 109.8,870.3 100.7,880.2C94.5,886.9 85.7,890.1 87.7,885.1C88,884.4 88.6,883.5 89.2,883.1C91.3,881.5 90.3,877.5 87.9,877.4C85.5,877.4 85.5,875.9 88.3,860.5C90.9,849.9 91.5,847.7 92.5,844.6C93.2,842.5 97.1,832.1 97.6,830.7C97.9,830.2 98.2,829.4 98.4,828.9C98.6,828.4 99,827.6 99.2,827.1C99.4,826.7 100.2,824.8 101,823.1C102.2,820.3 102.4,819.7 103,818.3C103,818 103.2,817.5 103.3,817.2C103.4,816.9 103.6,816.4 103.6,816.1C103.6,815.8 103.7,815.4 103.7,815.2C103.8,815 103.8,814.6 103.8,814.3C103.8,814 103.9,813.6 103.9,813.4C103.9,812.9 103.9,812 103.9,811.2C103.9,810 103.9,809.2 104,808.5C104,808.1 104.2,807.3 104.3,806.6C104.4,805.9 104.5,805 104.4,804.6C104.3,803.9 105.2,803.5 107.1,803.6C109.2,803.6 113.9,802.6 116.8,801.3C118.6,800.5 122.2,796.8 123.2,794.8C123.7,793.9 124.2,792.9 124.4,792.6C125.5,790.6 125.8,789.2 126,785.8C126.7,783.2 126.3,782.7 124,779.8C122.7,776.8 123.4,774.5 125.6,775.1C126,775.2 127.5,775.5 128.8,775.8C130.2,776 132.2,776.2 133.2,776.2C142.1,776.8 145.6,776.8 162.2,776.8C181.4,776.6 184.6,776.4 201.6,774.7C202.7,774.5 203.8,774.5 204.1,774.6C204.8,774.7 204.8,775.3 204.8,780.1C205.1,780.2 206.1,780.3 206.8,781.3C207.6,782.8 208.4,785 208.8,785.9C209.2,786.9 209.7,788.5 210.1,789.5C210.5,790.6 211.2,793 211.8,794.9C212.3,796.7 212.9,798.6 213.2,799.3C213.4,799.8 213.8,801.2 214,802.3C214.1,803.3 214.5,804.9 214.7,805.9C215.2,807.4 215.7,809.3 216.1,811.1C216.3,811.6 216.6,812.5 217.5,814.6C217.6,815 217.9,815.5 218,815.9C218.2,816.2 218.6,817 218.8,817.6C219.1,818.2 219.5,819.2 219.7,819.7C220,820.3 220.3,821.1 220.5,821.4C220.6,821.7 221,822.5 221.2,823.1C221.8,824.4 222.3,825.8 222.8,826.8C222.9,827.2 223.3,828 223.5,828.7C223.8,829.5 224.3,830.9 224.7,831.9C225.1,833 225.6,834.6 225.8,835.4C226.1,836.3 226.5,837.3 226.6,837.7C226.8,838.1 227.2,839.5 227.6,840.9C227.9,842.3 228.4,843.9 228.5,844.5C228.7,845.1 229.1,846.6 229.5,848C229.8,849.4 230.3,851.3 230.5,852.2C230.7,853.1 231,854.7 231.3,855.8C231.4,856.9 231.8,858.7 232,859.8C232.8,864.3 232.9,866.1 232.3,867.4L231.6,868.5L232.6,869.6C233.2,870.1 234,870.7 234.3,870.9C239.3,873.3 240.6,874.8 238.3,876.1C234.5,878.6 230.1,878 224.5,874.5C219.4,870.9 214.6,870.5 209,873.5C206.6,875 199.4,878.4 194.9,880.4C192.8,881.3 190.5,882.5 189.9,883C188.2,884.2 186.8,884.7 184.2,884.9C173.4,886.2 168.5,886.6 168.3,885.6Z"/>
-    <path class="c-open c-stroke c-fine" d="M128.8,835.8C129.6,833 130.5,828.5 132.9,822C134.4,817.1 135.3,805.6 136.2,798.2"/>
-    <path class="c-open c-stroke c-fine" d="M203.5,834.7C201.8,827.8 195.5,810.3 194.2,805.4"/>
-    <path class="c-open c-stroke" d="M167.6,816.6C167,816.4 164.7,817 164.2,815.3C163.6,813.6 163.9,807.1 164,803.4C164.1,799 163.8,797.7 165.1,796.1C166.4,794.4 170.6,794.2 171.6,793.9"/>
-    <path class="c-open c-stroke c-fine" d="M140.3,850.8C139.4,850.4 137.4,848.9 135.1,848.3C132.7,847.6 129.4,847 126,847C122.6,847.1 116.6,848.3 114.7,848.7"/>
-    <path class="c-open c-stroke" d="M191.4,852.1C193.4,851.2 200.5,848.4 203.6,847.6C206.7,846.9 208.1,847 210.1,847.2C212.1,847.4 214.7,848.3 215.7,848.6"/>
-    <path class="c-open c-stroke c-fine" d="M173.4,791C173.5,789.4 174.3,783.1 174.5,781.5"/>
-    <path class="c-open c-stroke c-fine" d="M194.1,803.9C193.9,802.8 192.2,797.7 191.8,796.4"/>
   </g>
   <!-- Bermuda cargo -->
   <g id="bottom-bermuda-cargo">
@@ -393,45 +142,6 @@
     <path class="c-open c-stroke" d="M155,821.1C155.6,820.5 157.9,820.9 159,817.7C160.1,814.5 159.5,805.1 161.5,801.7C163.5,798.3 169.4,798.5 171,797.9"/>
     <path class="c-open c-stroke c-hair" d="M172.5,789.7C172.8,787.6 174,779.3 174.3,777.3"/>
     <path class="c-open c-stroke c-hair" d="M162.5,792.5C162.6,791.1 163.3,785.2 163.5,783.7"/>
-  </g>
-  <!-- Jeans grigi -->
-  <g id="bottom-jeans-grigi">
-    <path class="c-main c-stroke" d="M139.2,876.8C136.4,876.6 134.8,875.9 130.6,873.2C128.7,871.9 126.7,870.7 126,870.6C125.3,870.4 123.8,869.8 122.7,869.2C118.3,867.2 110.5,868.3 106.4,871.5C105.2,872.4 103.6,873.5 103,873.8C102.4,874.1 100.6,875.3 99,876.5C94.4,879.7 88.9,881.3 85.7,880.4C84.3,880.2 85.1,878.1 88.3,873.7C90.5,870.3 90.7,869.8 89.7,868.9C89,868.3 88.6,867.4 88.6,866.3C88.5,865.5 88.1,863.9 87.6,862.8C85.9,859.7 86.1,858 89,853.8C90.5,851.7 90.5,851.4 90.9,848.2C91,846.4 91.4,844.2 91.5,843.3C91.8,842.4 92.1,840.8 92.3,839.7C92.6,838.6 92.9,837.1 93.1,836.3C93.4,835.5 93.7,834.1 93.9,833.1C94.2,832.1 94.6,830.7 94.8,830C95.3,828.5 96,826.6 96.6,824.6C96.9,823.8 97.4,822.7 97.6,822.2C98.2,820.9 98.6,820.2 99.8,817.6C100.9,815.7 101.4,815.1 103.8,810.7C105.6,806 105.8,805.1 105.8,803.7L105.9,802.3L109.4,801.3C118.9,798.4 123.2,792.1 123.3,784.3C123.7,783.5 124.1,783.1 124.1,783.1C124.8,783 204.3,780.4 204.7,780.5C205,780.5 205.5,780.9 205.8,781.6C206,782.5 206.8,784.6 207.5,786.3C208.2,788.2 209.4,791.5 210.2,793.8C210.9,795.9 211.8,798.5 212.2,799.4C212.6,800.2 212.9,801.8 212.8,802.8C212.7,803.7 212.8,805.4 212.9,806.5C212.8,807.5 212.5,809.4 212.1,810.7C211.7,811.8 211.2,813 211,813.4C210.9,813.9 210.8,815.1 210.9,816.3C211.1,817.6 211.7,820.3 212.3,822.2C212.8,824.3 213.6,826.8 213.8,827.7C214.1,828.6 214.5,830.2 214.8,831.2C216.7,838.1 217.6,842.2 217.6,843.2C217.7,844.1 218.2,844.8 219.7,846.6C223,850.5 223.2,852.2 221.4,859.2C221.1,860.3 221.3,860.6 223,862.2C224,863.3 225.3,864.8 225.8,865.7C226.4,866.9 227.3,867.9 228.4,868.5C230.9,869.8 230.9,870.2 229.3,871.1C225.6,873.1 220.8,872.6 214.5,869.3C210.8,867.4 206.6,867.4 203,869C196.4,872.3 182.8,875.5 175.4,875.8C172.7,875.9 169.6,876 168.7,876.1C166.1,876.4 165.6,875.9 166,874.1C167.1,869.2 167.1,864.6 166,863.8C165.2,863.2 164.8,862.5 164.6,860.7C164.3,858.6 164,858.1 161.7,854.5C160.4,852.6 160.5,850.9 162.2,847.9C163.7,845.4 163.7,844.2 162,825.6C161.8,818.7 162,816.6 162.5,814.4C163.1,811.9 162.8,811.4 161.1,811.4C159.4,811.4 157.2,812.4 157,813.1C156.9,813.4 155.9,814.5 155,815.6C154,816.7 152.8,818.3 152.4,819C152,819.7 151.2,821.1 150.7,822C150,823.6 148.9,826.7 146.7,836.1C146.3,838.3 145.8,840.8 145.6,841.6C144.9,844 145.2,846.4 146.3,848.2C147.8,851.2 147.7,854 146,856.3C145.3,857.5 144.4,859.5 144.2,860.8C143.8,862.7 143.3,863.5 142.4,864.3C141.2,865.3 141.1,865.7 141.4,867C141.8,869.7 142.7,873.6 143.1,874.9C143.5,876.1 142.7,877.1 141.6,877.1C141.3,877 140.2,876.9 139.2,876.8Z"/>
-    <path class="c-open c-stroke" d="M161,810.9C162,809.1 163.4,799.4 165.4,795.7C167.3,791.9 172.7,794.5 174.5,792.7C176.1,790.8 175.3,786.1 175.6,784.8"/>
-    <path class="c-open c-stroke c-hair" d="M181.7,847.8C184.6,846.9 194.7,843.6 199.2,843.1C203.7,842.7 207,843.9 208.5,844.2"/>
-  </g>
-  <!-- Pantaloni kaki -->
-  <g id="bottom-pantaloni-kaki">
-    <path class="c-main c-stroke" d="M137.9,875.2C135.1,875 132.8,874 129.4,871.6C127.8,870.6 125.8,869.5 125,869.1C124.2,868.9 122.8,868.2 121.9,867.6C118.6,865.6 110.5,867.1 106,870.7C104.8,871.7 103.2,872.8 102.5,873.2C101.7,873.6 99.5,875.1 97.7,876.4C93.3,879.4 88.4,880.8 84.9,880.4C81.9,880.2 82,879.8 85.6,875.7C89,872 89.8,870.2 88.8,869.1C88.5,868.8 88.3,867.6 88.2,866.5C88.2,865.4 87.8,863.6 87.3,862.4C86.1,859.7 86.5,858.4 89.8,854.5C91.2,852.9 91.3,852.6 91.9,849.2C92.3,847.3 92.9,844.5 93.3,842.9C93.6,841.4 94.2,839 94.6,837.5C95,836.1 95.9,833.4 96.6,831.6C98.9,826.2 102,819.5 102.4,818.3C102.7,817.7 103,816.9 103.2,816.4C104.2,812.5 105.2,804.1 105.3,802.8C105.4,801.7 105.5,801.6 108.2,800.6C118.5,796.4 123.6,786.6 122.3,782.3C122.2,782.6 120.8,782.5 136.1,781.6L148.7,780L169.3,780C180.7,780.3 190.5,780.6 191.3,780.7C193.6,780.8 206.8,778.2 207.3,777.8C207.5,777.8 208.4,779.5 209.3,783.4C210.2,788.3 211.2,794.2 211.6,796.3C211.9,798.3 212.1,800.5 212.1,801.4C212,802.2 212,804.5 212,806.2C211.9,807.7 211.7,809.9 211.4,811.1C211.1,812 210.9,813.2 210.9,813.7C210.9,814.3 210.9,815.7 211.1,817C211.7,819.6 214.1,829.4 215.5,836.6C216,839.3 216.5,842.4 216.5,843.3C216.6,844.8 216.7,845.1 218.4,846.9C221.8,850.7 222.4,853.5 220.6,857.2C219.8,859.2 220.3,860.1 224.1,862.2C229.5,865.2 231.3,867.8 228.9,869.2C225.5,871 221.9,870.8 215.7,868.4C210.6,866.6 207.8,866.6 203.4,868.6C201.9,869.3 199.9,869.9 198.9,870C198,870.1 195.6,870.5 193.8,871.1C188.6,872.6 181.6,873.6 176.4,873.6C173.8,873.7 170.6,873.8 169.3,873.9C165.6,874.2 165.6,874.2 166.1,869.8C166.3,867.8 166.7,865.4 166.9,864.6C167.3,863.4 167.2,862.9 166.5,862.1C165.9,861.4 165.4,860.1 165.3,858.5C165.1,856.8 164.7,855.4 163.6,853.8C161.7,851 161.7,849.8 163.7,846.3L165.3,843.7L164.8,829.4C164.7,824.3 164.4,818.3 164.4,815.6C164.6,808.2 164.6,808.2 162.2,808.2C160.2,808.2 159.2,809.1 158.3,811.2C157,813.7 156.2,814.8 155,816.3C154.7,816.7 154.2,817.4 153.7,818.1C153.3,818.7 152.7,819.6 152.5,820C152.3,820.4 151.8,821.1 151.6,821.6C151.4,822.1 150.6,823.7 149.9,825.2C147.7,831.3 147.9,830.9 146.4,837.1C146.1,838.4 145.7,840.3 145.5,841.2C144.8,844 145,845.7 146.3,848.1C147.9,851.7 147.6,853.4 144.6,856.2C143.9,856.9 143.4,858.1 143.1,860C142.7,862.3 142.3,863 141.4,863.7C140,864.6 140.1,865.3 142.2,871.1C143.6,875 142.7,875.8 137.9,875.2Z"/>
-    <path class="c-open c-stroke" d="M158,807.5C158.8,807.1 161.2,807.9 162.5,805.3C163.7,802.3 162.8,790.8 164.8,787.9C166.8,785.4 172.4,786.5 173.9,786.3"/>
-    <path class="c-open c-stroke c-hair" d="M175.2,784.4C175.4,783.6 175.9,781.3 176.1,780.7"/>
-    <path class="c-open c-stroke c-hair" d="M133.4,847.7C132.3,847.3 129.1,846.1 126.6,845.8C124.1,845.5 121.6,845.5 118.3,845.9C115.1,846.4 109.8,847.7 106.8,848.8C103.8,849.8 101.4,851.4 100.3,852"/>
-    <path class="c-open c-stroke c-hair" d="M180.6,848.2C182.5,847.6 188.2,845.1 192.4,844.4C196.7,843.8 203.5,844.2 205.8,844.3"/>
-  </g>
-  <!-- Pantaloni con cintura -->
-  <g id="bottom-pantaloni-cintura">
-    <path class="c-main c-stroke" d="M137,874.7C134.5,874.5 131.5,873.2 129.2,871.3C120.1,864.4 109.7,866 98.3,876.2C94.7,879.2 89.5,881.1 86.2,880.6C84,880.4 84.1,880.3 87,876C89.5,872.4 90.1,870.6 89.1,870.3C88.9,870.3 88.7,869.1 88.6,867.8C88.6,866.6 88.2,864.8 87.9,863.9C86.7,860.8 87.2,858.3 90.1,854.4C91,853 91.2,852.5 91.8,848.3C92.3,845.9 93.1,842.2 93.6,840C94.5,836.3 94.9,834.7 95.6,832.3C95.8,831.6 96.1,830.5 96.4,829.8C96.5,829.1 96.9,828.1 97.1,827.5C97.3,826.9 97.6,826 97.9,825.3C98.2,824.1 98.4,823.6 99.7,820.4C100,819.4 100.5,818.2 100.7,817.8C100.8,817.3 101.1,816.6 101.3,816.1C102.4,813 103.9,806.3 104,804.6L104.2,802.5L107,802C121.7,799.4 129,785.7 124.4,783C123.7,782.7 124.1,782.5 125.6,782.1C129.1,780.8 135.7,775.8 136.4,773.5C136.8,772.5 136.8,772.5 137.9,772.4C139.4,772.4 139.4,772.2 139.7,768.6C139.7,766.5 139.9,765.4 140.2,765.2C141.3,764.5 146.9,765.4 146.5,766.2C145.9,767 145.7,772.3 146.1,772.5C146.4,772.6 149.1,772.8 153.3,772.8L160.1,773L161,773.6L161.9,774.1L170.5,774.2C180.9,774.3 182.3,774.2 183.8,773.5C184.9,772.9 185,772.9 188.4,772.8C192.7,772.6 192.7,772.7 193.2,768.8C193.4,765.5 193.4,765.5 196.5,765.4C199.1,765.3 199.1,765.3 198.8,768.5C198.1,772 198,772.1 202.2,771.7C205,771.5 205.3,771.5 205.5,771.8C205.6,772.1 205.3,775.5 204.9,778.1C204.6,779 204.7,780.1 205.7,780C206.7,783.6 207.8,789.7 208.3,792C208.7,794.4 209.1,797 209.1,797.7C209.2,798.4 209.5,799.3 209.9,799.6C210.4,800 210.4,800.3 210,800.8C209.7,801.3 209.8,802.6 211.3,810.4C211.4,811.3 211.9,812.7 212.1,813.5C213.2,818.2 213.4,819.3 213.8,821.1C214.3,822.9 214.5,824.3 216,831.8C216.1,833.1 216.6,836.2 217,838.7C218.1,846.8 218,846.3 219.1,847.5C221.5,850.3 222.1,853.4 221,856.8C220.7,857.8 220.5,858.9 220.5,859.2C220.5,859.9 223.6,863.6 224.4,863.9C225.3,864.2 229.1,867.3 229.2,867.8C229.2,868.3 227.1,869.4 225.5,869.8C223.5,870.3 220.5,869.6 217.1,868C212.5,865.9 207.5,865.8 203.3,867.8C202.3,868.3 200.7,868.8 199.8,868.9C199,869 197.5,869.4 196.5,869.7C189.6,872.3 179.7,873.9 170.7,873.9C162.9,874.2 163.5,874.8 164.7,866.6C165.1,864.3 165.1,864.1 164.3,863C163.5,862.1 163.4,861.5 163.4,859.6C163.4,857.6 163.3,857.1 161.9,855C160,852.2 160,851.5 161.7,848L163,845.5L163.2,831.6C163.2,813.9 161.9,807.8 159.7,807.8C157.7,807.7 157.4,808.1 155.6,812.3C155.2,813.2 154.1,815.2 153.1,816.7C152.1,818.2 151.2,819.9 151,820.2C150.9,820.6 150.4,821.5 150.1,822.2C148.4,825.9 147.2,829 146.5,831.3C146.1,832.8 145.5,834.8 145.3,835.7C143.2,844.7 143.2,845.1 144,847.5C145.3,851 145,852.9 143,855.5C141.6,857.3 141.3,857.9 140.9,860.4C140.5,862.8 140.3,863.6 139.6,864.2C138.6,865 138.7,865.4 140.4,868.4C141.8,871.2 142.5,873.4 142.1,873.9C141.5,874.4 138.9,874.9 137,874.7Z"/>
-    <path class="c-trim c-stroke" d="M161.3,773.7C160.5,773.4 160.5,773.3 160.9,769.8L161.1,766.1L162.3,765.7C163.4,765.5 164.9,765.4 173.4,765.5L183.4,765.5L184.6,766C185.4,766.4 185.7,766.5 185.5,766.8C185.3,766.9 185,768.5 184.8,770.2C184,774.5 184.6,774.3 170.6,774.2C162.9,774.1 162,774 161.3,773.7ZM178.5,771.5C178.7,771.4 179,770.8 179.2,770C179.7,768.2 179.6,768.2 174.5,768.4C172.4,768.5 170.1,768.5 169.5,768.4C166.9,768.1 166.5,768.4 166.4,770C166.3,770.9 166.4,771.5 166.7,771.5C167.3,771.6 178.2,771.6 178.5,771.5Z" fill-rule="evenodd"/>
-    <path class="c-accent c-stroke" d="M131.1,771.8C128.8,771.5 125.9,771.2 124.6,771L122.1,770.8L121.8,768.1C121.3,765.2 121.5,764.4 122.8,764.4C123.2,764.4 125.9,764.5 128.9,764.8C131.8,765.1 135.4,765.4 136.7,765.5C139.9,765.8 140,765.9 139.8,769.2C139.6,770.6 139.3,772 139.2,772.1C138.9,772.5 136.6,772.4 131.1,771.8Z"/>
-    <path class="c-accent c-stroke" d="M149.2,772.8C147.8,772.7 146.4,772.6 146.1,772.5C145.6,772.3 145.8,767.3 146.3,766.6L146.7,766.1L153.4,766.2C161.8,766.3 161.2,766 161,769.7C160.6,773.3 161.4,773.1 149.2,772.8Z"/>
-    <path class="c-main c-stroke" d="M122.1,781.3L120.6,779.6L121,776.9C121.2,775.3 121.5,773.4 121.7,772.5L122.1,771.1L124.3,771.1C127.1,771.3 135.7,772.3 136.3,772.5C138.9,773.5 127.9,781.7 123.9,782.5C123.8,782.5 123,782 122.1,781.3Z"/>
-    <path class="c-accent c-stroke" d="M184.6,772.4C184.2,771.8 184.8,767.7 185.4,767L185.9,766.4L189.3,766.4C193.7,766.3 193.6,766.3 193,769.7C192.3,772.8 192.5,772.6 188.2,772.8C185,772.9 184.9,772.9 184.6,772.4Z"/>
-    <path class="c-accent c-stroke" d="M198.6,771.5C198.2,771.1 198.9,765.7 199.4,765.5C199.6,765.5 201,765.4 202.5,765.3L205.4,765L205.9,765.6C206.5,766.3 206.3,770.3 205.7,771C205.1,771.7 199.2,772.2 198.6,771.5Z"/>
-    <path class="c-accent c-stroke" d="M166.7,771.5C166.4,771.5 166.3,770.9 166.4,770C166.5,768.4 166.9,768.1 169.5,768.4C170.1,768.5 172.4,768.5 174.5,768.4C179.6,768.2 179.7,768.2 179.2,770C179,770.8 178.7,771.4 178.5,771.5C178.2,771.6 167.3,771.6 166.7,771.5Z"/>
-    <path class="c-open c-stroke" d="M162.9,807C162.3,806.6 159.8,807.1 159.6,805C159.3,802.7 160.8,794.2 161.4,791.5C162.2,788.8 161.5,790.1 163.4,789.5C165.2,788.8 170.7,787.6 172.2,787.2"/>
-    <path class="c-open c-stroke c-fine" d="M132.2,848.6C130.8,848.2 126.2,846.8 123.8,846.4C121.5,846.1 120.7,846.2 118.1,846.5C115.5,846.8 111.1,847.6 108.3,848.6C105.3,849.7 101.9,851.9 100.7,852.6"/>
-    <path class="c-open c-stroke c-fine" d="M181.4,848.6C184.2,847.7 193.9,844.7 198.4,844.1C202.9,843.8 206.4,844.8 208,845"/>
-    <path class="c-open c-stroke c-hair" d="M173,784.1C173.4,782.5 175.5,776.3 176,774.8"/>
-    <path class="c-open c-stroke c-hair" d="M165.1,784.5C165.3,783.3 166.3,778.4 166.6,777.2"/>
-  </g>
-  <!-- Jeans chiari -->
-  <g id="bottom-jeans-chiari">
-    <path class="c-main c-stroke" d="M138.1,876.9C135.5,876.6 133.2,875.5 130.5,873C128.3,871.1 126.8,870.3 121.4,868C118.5,866.8 109.5,868.1 107.1,870C106.3,870.6 104.7,871.8 103.5,872.5C102.4,873.3 101,874.5 100.3,875.1C96.4,878.9 90.5,881.3 86.9,880.5C85.1,880.2 85.1,880.2 87.5,876.4C91,870.3 90.8,870.9 90.1,870.1C89.7,869.6 89.4,868.6 89.4,867.1C89.3,865.9 89,864.4 88.7,863.7C87.2,860.6 87.4,859 90,855.3C91.9,852.7 91.6,854.5 93.8,838.8C94.8,834.2 95.8,829.5 96.2,828.1C97.4,824.1 98.1,821.6 98.5,819.7C98.8,818.7 99,817.5 99.2,817C99.2,816.4 99.5,815.4 99.7,814.8C99.9,814.1 100.4,811.7 100.8,809.1C101.3,804.1 101.5,803.3 102.1,803.2C102.4,803.1 103.7,802.9 104.9,802.8C117.4,801.9 126.6,790.6 124.1,783.6C123.6,782.9 122.1,783.1 140.4,778.3L155.9,774.1L173.8,773.5C183.8,773.1 192.7,772.8 193,772.9C193.4,772.9 201.9,778.8 204.6,780C205.2,780.1 205.6,780 206.2,780.5C208.7,786.8 210.8,793.3 211.9,796.7C214.3,804.4 215,814.5 215.1,822C216.2,838.3 216.8,844.3 217.8,845.5C221.4,850 221.8,851.2 221,856.5C220.6,859.5 220.6,859.6 223.8,861.8C226.3,863.4 227.6,864.7 228.8,866.5L229.9,868.2L228.6,868.9C225.5,870.8 220.8,870.5 214.8,867.9C211.6,866.5 207,866.8 204.1,868.6C201.7,870.1 194.9,872.2 187.3,874C180.3,875.9 178.2,876.2 166.8,876.6C164.5,876.8 163.3,876.1 163.8,874.9C164.6,873 165.1,866.1 164.5,865.2C164.2,864.7 163.8,863 163.7,861.5C163.5,859.6 163.2,858.4 162.6,857.7C160.2,854.9 160.2,852.3 162.6,848.5L164.1,846.2L164.2,834.1C164.8,818.5 163.3,810.1 160.6,809.9C159.6,809.9 157.8,810.6 157.7,811.1C157.5,811.3 156.8,812.7 156,814.1C155.2,815.4 154.4,816.8 154.2,817.1C154,817.4 153.3,818.5 152.7,819.6C152.1,820.7 151.3,822 151.1,822.5C150.8,823 150.3,824 149.9,824.8C149.5,825.7 148.7,827.7 148.1,829.3C147.6,831 146.9,833.1 146.7,833.8C145.6,837.3 145,839.9 144.1,844.4L143.6,847.3L144.9,850.1C146.7,854.3 146.6,855.3 144.1,858.6C143.6,859.3 142.9,860.9 142.7,862.1C142.4,863.7 141.9,864.8 141.2,865.5C140,866.8 140.2,868.3 141.9,872C142.8,874.3 143.1,876.1 142.5,876.4C141.8,876.9 139.7,877.2 138.1,876.9Z"/>
-    <path class="c-open c-stroke" d="M164.1,809.2C163.4,808.9 160.4,809.5 160.3,807.5C160.1,805.2 161.8,796.6 162.4,793.6C163,790.6 162.5,792.1 164.3,791.4C166,790.7 171.2,789.6 172.7,789.3"/>
-    <path class="c-open c-stroke c-hair" d="M175.9,780.1C176.1,779.2 177,775.5 177.2,774.5"/>
-    <path class="c-open c-stroke c-hair" d="M132.2,848.6C131,848.3 127.4,847 125,846.7C122.7,846.3 120.7,846.1 117.9,846.4C115.2,846.6 111.1,847.4 108.6,848.2C106,849 103.5,850.6 102.4,851.1"/>
-    <path class="c-open c-stroke c-hair" d="M180.2,849.3C183,848.4 192.1,845.2 196.7,844.5C201.4,843.9 206.2,844.7 208,844.8"/>
-    <path class="c-open c-stroke c-hair" d="M165.7,786C165.9,784.5 167,778.6 167.5,777.1"/>
   </g>
   <g id="shoes">
     <g id="shoe-left">
@@ -453,7 +163,7 @@
     <path class="c-skin c-stroke" d="M158.8,689C147.2,686.1 133.8,671 142.8,671C143.7,671 144,669.8 144,665.3C144,660.1 144.1,660.2 138.7,659C127.6,656.3 115.3,650.7 112,646.8C111.1,645.7 110,645.8 107.2,647.2C87.2,657.5 64.2,640 68.5,617.9C69.2,614.2 72.6,607.4 74.2,606.3C76.3,605 76.8,602.9 75.6,600.4C73,595.1 71.1,580.7 71.7,570.8C74.3,521.7 113.2,488.1 167.5,487.9C178.7,487.8 180.9,488 189,489.6C237.1,499.2 258.4,538.5 244.4,592C242.5,599.2 242.3,600.4 242,609.2C240.8,638.2 215.9,658.9 179.3,661.4C173.6,661.7 173.5,661.9 173.5,667.5C173.5,672.3 174,673.5 176.2,673.5C181.7,673.5 180.4,683.9 174.4,687.9C172.1,689.4 163.1,690 158.8,689Z"/>
     <path class="c-open c-stroke c-fine" d="M101.5,604C99.8,603.2 94.3,599.8 91.5,599C88.7,598.2 86.2,598.9 84.5,599.5C82.8,600.1 81.6,602 81,602.5"/>
 
-    <!-- Capelli: nel gruppo della testa (così seguono il respiro), sotto gli occhi. Stile mostrato di default: spettinati -->
+    <!-- Capelli: nel gruppo della testa (così seguono il respiro), sotto gli occhi. Stile mostrato di default: ricci -->
     <g id="hair">
       <!-- Spettinati -->
     <g id="hair-spettinati">
@@ -588,70 +298,6 @@
     <path class="c-open c-stroke c-fine" d="M127.5,742.5C128.3,738 131.7,720 132.5,715.5"/>
     <path class="c-open c-stroke c-fine" d="M200.5,732C200.6,731.3 201.7,731.7 201,728C200.3,724.3 197.2,713 196.5,710"/>
   </g>
-  <!-- Felpa -->
-  <g id="top-felpa" class="c-idle-torso c-origin-maschio-bambino">
-    <path class="c-main c-stroke" d="M146.4,772.3C143.2,772.2 137.5,771.8 133.7,771.4C120.5,769.6 121.8,769.8 121.8,768.9C121.8,768 120.8,767.8 116,768C109.9,768.3 98.1,768.2 94,767.7C92,767.5 89,767.1 87.4,767L84.5,766.7L82.9,765.6C79.8,763.4 79.1,762.1 78.6,758.3C78,754.5 77.9,755.8 80.7,738.6C86.6,715.5 98.2,692.9 106.3,685.9C108.5,684 108.4,684.2 107.6,682.6C105.7,679.1 110.3,671.1 114.1,671.2C114.3,671.2 114.6,670.6 114.8,670C116,665.7 123.8,663.3 137.5,663.2C142,663.1 141.9,662.8 141.6,667.6C141.3,672.4 140.8,671.9 147.5,674.8C153.9,677.5 159.2,680.1 164,683.2C169.8,687.1 170.2,687.1 176,681.5C179.7,677.7 179.6,675.5 176,674.2C172.5,673.1 172.9,673.5 172.6,669.8C172.5,667.3 172.6,666.1 173,665.1L173.6,663.8L176.1,663.9C178.2,664 178.8,664.2 179.5,664.9C179.9,665.3 181.1,665.8 182.2,666.1C183.2,666.3 185.5,666.9 187.3,667.3C196.1,669.4 202.1,675.9 199.9,680.8C199.5,681.4 199.3,682 199.3,682C199.3,682.1 200.6,683.2 202.1,684.6C209,690.5 214.1,700.8 221.6,724.6C234.1,759.3 234.2,759.5 229.9,764C229.1,764.8 228.9,764.8 226.8,765.2C225.5,765.4 224,765.8 223.2,766C220.7,766.8 213,767.8 210.6,767.9L208.2,767.9L207.3,768.8C206.4,769.6 206.2,769.7 204.5,769.8C203.6,769.9 200.3,770.1 197.4,770.5C181.8,772.3 163.6,772.9 146.4,772.3ZM155.6,722C156,721.6 156.7,719.7 157.5,716.8C157.6,716.2 157.5,715.6 157.3,715.4C157,715.2 157.1,711.4 157.4,705.4C158.2,689.9 158,687.8 156.1,687.1C154.4,686.4 152,688.6 153,689.9C154,691 153,714.3 152,715.6C151.3,716.5 151.3,716.8 151.6,717.9C151.9,718.6 152,719.5 152,720.1C151.9,721.8 154.4,723 155.6,722ZM186.5,720.5C187.1,719.6 187.6,715 187.2,714.4C187,714 186.7,710.8 186.6,707.1C186.5,703.5 186.3,697.9 186.1,694.6C185.9,691.4 185.8,688.5 185.9,688.1C186.4,686.8 184.1,685.8 182.5,686.7C181.7,687.3 181.5,688.6 181.8,693.4C182.7,704.2 183,714.3 182.4,714.8C181.8,715.2 181.8,716.3 182.5,718C182.8,718.8 183.1,719.8 183.2,720.3C183.5,721.3 185.8,721.5 186.5,720.5Z" fill-rule="evenodd"/>
-    <path class="c-trim c-stroke" d="M140.5,779.8C137.6,779.8 133.2,779.9 130.7,780C128.4,780.1 125.6,780.2 124.4,780.1L122.4,779.9L121.1,778C119.8,776.1 119.7,776 120.2,774.9C120.5,774.3 121,772.9 121.3,771.8C121.7,769.6 121.4,769.7 124.4,770C140.4,772.1 149,772.6 161,772.6C171.1,772.6 187.4,771.7 197.3,770.5C200,770.2 203.4,769.9 204.5,769.8L206.7,769.8L206.9,772.2C206.9,775.3 206.7,775.7 204.4,776.9C203.4,777.4 202.7,777.6 201.7,777.5C201.1,777.5 198.6,777.7 196.4,777.8C182.6,779.6 158.1,780.7 140.5,779.8Z"/>
-    <path class="c-trim c-stroke" d="M95.9,776C94.6,775.9 92.3,775.5 90.9,775.2C89.5,774.9 87.8,774.5 87.2,774.4C86.6,774.4 85.7,774.1 85.1,773.8L84,773.3L84.5,770.3C84.7,766.3 84.8,766.2 94,767.7C98.1,768.2 109.9,768.3 116,768C118.1,767.9 120.3,767.9 120.8,768L121.8,768.2L121.6,770.7C121.3,772.1 120.8,773.8 120.4,774.2L119.8,775.2L115.6,775.6C110.9,776 99.5,776.3 95.9,776Z"/>
-    <path class="c-trim c-stroke" d="M207.6,774.9C206.5,774.5 206.3,769.7 207.4,768.7C208.1,768 208.2,768 210.7,767.9C213.1,767.8 220.8,766.7 223.2,766C224.7,765.5 227.3,765.1 228,765.2C228.4,765.3 229.4,768.6 229.3,769.8C229.1,770.9 228.5,771.3 226.1,772C225.1,772.3 222.7,773.1 221,773.7C214.9,775 209,775.3 207.6,774.9Z"/>
-    <path class="c-accent c-stroke" d="M152.8,721.7C152.4,721.3 152,720.7 152,720.1C152,719.5 151.9,718.6 151.6,717.9C151.3,716.8 151.3,716.5 152,715.6C153,714.3 154,691 153,689.9C152,688.6 154.4,686.4 156.1,687.1C158,687.8 158.2,689.9 157.4,705.4C157.1,711.4 157,715.2 157.3,715.4C157.7,715.8 157.6,716.3 156.6,719.7C155.8,722.4 154.6,723.1 152.8,721.7Z"/>
-    <path class="c-accent c-stroke" d="M183.2,720.3C183.1,719.8 182.8,718.8 182.5,718C181.8,716.3 181.8,715.2 182.4,714.8C183,714.3 182.7,704.2 181.8,693.4C181.5,688.6 181.7,687.3 182.5,686.7C184.1,685.8 186.4,686.8 185.9,688.1C185.8,688.5 185.9,691.4 186.1,694.6C186.3,697.9 186.5,703.5 186.6,707.1C186.7,710.8 187,714 187.2,714.4C187.6,715 187.1,719.6 186.5,720.5C185.8,721.5 183.5,721.3 183.2,720.3Z"/>
-    <path class="c-open c-stroke c-fine" d="M131.5,763.5C132.5,762.7 135.7,760.9 137.7,758.3C139.7,755.6 134.2,749.1 143.8,746.7C153.6,744.4 185.5,744.2 195.2,746.7C204.6,748.7 200.7,756.5 202.5,758.7C204.1,760.9 204.4,760.6 205.4,761C206.3,761.3 208.2,767.8 208,761.1C207.7,753.9 203.1,716.6 202,707.1"/>
-    <path class="c-open c-stroke c-fine" d="M122.3,768.5C123.1,767.6 126.2,766.2 126.5,763.2C126.7,760.1 124.2,757 123.4,749.7C123,741.3 127.5,717.6 128.8,711.1"/>
-    <path class="c-open c-stroke c-fine" d="M151,689.2C148.8,688.7 143.6,688.1 138.4,686.4C133.3,684.8 124.3,680.1 120.3,679.2C116.2,678.3 114.8,680.3 113.3,681C111.8,681.6 111.6,683 111.2,683.4"/>
-    <path class="c-open c-stroke c-fine" d="M189.3,686.9C190.5,685.9 195.1,681.7 196.2,680.7"/>
-    <path class="c-open c-stroke c-fine" d="M137.7,671.7C137.5,671.5 137.6,670.7 136.3,670.2C134.9,669.6 130.9,668.6 129.8,668.3"/>
-  </g>
-  <!-- Giacca -->
-  <g id="top-giacca" class="c-idle-torso c-origin-maschio-bambino">
-    <path class="c-main c-stroke" d="M140.4,771.6C129.4,770.6 122.6,769.8 120.7,769.3C118.6,768.7 118.9,768.7 107,769.1C101.3,769.2 94,769 90.8,768.6C87.5,768.2 83.7,767.7 82.3,767.5L79.9,767.2L78.8,766.1C76.2,763.2 76.9,747.3 81,727.6C81.1,727 81.4,726.1 81.6,725.5C81.7,724.9 81.9,724.1 82.1,723.7C82.2,723.3 82.6,722.4 82.8,721.8C86.4,712.2 89.3,705.8 93.8,697.9C97,692.1 100.2,688.4 104.8,684.8C109.8,680.9 114.5,678.4 118.4,677.8C119.9,677.6 120.2,677.9 120.8,680.3C121.9,684.2 125.3,692.7 126.2,693.9C127.3,695.3 128,695.3 132.7,693.7C134.4,693.1 135.9,692.6 136,692.6C136.1,692.6 137.9,692 140,691.4C144.2,690 146.7,689.8 148.6,690.6C149.3,690.9 150.4,691 151.1,691C152.7,691 155.2,692.3 158.4,694.8C162.5,698 162.3,697.5 161.6,703.2C160.9,708.6 160.9,711 161.8,711.7C162.2,712.2 162.3,714.4 162.9,735.2C163.1,739.1 163.4,744.6 163.7,747.5C164.2,754 164,770.2 163.6,771.1L163.3,771.9L153.8,771.9C148.8,771.9 142.7,771.8 140.4,771.6ZM127.5,761.7C130.2,758.6 131.4,756.2 133.8,749.8C135.6,745.4 135.4,744.4 132.2,744.5C130.4,744.6 130.7,744.1 128.6,748.7C126.6,753.1 126.4,753.4 125,756C124.3,757.2 123.8,758.2 123.9,758.4C123.9,758.6 122.5,759.4 121.5,759.6C119.6,760.1 120.9,762.7 123.1,762.7C123.8,762.7 124.5,762.8 124.6,763C125.3,763.5 126.4,763 127.5,761.7Z" fill-rule="evenodd"/>
-    <path class="c-main c-stroke" d="M170.7,771.3C170.5,771.1 170.5,768.6 170.6,764.4C170.8,760.5 170.6,755 170.5,752.1C170.3,749.1 170,743.7 169.8,740.2C169.6,736.6 169.3,731.4 169.1,728.7C168.6,717.6 168.7,711.9 169.5,711.4C170.6,710.8 170.5,711.2 168.8,700L168.5,697.9L170.6,695.1C172.3,693 173.1,692.3 174.3,691.8C175.1,691.5 176.6,690.7 177.5,690.2C179.6,689.1 181.4,689.2 186.5,690.7C193.8,692.9 194.2,692.7 192.7,687.3C191.4,682.8 191.3,680.8 192.7,681C198,681.4 205.3,688.7 209,697.4C209.4,698.4 209.9,699.5 210.1,699.8C210.8,701.3 212.4,705.1 213,706.9C213.3,708.1 214,709.9 214.4,711.1C215.6,714.2 216.7,717.3 217.1,718.7C218,721.7 219.1,725.5 219.6,727.2C220.1,728.7 221.4,733.2 221.9,735.2C222.1,736.1 222.7,737.9 223,739.2C223.4,740.4 224,742.4 224.3,743.5C224.6,744.7 225.1,746 225.2,746.6C230.4,762.4 230.1,764.6 223.8,766C221,766.5 218.7,766.9 215.7,767.6C214.9,767.8 212.7,767.9 210.7,767.9C207.6,768 207,768.1 206.1,768.4C205.4,768.7 204.6,768.9 203.5,768.9C202.5,769 199.9,769.2 197.7,769.6C192.5,770.3 187.1,770.7 180.6,771.1C177.7,771.2 174.4,771.4 173.2,771.5C171.7,771.6 171,771.5 170.7,771.3ZM207.1,759.4C207.1,756.4 206.5,755.1 204.9,754.5C203.5,754.1 203,753.6 200.5,748.5C198.4,744.1 197.8,743.5 195.9,744.5C195.3,744.8 195.2,745 195.6,746.3C196.3,748.7 198.5,753.7 199.8,755.6C200,756 200.6,757 201.1,757.8C204,762.3 207.1,763.1 207.1,759.4Z" fill-rule="evenodd"/>
-    <path class="c-trim c-stroke" d="M139.2,779.4C136.3,779.5 131,779.7 127.5,779.9C124.1,779.6 120.6,779 119.8,778.9C118,778.8 116.2,777.8 115.9,776.7C115.6,775.6 118,768.5 118.8,768.8C122,769.7 122.4,769.7 132.6,771C139.6,771.7 149.3,772 155.4,771.9C159,771.8 162.2,771.9 162.5,772C163.2,772.2 162.4,778.6 161.5,779C160.7,779.4 147.4,779.5 139.2,779.4Z"/>
-    <path class="c-main c-stroke" d="M126.2,693.9C125.2,692.6 121.9,684.3 121.1,681.3C120.9,680.2 120.4,678.9 120.2,678.4C117.9,674 130.1,664.5 137.3,665.1L138.9,665.2L138.8,667.7C138.7,669.5 138.5,670.4 138.2,670.9C137.2,671.9 136.9,673 137.2,674.2C137.6,675.6 143.1,681.6 144.7,682.4C147,683.5 148.3,684.6 148.8,685.6C149,686.2 149.9,687.1 150.7,687.8C153.9,690.3 152.5,692.1 148.6,690.6C146.7,689.8 144.2,690 140,691.4C137.9,692 136.1,692.6 136,692.6C135.9,692.6 134.4,693.1 132.7,693.7C128,695.3 127.3,695.3 126.2,693.9Z"/>
-    <path class="c-trim c-stroke" d="M170.5,778.5C170.2,778.2 170,777.8 170,777.1C170.1,776.5 170.1,775.2 169.9,774.2C169.6,771.5 169.3,771.7 175.9,771.3C185.1,770.9 191.8,770.3 196.9,769.7C205.6,768.6 205.9,768.6 205.7,770.4C205.6,771.1 205.6,772.3 205.6,773.1C205.4,775.6 203.6,776.9 200.5,776.8C199.7,776.8 198.4,776.9 197.6,777C196.1,777.1 194.3,777.3 187.7,777.8C176.4,778.9 171.6,779.1 170.5,778.5Z"/>
-    <path class="c-accent c-stroke" d="M164,771.5C163.9,771.4 164.1,767.3 164.2,762.3C164.1,757 163.9,750.3 163.7,747.5C163.4,744.6 163.1,739.2 162.9,735.4C162.7,731.6 162.5,724.7 162.4,720.2C162.2,711 162.1,711.4 165.1,711.4C168.8,711.4 169,711.5 168.8,715.4C168.7,717.4 168.8,720.9 168.8,723.3C169.2,728.4 169.6,736.7 170.1,746.7C170.3,750.2 170.6,755.2 170.7,757.8C170.9,760.4 170.8,764.6 170.7,767.1L170.3,771.7L167.2,771.7C164.9,771.8 164,771.7 164,771.5Z"/>
-    <path class="c-main c-stroke" d="M187.4,691C180.6,689 179.7,688.9 177,690.5C173.1,692.8 171.9,692.1 173.6,688.8C174.2,687.7 174.7,685.9 174.9,684.7C175,683.5 175.3,682 175.6,681.4C176.3,679.7 175.9,676.5 174.9,675.5C174,674.7 173.5,674.4 171.7,674C170.3,673.7 169.6,670.2 170.5,668.4C171.9,665.6 183.3,670.9 187.9,676.3C188.8,677.5 190.1,679 190.6,679.6C191.5,680.5 191.7,681 191.7,682.2C191.7,683.1 192.2,685.4 192.7,687.4C194.1,692.6 193.7,692.9 187.4,691Z"/>
-    <path class="c-trim c-stroke" d="M93.4,776.5C92.6,776.4 90.9,776.1 89.6,776C86.6,775.4 85.5,775.1 85.8,774.7C86,774.5 86.5,773.2 87,771.6C87.6,767.9 86.6,768.1 96.2,769.1C100.6,769.2 106.8,769.1 110,769C116.9,768.6 118.3,768.7 118,769.6C117.8,769.9 117.5,771.3 117.1,772.7C116.5,774.2 115.9,775.5 115.7,775.6C114.6,776.2 96.6,776.9 93.4,776.5Z"/>
-    <path class="c-under c-stroke" d="M162,697.9C162,697.4 155.3,692.4 154,691.9C153,691.5 152.7,691.1 152.6,690.3C152.4,689.5 151.8,688.7 150.8,687.9C146.6,684.6 148.2,683.6 155.3,684.9C161.3,686 165.5,685.8 171.8,683.9C175.5,682.7 176,684 173.6,688.8C173.1,689.8 172.8,690.9 172.8,691.3C173.2,692.8 169.2,697.4 167.4,697.8C165.5,698.2 162,698.2 162,697.9Z"/>
-    <path class="c-trim c-stroke" d="M205.5,774.3C205.5,773.9 205.5,772.5 205.6,771.2C205.6,768 205.6,768 210.7,767.9C212.7,767.9 214.9,767.8 215.7,767.6C219,766.8 222.5,766.1 224.2,765.9L226.1,765.7L226.2,767.1C226.7,771.3 226.7,771.2 225.9,771.8C225.3,772.2 224.8,772.4 224.1,772.6C223.5,772.7 221.9,773.1 220.7,773.5C212.3,775 205.6,775.1 205.5,774.3Z"/>
-    <path class="c-main c-stroke" d="M124.6,763C124.5,762.8 123.8,762.7 123.1,762.7C120.9,762.7 119.6,760.1 121.5,759.6C122.5,759.4 123.9,758.6 123.9,758.4C123.8,758.2 124.3,757.2 125,756C126.4,753.4 126.6,753.1 128.6,748.7C130.7,744.1 130.4,744.6 132.2,744.5C135.9,744.4 135.8,745.3 132,754.5C129.8,759.9 125.9,764.1 124.6,763Z"/>
-    <path class="c-accent c-stroke" d="M161.4,711.3C161,710 161,708.8 161.4,704.2C162.1,698.2 162,698.3 165.7,698L168.4,697.8L168.8,699.7C170,707 170.3,710.5 169.9,711C169.4,711.6 161.5,711.9 161.4,711.3Z"/>
-    <path class="c-main c-stroke" d="M204.6,761.4C203.7,761.1 202.3,759.6 201.1,757.8C200.6,757 200,756 199.8,755.6C198.5,753.7 196.3,748.7 195.6,746.3C195.2,745 195.3,744.8 195.9,744.5C197.8,743.5 198.4,744.1 200.5,748.5C203,753.6 203.5,754.1 204.9,754.5C206.5,755.1 207.1,756.4 207.1,759.4C207.2,761.6 206.5,762.1 204.6,761.4Z"/>
-    <path class="c-trim c-stroke" d="M80.1,773.6C79.1,772.7 80.2,767.9 81.6,767.5C82.3,767.3 86.8,767.9 87.3,768.3C87.6,768.5 86.3,774 85.8,774.6C85.2,775.1 80.9,774.3 80.1,773.6Z"/>
-    <path class="c-open c-stroke c-fine" d="M118.3,757.9C118.5,757.4 119.6,757.7 119.5,755.2C119.4,752.6 118.1,747.7 118.1,740.9C118.8,733.1 122.2,716.8 123.2,712"/>
-    <path class="c-open c-stroke c-fine" d="M208.1,753C207.7,752.3 206.8,754.7 205.6,748.2C204.5,740.9 201.4,713.7 200.6,706.8"/>
-  </g>
-  <!-- Polo -->
-  <g id="top-polo" class="c-idle-torso c-origin-maschio-bambino">
-    <path class="c-main c-stroke" d="M145.2,777.7C136.9,777.7 131.7,777.7 127.4,777.3C124.7,776.8 122.1,776.4 121,776.5C119.2,776.5 119,776.4 118.2,775.7L117.3,775L118.1,771.8C118.2,762.8 116.9,751.9 116.5,743.7C116.6,741 116.8,740.8 119,740.7C121.5,740.6 121.9,740.2 122.3,736.8C122.8,733.1 122.8,733.1 120.1,732.9C118.9,732.9 116.4,732.6 114.6,732.3C112.8,732.1 109.8,731.7 108,731.4C102,730.5 94.2,728.7 87.8,726.8C81.6,724.9 81.8,725.4 84.2,718.6C85,716.8 87.1,711.8 88.4,709.1C89.1,707.6 90,706 90.2,705.5C95.4,694.3 103.5,684.9 111.6,680.6C114.3,679.2 123.3,675.7 124.2,675.8C124.6,675.8 125.8,674.7 127.2,673.1C132.1,667.8 134.3,666.3 138.1,666C140.7,665.8 141.5,667.3 140,670C138.9,672.1 141,674.1 148.8,678.3C153.8,680.9 159.4,683.6 160.6,684.1C165.5,685.9 166.2,687.8 163,690.2C160.1,692.3 160.2,691.9 160.5,701.1C160.9,718.1 160.1,716.5 168,716.1L173.5,715.7L173.7,711.2C173.9,708.8 173.6,703.1 173.4,698.6C173,694.1 172.9,689.8 173,688.9L173.2,687.4L174.7,687.5C175.8,687.5 177,687.9 178.6,688.8C186.5,693.3 186.4,693.3 186.8,689.2C186.9,687.4 186.8,685.1 186.4,682.9C185.3,678 186.4,676.8 190.1,678.9C190.6,679.2 191.1,679.5 191.2,679.5C195.5,679.4 205.1,688.9 209.2,697.1C209.4,697.7 210.1,698.8 210.4,699.6C210.9,700.4 211.2,701.2 211.2,701.4C211.2,701.5 211.4,701.9 211.6,702.2C212.3,703.5 212.8,704.5 215.2,710.6C216.6,714.1 218,717.8 218.2,718.8C218.4,719.8 218.7,720.8 218.9,721C221.2,723.5 220.8,727.3 218.2,728.5C217,729 215.9,729.6 215.7,729.8C215.6,730 214.7,730.2 213.9,730.2C213,730.3 210.5,730.9 208.3,731.5C206.2,732.1 204.1,732.7 203.7,732.7C202.2,732.7 202.2,732.8 204.2,755C204.5,758.9 204.9,763.9 205.2,766.4C205.4,772.5 205.1,774.1 204,774.5C203.5,774.7 202.6,774.9 201.9,775.2C201.3,775.4 200.1,775.6 199.4,775.6C198.5,775.6 196.6,775.7 195.1,775.9C189.2,776.6 183,777.1 173.2,777.6C164.5,778 152.2,778 145.2,777.7Z"/>
-    <path class="c-trim c-stroke" d="M161.6,715.9C161,715.2 160.7,712.8 160.5,701.1C160.2,692 160.1,692.1 163.1,690.1C164.2,689.3 165.1,688.5 165.1,688.3C165.2,688.1 165.8,687.6 166.6,687.3C168.9,686.3 173.7,680.7 174.9,677.6C175.4,676.2 174.7,675.2 172.8,674.7C169.6,673.8 169.9,668.1 173.1,668.5C176.1,669 178.9,670.6 182,674C183,675.2 184.4,676.5 185,676.9C185.8,677.7 186,678 185.9,678.7C185.8,679.3 186.1,681.2 186.4,683C186.8,685.1 186.9,687.4 186.8,689.2C186.4,693.3 186.5,693.3 178.6,688.8C177,687.9 175.8,687.5 174.7,687.5L173.2,687.4L173,689C172.9,689.9 173,694.1 173.3,698.3C174,706.9 174.1,715.4 173.6,715.6C172.4,716.2 162.1,716.4 161.6,715.9Z"/>
-    <path class="c-trim c-stroke" d="M115.6,740.4C115.3,740.2 113.6,739.9 111.9,739.7C106.3,738.9 102.1,738.1 96.7,736.9C93.8,736.2 90.4,735.6 89.2,735.4C88,735.2 86.8,735 86.5,734.8C86.3,734.7 85.3,734.3 84.1,733.9C83,733.6 81.6,733 81.1,732.7L80.1,732L80.8,729.1C81.9,724.9 81.9,724.9 86.6,726.4C93.4,728.5 101.6,730.5 108,731.4C109.8,731.6 112.8,732.1 114.6,732.3C116.4,732.6 118.9,732.9 120.1,732.9C122.8,733.1 122.8,733.1 122.3,736.8C121.8,740.4 118.8,742 115.6,740.4Z"/>
-    <path class="c-open c-stroke c-fine" d="M156.4,687C154,688.2 145.1,693.1 142.4,694.3C139.7,695.6 141.8,695.7 139.9,694.3C138,693 133.5,688.9 131.1,686C128.8,683 126.5,678.1 125.5,676.6"/>
-    <path class="c-open c-stroke c-fine" d="M208.8,724.1C207.6,724.3 203.1,728.2 201.4,725.2C199.6,722.2 199,709.4 198.5,706.2"/>
-    <path class="c-open c-stroke c-fine" d="M124.3,730.4C124.1,729.9 122.9,730.1 123.2,727C123.5,724 125.7,714.7 126.2,712.2"/>
-    <circle class="c-dot" cx="166.7" cy="696" r="3.5"/>
-    <circle class="c-dot" cx="167.6" cy="708" r="3.5"/>
-  </g>
-  <!-- Maglione -->
-  <g id="top-maglione" class="c-idle-torso c-origin-maschio-bambino">
-    <path class="c-main c-stroke" d="M147.2,771.7C137.1,771.3 127.5,769.9 124,768.8C122,768.4 121.5,768.3 116.2,768.7C112.3,768.9 107.9,769.1 102.7,769.1C98.5,768.9 93.3,768.5 91.1,768.3L87,767.9L85.5,766.4C82.3,763.4 82,759.8 83.2,747.3C83.3,746.5 83.4,744.5 83.6,742.8C84.1,738.1 86.6,726.5 87.7,723C88.1,722 88.7,720.2 89.1,719.1C99.3,692.3 107.4,682.9 125.5,675.9C131,673.8 132,673.8 132.7,675.8C136,684.2 158.1,691.3 172.1,688.4C179.6,686.8 185,682.7 185,678.8C184.7,671.4 204.6,683.2 210.9,694.4C212.9,698.1 214.1,700.8 217.4,709.7C217.6,710.2 218.6,713 219.7,716.1C220.7,719.1 221.8,722.2 222.1,723.1C222.4,723.9 223,726.2 223.6,728.1C224.1,730.1 225.2,733.5 225.8,735.8C226.6,738 227.3,740.3 227.5,740.8C228,742.4 230.1,749 230.5,750C230.7,750.4 231,751.2 231.2,751.7C233.9,759.1 233.9,761.2 231.1,764.1L230.1,765.2L228,765.5C226.5,765.6 225.3,765.9 224.2,766.3C220.9,767.4 216.3,768.1 213.2,768.2C210.6,768.2 209.9,768.3 209.2,768.7C208.6,768.9 207.5,769.1 205.8,769.2C204.5,769.3 202.6,769.4 201.7,769.6C191.6,771 163.5,772.2 147.2,771.7Z"/>
-    <path class="c-trim c-stroke" d="M149.4,780.2C141.7,780 137.4,780 130.8,780.1C129.3,780.2 127.1,780.4 126,780.4C123,780.2 121,777.7 122.3,775.6C122.6,775 123.2,773.3 123.4,771.9C123.5,769.1 123.7,768.8 125.1,769.2C126.8,769.6 131.4,770.4 140,771.4C145.8,771.8 172.3,771.8 179.6,771.4C190.5,770.8 197.9,770.1 201.7,769.6C202.6,769.4 204.6,769.3 206.1,769.2L208.6,769.1L208.7,771.8C208.6,773.3 208.5,774.9 208.5,775.3C208.5,776.9 206.2,777.8 201,778.2C198.9,778.2 196.6,778.3 195.6,778.4C192.9,778.6 185.6,779.2 181.6,779.5C178.2,779.8 174.4,780 161.8,780.3C159.4,780.4 153.8,780.3 149.4,780.2Z"/>
-    <path class="c-trim c-stroke" d="M95.4,776.7C93.8,776.5 91.4,776.2 90,776C86.2,775.2 85.9,774.6 87.1,771.2C87.7,767.4 85.8,767.6 102.7,769.1C107.8,769.1 112.4,768.9 116.1,768.7C124.4,768.3 123.8,767.8 122.9,773.9C122.4,775.7 121.5,776.8 121,776.5C120.8,776.4 119.2,776.5 117.4,776.7C113,777.1 99.5,777.2 95.4,776.7Z"/>
-    <path class="c-trim c-stroke" d="M160.5,688.9C160,688.9 158.3,688.7 157,688.5C141.5,686.4 126.5,674.9 135,672.6C138.4,671.6 140,672 139.8,673.6C139.8,674.7 142.1,676.6 145.5,678.2C160.2,684.6 178.1,683.3 178.1,675.9L178,673.8L179.9,674C183.7,674.4 186,675.7 185.4,676.9C185.1,677.4 185,678.2 185,678.9C184.9,684.8 171.9,690.4 160.5,688.9Z"/>
-    <path class="c-trim c-stroke" d="M208.5,775.4C208.5,775.1 208.7,773.5 208.7,771.8C208.6,768.2 208.6,768.3 213.4,768.2C216.3,768.1 219,767.7 225,766.1C226.3,765.6 227.1,765.5 228.2,765.5L229.6,765.5L230,768C230.3,770.9 230.2,771.1 226.9,772.2C225.5,772.7 223.9,773.4 223.3,773.6C221.4,774.4 217.2,775.3 214.1,775.6C212.5,775.7 210.6,775.8 209.8,775.9C208.7,775.9 208.6,775.9 208.5,775.4Z"/>
-    <path class="c-open c-stroke c-fine" d="M212.9,766.2C212.7,766 212,767 211.5,765.1C210.8,763.2 210.1,762.3 208.9,754.4C207.7,745.5 204.3,715 203.4,707"/>
-    <path class="c-open c-stroke c-fine" d="M125.3,768.5C125.7,767.7 127.6,766.5 127.6,763.7C127.5,761 125.1,758.5 124.4,751.3C123.8,743.3 128.1,718.9 129.4,712.2"/>
-  </g>
-  <!-- Camicia aperta -->
-  <g id="top-camicia" class="c-idle-torso c-origin-maschio-bambino">
-    <path class="c-main c-stroke" d="M136,780.9C133.5,781 129.5,781.3 127.2,781.5C125.1,781.6 122.6,781.4 121.8,781.4C120.6,781.4 120.4,781.4 119.8,780.7C119.5,780.3 118.8,779.4 118.2,778.7C117.6,778 117,777.2 116.9,776.9C116.5,776.1 117.6,761.4 116.4,748.7C116.2,745.7 115.6,745 113.7,744.9C111.2,744.8 99.8,742.5 92.6,740.5C91.2,740.2 89.3,739.8 88.5,739.8C87.6,739.7 86.8,739.6 86.6,739.4C86.4,739.3 84.9,738.7 83.4,738.2C77.8,736.4 77.8,736.5 80.5,728.2C85.3,715.6 90.7,705 97.2,695C102.7,686.8 116.9,677.2 123.4,677.3C124.9,677.3 124.8,677 125.2,681.8C125.7,686.8 126.9,694 127.4,694.7C127.8,695.2 129.3,694.9 130.7,694C139.7,688.4 141.3,688.1 144.4,690.6C147,692.6 148,693.1 149.3,693.1C151.7,693.1 151.5,726.6 150.8,778C150.3,781.3 150.5,781.3 136,780.9Z"/>
-    <path class="c-main c-stroke" d="M182.5,779.7C182.1,779 182,776.3 182.5,770.8C182.7,768.2 182.8,763.5 182.7,760.5C182.5,757.3 182.4,752.3 182.2,749.3C181.6,735.4 180.7,721.9 180.2,716.4C178.7,696.6 178.8,692.7 180.5,692.7C181,692.7 181.7,692 182.7,690.6C184.4,688.2 185.7,687.7 187.7,689C194.5,693.2 195.6,692.4 192.3,685.8C190.8,682.6 190.3,680.6 191.1,680.2C192.7,679.3 202.4,684.8 205.3,688.4C206,689.3 207,690.5 207.6,691.2C209.9,694 215.1,703.8 219.1,713.5C219.7,714.8 221.3,718.7 222.7,721.9C226.3,730.4 226.3,730.7 222.2,732.8C221,733.4 219.8,734.1 219.5,734.4C219.1,734.6 218.2,735 217.4,735.2C216.6,735.3 214.7,735.9 213.1,736.5C211.5,737.1 209.4,737.8 208.6,738L207,738.4L207,740.6C207,742.7 207.9,753.3 208.4,757.4C208.7,759.6 208.8,776.1 208.6,776.9C208.4,777.6 204.2,778.9 202,778.9C201,778.8 199.2,778.8 197.8,778.9C195.5,779 190.2,779.4 184.8,779.9C182.9,780.1 182.8,780.1 182.5,779.7Z"/>
-    <path class="c-under c-stroke" d="M151.6,775.5C151.3,775.4 151.7,769.9 151.5,755C151.1,716.1 151.5,695.1 150.5,693.8C150.2,693.3 149.8,692.4 149.6,691.8C149.5,691.3 148.8,689.9 148,688.8C145.6,685.1 146.9,684.3 152.4,686.1C160.8,688.7 168.7,688.4 176.1,685C178.2,684 178.6,684.6 178.7,688.7C178.7,690.5 178.9,692.2 179.1,692.5C179.3,692.8 179.3,693.4 179.2,693.9C178.9,694.6 179.3,704.8 180.2,716.3C180.7,722.1 181.6,735.6 182.2,749.3C182.4,752.3 182.5,757.3 182.7,760.5C182.8,766.5 182.4,774.9 182.1,774.9C182,774.9 179.3,775.1 176.2,775.3C170.2,775.7 152.3,775.8 151.6,775.5Z"/>
-    <path class="c-main c-stroke" d="M127.4,694.7C126.9,694 125.7,686.7 125.1,680.9C124.9,679.1 124.8,677.5 124.6,677.3C123.2,675.3 134.9,666.4 138.9,666.5C141.3,666.5 141.5,667.4 140.2,672.4L139.5,675L140.7,677.2C142.4,680.3 144.2,682.8 145.6,684C146.3,684.6 146.7,685.4 146.7,685.9C146.7,686.4 147.3,687.7 148,688.8C151.3,693.7 149.6,694.6 144.4,690.6C141.3,688.1 139.7,688.4 130.7,694C129.3,694.9 127.8,695.2 127.4,694.7Z"/>
-    <path class="c-main c-stroke" d="M179,692.5C178.8,692.3 178.8,690.7 178.7,688.9C178.7,687 178.5,685.4 178.3,685.2C178,685 177.8,684 177.8,683C177.7,680 176.3,677.2 174.7,676.5C172.7,675.6 172.6,675.3 172.8,672L172.9,669.1L174.4,669.2C176.6,669.4 180,671.1 183.1,673.5C184.6,674.8 186.7,676.6 187.9,677.6C189.1,678.6 190.2,679.5 190.3,679.5C190.6,679.5 190.7,680.1 190.7,681C190.7,682.1 191.1,683.3 192.3,685.8C195.6,692.4 194.5,693.2 187.7,689C185.7,687.7 184.4,688.2 182.7,690.6C181.3,692.6 179.6,693.4 179,692.5Z"/>
-    <path class="c-open c-stroke c-fine" d="M115.6,744.6C116.5,744.5 120.1,748.9 120.8,744.6C121.9,739.8 124,719.3 124.8,714.4"/>
-    <path class="c-open c-stroke c-fine" d="M205.2,734.6C205.3,734 206.3,735.5 205.9,730.8C205.4,726.2 203.1,711.5 202.6,707.6"/>
-  </g>
   <!-- Maglietta con riga -->
   <g id="top-maglietta-riga" class="c-idle-torso c-origin-maschio-bambino">
     <path class="c-main" d="M147.5,776.5C129.6,775.3 123.1,773.4 121.6,768.8C121.2,767.7 120.3,765.8 119.5,764.5C117,760.5 116.8,759.9 117.4,756.9C121.2,738.5 121.4,740.1 115.7,739.1C110.8,738.1 97.9,734.7 97.2,734.2C96.9,734 95.5,733.7 94.2,733.6C90.1,733.2 86.8,731 87.1,728.7C87.7,724.3 98.2,704.4 104.8,694.9C115.2,679.8 137.4,665.5 138.5,673.2C141.3,692.2 179.7,696.3 179,677.7C178.8,673.6 178.8,673.5 180.2,673.5C186.2,673.6 199.1,686.6 206.2,699.6C207.5,702 209.1,704.5 209.6,705.4C211.7,708.5 220,727.6 220,729.3C220,730.5 217,733.1 215.1,733.4C214.3,733.6 212.1,734.2 210.1,734.9C208.2,735.6 205.7,736.3 204.6,736.5C202.4,736.8 202.2,738 203.4,744.3C203.7,746.2 204.2,749.1 204.5,750.8C204.7,752.3 205.1,754.9 205.4,756.4C207.8,771.4 208.5,770.3 195.7,773.1C179.9,776.6 166.3,777.5 147.5,776.5Z"/>
@@ -660,58 +306,5 @@
     <path class="c-open c-stroke" d="M147.5,776.5C129.6,775.3 123.1,773.4 121.6,768.8C121.2,767.7 120.3,765.8 119.5,764.5C117,760.5 116.8,759.9 117.4,756.9C121.2,738.5 121.4,740.1 115.7,739.1C110.8,738.1 97.9,734.7 97.2,734.2C96.9,734 95.5,733.7 94.2,733.6C90.1,733.2 86.8,731 87.1,728.7C87.7,724.3 98.2,704.4 104.8,694.9C115.2,679.8 137.4,665.5 138.5,673.2C141.3,692.2 179.7,696.3 179,677.7C178.8,673.6 178.8,673.5 180.2,673.5C186.2,673.6 199.1,686.6 206.2,699.6C207.5,702 209.1,704.5 209.6,705.4C211.7,708.5 220,727.6 220,729.3C220,730.5 217,733.1 215.1,733.4C214.3,733.6 212.1,734.2 210.1,734.9C208.2,735.6 205.7,736.3 204.6,736.5C202.4,736.8 202.2,738 203.4,744.3C203.7,746.2 204.2,749.1 204.5,750.8C204.7,752.3 205.1,754.9 205.4,756.4C207.8,771.4 208.5,770.3 195.7,773.1C179.9,776.6 166.3,777.5 147.5,776.5Z"/>
     <path class="c-open c-stroke c-fine" d="M199.5,733.4C199.6,732.8 201.4,734.6 200.5,729.8C199.6,724.7 195.1,706.2 194,701.2"/>
     <path class="c-open c-stroke c-fine" d="M125,741.4C126.1,737.2 130.4,717.4 131.5,711.9"/>
-  </g>
-  <!-- Felpa con cappuccio -->
-  <g id="top-felpa-rossa" class="c-idle-torso c-origin-maschio-bambino">
-    <path class="c-main c-stroke" d="M146.7,782.9C142.7,782.7 137,782.4 134,782.3C131,782.4 127.8,782.7 126.6,782.9C124.5,783.1 123.1,783.1 123.2,782.9C123.2,782.8 122.6,782.1 121.7,781.1L120.2,778.9L117.6,778.9C116.2,778.9 114,779 112.6,779.1C109.4,779.3 93.1,778.7 84.4,777C76.1,775.1 76.3,775.2 76.3,772C76.3,770.5 76.3,770.3 74.8,769.3C67.7,764.4 69.3,755.9 80.4,734.4C87,717.6 95.4,701.7 102,694.5C103.9,692.6 104.1,691.4 103,690.2C98.9,685 101.7,676.4 108.9,672.5C110.4,671.8 111.1,671.1 111.1,670.5C111.2,666.1 117.7,661.7 126.5,660.1C128.7,659.8 130.7,659.2 131.2,658.8C132.2,658.1 138.8,659 140.9,660.2L142.1,660.8L141.9,665.8C141.5,670.5 141.5,670.8 140.1,671.9C138,673.7 138.7,674.9 143.7,677.8C145.4,678.8 149.4,681 152.6,682.9C159.4,686.8 162.1,687.9 163.8,687.3C164.6,687.1 166.8,686.8 168.8,686.6C174.3,686.1 181.5,679.8 178.6,678.1C178.4,678 177.6,677.2 176.8,676.4C176,675.5 174.8,674.8 174.2,674.5C173.1,674.2 173.1,674.1 172.9,669.3C172.7,662.8 172.7,662.7 178.6,662.7C183.2,662.7 183.7,662.7 184.6,664C184.9,664.5 186.4,665.6 187.9,666.4C191.4,668.3 193.8,670.4 195.4,673.2C196,674.4 197.1,675.8 197.6,676.4C198.9,678 199.3,681.4 198.3,683.5L197.6,685.2L198.7,686C207.2,690.9 218.6,714.9 228.3,749.9C232,762.7 232.1,765.4 228.3,769.1C227.3,770.1 227.2,770.3 227.6,771.8C228.9,773.3 228.6,773.7 225.4,774.7C224.2,775.1 221.3,776.1 218.8,776.9C215.8,777.4 212.2,777.8 211.1,777.9C209.2,777.9 208.9,778 208.2,778.6C206.7,779.7 204.8,780.2 201.7,780.4C200.2,780.5 197.2,780.8 194.9,781.2C183.2,783 161.8,783.8 146.7,782.9Z"/>
-    <path class="c-skin" d="M156.5,682.7C150,679.1 149.8,679.1 163.7,679C177,678.9 177.1,678.9 174.8,681.8C172.8,684.1 168.6,685.2 162,685.3C161.5,685.3 159.1,684.2 156.5,682.7Z"/>
-    <path class="c-open c-stroke c-hair" d="M195,773.9C191.3,774.3 182.4,775.6 173.1,775.9C163.6,776.1 144.7,775.8 138.6,775.3C132.6,774.7 136.8,774 136.4,772.7C135.9,771.4 134.2,769.7 135.6,767.7C136.9,765.8 142.4,763.1 144.4,760.5C146.4,757.9 146.3,753.6 147.7,751.9C149.1,750.2 144.4,751.4 152.5,751C160.5,750.8 186.4,748.1 194.9,751C202.9,753.6 201.8,763.1 203.3,765.2"/>
-    <path class="c-open c-stroke c-fine" d="M220.2,770.4C219.6,770.6 217.5,771.3 216.2,771.3C214.9,771.3 213,771.7 212.1,770.7C211.4,769.7 214.3,772.9 212.1,765.3C210.8,757.4 204.7,720.6 202.4,709.7"/>
-    <path class="c-open c-stroke c-fine" d="M123.4,776.6C123.3,775.9 121,774.4 121.9,772.5C122.5,770.9 127.1,769.5 127.3,766.5C127.4,763.6 123.2,760.2 122.4,754.2C121.8,747.6 126.3,728.5 127.5,722.7"/>
-    <path class="c-open c-stroke c-fine" d="M145,693.4C140.8,692.1 125.1,685.9 119.4,684.7C113.7,683.6 112.4,685.9 110.5,686.9C108.7,688 108.5,690.2 108.1,690.9"/>
-    <path class="c-open c-stroke" d="M156.2,714.2C156.1,711.5 155.6,700.9 155.4,698.1"/>
-    <path class="c-open c-stroke" d="M184.1,712.9C183.6,710.3 181.7,699.9 181.3,697.3"/>
-    <path class="c-open c-stroke c-hair" d="M125.7,718.5C124.7,716.5 121.9,709.4 119.6,706.2C117.4,702.9 114.3,700.8 112.4,699.4C110.5,698 108.8,697.9 108,697.7"/>
-    <path class="c-open c-stroke c-hair" d="M109.9,771.5C106.3,771.6 91.9,771.3 88.4,770.9"/>
-  </g>
-  <!-- Camicia con maniche arrotolate -->
-  <g id="top-camicia-risvoltata" class="c-idle-torso c-origin-maschio-bambino">
-    <path class="c-main c-stroke" d="M121.4,783.1C120.8,783.2 119.3,783.4 118.3,783.4L116.3,783.1L117.3,779.2C117.2,775.6 116.9,771 116.8,769L116.6,765.5L118.4,765.4C122.2,765.2 122.2,765.2 122.4,758.1C122.4,755.5 122.4,755.5 112.8,755.2C108.9,755 103.7,754.7 101.1,754.4C98.5,754.2 92.2,753.6 87.2,753.2C72.6,751.6 73.3,752 74.4,745.7C77.4,726.9 87.7,699.4 95.4,691.3C97.9,688.6 99.1,687.5 101,686C104.8,683 114.5,678 117.3,677.6C118.5,677.5 118.8,677.2 119.7,675.3C123.2,669 130.6,664.3 138.5,663.6C142.6,663.2 142.7,663.2 142,667.2C141.4,670.4 140.7,671.3 138.8,671.4C136.2,671.7 137.7,676.5 141.9,680.9C143.2,682.2 143.6,683 143.7,684.2C143.7,685.4 144.5,686.7 146.3,689L148.9,692.3L147.8,721.2C149.2,750.4 148.4,779.6 146.4,781.1C145.3,781.9 145.8,781.8 133.3,781.9L122.4,782.8L121.4,783.1Z"/>
-    <path class="c-under c-stroke" d="M151,779.5L148,779.6L149.2,776.4C149.6,756.6 148.6,745 147.8,721.3L148.9,692.3L146.4,689.1C141.7,683 142.8,682.1 151.4,685C161.6,688.4 171,688.2 176.6,684.7C181.1,681.7 182.2,682.3 183.1,688.9C183.3,690.3 183.6,691.7 183.7,691.9C183.9,692.3 184,693.3 184.1,694.2C184.1,695.2 184.7,698.6 185.1,701.7C186.8,709.9 188.9,722.3 190.7,733.5C191,735.9 191.6,740.3 191.9,743.2C192.7,750.4 193.4,757.2 193.7,760.8C193.8,762.5 194,765.2 194,766.9C193.7,779.8 193.5,780.5 191.4,780.4C184.8,780.3 163.5,779.7 151,779.5Z"/>
-    <path class="c-main c-stroke" d="M195.2,780.6C194.4,780.7 193.6,780.8 193.3,780.4C193.3,778.8 194.1,769.3 194,766.9C194,765.2 193.8,762.5 193.7,760.8C193.4,757.2 192.7,750.4 191.9,743.2C191.6,740.3 191,735.9 190.7,733.5C188.9,722.5 186.8,710 185.2,701.7C183.8,693.1 183.8,692.9 185.5,692.6C186.5,692.5 187.2,692 188.1,691C189.7,689.1 191.3,689 194.6,690.9C199.4,693.6 201.1,692.9 200,688.6C198.8,684.1 199.2,683.1 201.6,683.7C208,685.5 214.2,695.6 219.2,712.4C219.8,714.3 220.5,716.8 220.9,717.8C221.9,721.2 223.4,727.2 225.2,734.8C225.4,735.8 225.8,737.1 225.9,737.7C226.2,738.3 226.6,739.8 226.9,740.9C227.2,742.1 227.9,744.2 228.3,745.7C228.7,747.1 229.3,748.8 229.5,749.6C229.7,750.4 229.9,751.2 230,751.4C230.3,752.1 222.8,754.2 218.2,754.7C215.6,755 215.6,755.1 215.8,757.9C216,760.6 216.6,764 217.1,764.4C217.1,764.6 217.3,765.8 217.3,767C217.3,768.3 217.5,770.9 217.7,772.8C218.7,776.8 218.7,776.8 211,778C209.4,778.2 207.8,778.3 207.6,778.3C206.6,778.3 196.3,780.4 195.2,780.6ZM212.1,737.7C212.8,737.5 212.8,735.1 212.1,731.4C211.7,728.9 210.5,723.5 209.6,717.9C208.9,714 209.2,714.1 202.9,714.3C194.5,714.6 195.1,713.1 197.4,727.1C199.3,738.8 199.3,738.8 207.6,738.3C209.8,738 211.8,737.8 212.1,737.7Z" fill-rule="evenodd"/>
-    <path class="c-main c-stroke" d="M102.7,765.4C95.8,765.3 88.4,764.8 86.3,764.6C84.1,764.3 81.9,764.2 81.3,764.2C80.7,764.3 79.7,764.2 79,764C78.4,763.9 76.8,763.6 75.2,763.4C70.7,762.8 70.3,762.5 69.6,758.7C68.3,752 69,750.8 73.7,751.5C77.5,752 90,753.4 108.1,754.9C111.9,755.2 115.9,755.4 117,755.3C121.1,755.2 122.4,755.8 122.4,758.1C122.1,765 121.9,765.4 118.8,765.4C118.3,765.4 117.3,765.4 116.5,765.5C115.7,765.5 109.6,765.5 102.7,765.4Z"/>
-    <path class="c-main c-stroke" d="M184,692.2C183.7,692 183.3,690.5 183.1,688.9C182.6,685.5 182.1,683.9 181.2,683.2C180.9,682.8 180.5,681.9 180.4,681C179.9,678.1 177.4,675 175.7,675C173.5,675 172.6,671.7 173.7,668C175,664.1 188.6,670.5 194.7,677.8C196.1,679.6 198.8,682.2 199.5,682.5C199.8,682.6 199.7,683.3 199.6,684.1C199.4,685 199.5,686.5 200,688.4C201,692.9 199.4,693.6 194.6,690.9C191.3,689 189.7,689.1 188.1,691C186.9,692.5 185,693.1 184,692.2Z"/>
-    <path class="c-main c-stroke" d="M217.2,764.5C216.7,764.1 216,761.1 215.8,757.9C215.6,755.1 215.6,755 218.2,754.7C220.1,754.6 228.2,752.7 229.2,752.2C233.1,750.5 234.6,751.9 234.9,757.1C235.2,761.5 235.2,761.7 231.8,762.5C230.7,762.8 229.2,763.2 228.6,763.4C226.6,764 217.7,764.9 217.2,764.5Z"/>
-    <path class="c-main c-stroke" d="M202.6,738.4C199.4,737.8 199.1,737.1 197.4,727.1C195.1,713.1 194.5,714.6 202.9,714.3C209.2,714.1 208.9,714 209.6,717.9C210.5,723.5 211.7,728.9 212.1,731.4C212.8,735.1 212.8,737.5 212.1,737.7C211.2,738 203.7,738.6 202.6,738.4Z"/>
-    <path class="c-skin" d="M160.1,685.6C158.6,685.4 155.6,684.6 153.2,683.8C150.9,683 148.2,682.1 147.3,681.9C145.2,681.5 143.8,680.5 144.3,679.7C144.6,679.3 146.5,679.3 161.1,679.4L177.4,679.4L177.6,680.5C177.8,681.7 174.9,684 172,685C170.4,685.6 163.6,685.9 160.1,685.6Z"/>
-    <path class="c-open c-stroke c-fine" d="M120.1,753.5C119.8,753.3 118.5,753 118.1,752.6C117.7,752.1 117.6,754.7 117.7,750.6C117.8,746 120.1,724.5 121.2,718.7"/>
-    <path class="c-open c-stroke c-fine" d="M143.6,693.3C142.9,692.9 140.8,690.9 139.7,690.4C138.7,689.9 139.4,689.7 137.3,690.3C135.3,691.1 129.9,693.8 127.6,694.6C125.3,695.3 124.6,696.7 123.3,694.8C122,693 120.2,686.2 119.8,683.5C119.5,681 120.9,680 121.1,679.3"/>
-    <path class="c-open c-stroke c-fine" d="M213.3,753.7C213.4,753.5 214.5,754 214.6,752.5C214.5,750.9 213.1,745.6 213.1,743.4C213,741.1 213.8,740.8 213.9,740.3"/>
-  </g>
-  <!-- Polo blu -->
-  <g id="top-polo-blu" class="c-idle-torso c-origin-maschio-bambino">
-    <path class="c-main c-stroke" d="M146.7,765.9C146.7,765.2 141.1,764.7 140,765.3C139.2,765.8 139,765.8 128.6,764.8C124.2,764.5 122.4,764.3 122,764C121.2,763.6 120.7,759.6 120.3,750C120.1,745.9 119.7,743.2 119,742.9C118.5,742.8 117.7,742.7 110.2,741.9C107.9,741.6 105.1,741.2 104,741C103,740.8 100.4,740.4 98.4,740C96.4,739.7 93.7,739.2 92.5,738.9C91.4,738.7 89.6,738.4 88.6,738.4C83.2,737.9 77.7,735.5 77.9,733.8C78.8,729.4 82.7,718.7 86.1,711.8C91,701.9 97.5,692 101.1,688.8C101.9,688.1 102.6,687.3 102.6,687.2C102.9,685.1 117.9,676 125.4,673.5C126,673.3 126.6,672.9 126.8,672.4C131.6,665.2 133.9,663.3 138.9,662.3C140.8,661.9 141.2,661.9 141.5,662.2C141.9,662.9 141.2,667.3 140.5,668.1C138.4,670.3 144.7,676.1 156.1,681.3C158.2,682.3 160.6,683.6 161.5,684.3C162.4,684.9 163.5,685.5 163.7,685.5C164,685.5 164.4,685.8 164.5,686.2C164.6,686.6 165.2,687.2 165.7,687.6C166.8,688.4 166.5,689.4 164.8,691C163,692.7 162.7,694.3 163.2,699.7C163.5,702.3 163.8,706.3 163.9,708.6C164.2,713.8 164,713.7 170.6,713.4C175.6,713.2 175.6,713.2 175.9,712.4C176.1,711.6 175.6,699.1 175.1,693C174.8,688.1 174.8,687.7 176.5,686.5C178.6,685 179.6,685.1 183.1,687.7C189,692.1 190.1,690.7 187.9,682.1C186.2,676.5 187.4,675.8 193.3,679.4C203.5,685.7 211.4,697.6 218.4,717.3C219.1,718.9 219.9,721 220.3,721.9C225.3,733.4 225.4,735.7 221.5,737.2C220.2,737.8 218.9,738.3 218.8,738.4C218.7,738.6 217.9,738.7 217.2,738.8C216.4,738.9 214.2,739.4 212.2,740C210.2,740.5 208,741 207.4,741C205.3,741.2 206.4,752.9 209.1,758.9C210.4,761.6 210.2,761.9 207.9,763.4C206.8,764 205.8,764.6 205.6,764.8C205.1,765.1 204.5,765.2 199.8,765.3C195.3,765.5 194.4,765.6 193.5,765.9C192.1,766.4 186.6,766.5 185.1,766.1C182.7,765.4 182.5,765.4 172.4,765.5C163.3,765.5 162.7,765.5 161.7,765.9C160.4,766.3 146.7,766.4 146.7,765.9Z"/>
-    <path class="c-main" d="M164.8,713C164.3,712.6 164.1,711.5 163.9,708.5C163.8,706.3 163.5,702.3 163.2,699.7C162.7,694.2 163,692.7 165,690.8C165.7,690.1 166.3,689.3 166.3,689C166.3,688.8 166.8,688.2 167.6,687.9C168.4,687.5 169,686.9 169.2,686.3C169.3,685.7 169.7,685.2 170,685.1C171.5,684.7 175.7,677.8 175.6,675.8C175.6,674.7 174.2,673.2 173,672.9C170.3,672.4 170.3,666.1 172.9,666.1C175.7,666.2 181,669.5 183.5,672.9C184.2,673.9 185.3,675.2 186,675.8C187,676.7 187.2,677.1 187.3,678.5C187.3,679.4 187.6,681 187.9,682.1C190.2,690.6 189,692.1 183.1,687.7C179.6,685.1 178.6,685 176.5,686.5C174.8,687.7 174.8,687.8 175.1,693.2C175.9,706 176.3,712.2 175.7,712.8C175.2,713.5 165.6,713.7 164.8,713Z"/>
-    <path class="c-trim" d="M173.2,709C173.1,708.9 172.9,708.4 172.8,707.9C172.6,707.2 172.4,707.1 171.1,707.3C169.4,707.5 168.6,707 168.6,705.9C168.6,704.6 169.7,703.9 171.1,704.1C172.2,704.3 172.2,704.3 172.3,703.2C172.3,701.3 174.6,702.2 175.4,704.6C176,706.2 174,710.2 173.2,709ZM165.9,707.6C165.2,706.3 165.2,705.7 165.8,704.4C166.6,702.7 167,703.3 167,706C166.9,708.9 166.8,709.1 165.9,707.6ZM172.1,695.5C172,692.2 172.1,691.9 173.1,692.6C174.8,693.8 174.9,696.3 173.4,697.8C172.4,698.9 172.1,698.6 172.1,695.5ZM164.9,696.8C164.1,695.3 164.6,693.5 165.9,692.7C166.8,692.2 167,692.5 166.5,693.6C166.2,694.2 166.1,695.5 166.3,696.4C166.4,698.6 165.9,698.7 164.9,696.8ZM168.1,696.4C167.2,695.1 167.9,693.9 169.6,693.9C170.7,693.9 171.4,694.5 171.4,695.5C171.3,696.9 168.9,697.6 168.1,696.4Z" fill-rule="evenodd"/>
-    <path class="c-skin" d="M162.4,682.8C161.8,682.3 160.3,681.5 159.2,680.9C155.8,679.4 156.3,679.2 164.5,679.2C172.8,679.2 173.4,679.7 169.8,682.8C168.6,683.9 163.8,683.8 162.4,682.8Z"/>
-    <path class="c-open c-stroke" d="M164.8,713C164.3,712.6 164.1,711.5 163.9,708.5C163.8,706.3 163.5,702.3 163.2,699.7C162.7,694.2 163,692.7 165,690.8C165.7,690.1 166.3,689.3 166.3,689C166.3,688.8 166.8,688.2 167.6,687.9C168.4,687.5 169,686.9 169.2,686.3C169.3,685.7 169.7,685.2 170,685.1C171.5,684.7 175.7,677.8 175.6,675.8C175.6,674.7 174.2,673.2 173,672.9C170.3,672.4 170.3,666.1 172.9,666.1C175.7,666.2 181,669.5 183.5,672.9C184.2,673.9 185.3,675.2 186,675.8C187,676.7 187.2,677.1 187.3,678.5C187.3,679.4 187.6,681 187.9,682.1C190.2,690.6 189,692.1 183.1,687.7C179.6,685.1 178.6,685 176.5,686.5C174.8,687.7 174.8,687.8 175.1,693.2C175.9,706 176.3,712.2 175.7,712.8C175.2,713.5 165.6,713.7 164.8,713Z"/>
-    <path class="c-open c-stroke" d="M156.6,687C156,686.7 153.8,685.7 152.9,685.5C151.9,685.3 153,684.6 150.8,685.8C148.6,687 142,691.4 140,692.5C137.9,693.7 139.6,694.1 138,692.6C136.4,691 132.4,686.6 130.5,683.4C128.8,680.2 127.4,675.1 126.8,673.4"/>
-    <path class="c-open c-stroke c-fine" d="M204.3,738C204.4,736.7 205.4,737.1 204.6,730.5C203.7,724.3 200.5,705.7 199.8,700.8"/>
-    <path class="c-open c-stroke" d="M123.9,743.1C124,738.2 126,718.3 126.7,713.4"/>
-  </g>
-  <!-- Cardigan grigio -->
-  <g id="top-cardigan-grigio" class="c-idle-torso c-origin-maschio-bambino">
-    <path class="c-main c-stroke" d="M131.3,782.3C129.2,782.4 126.7,782.7 125.7,782.7C124.1,782.8 123.9,782.8 123.4,782.5C123.2,782.1 122.5,781.2 122.1,780.3C121.6,779.3 121,778.1 120.8,777.5C120.1,776.4 119.7,776.3 111.9,776.4C104.4,776.8 85.5,776.7 84.8,776.3C84.2,775.9 83.6,774.4 83.4,772.6C83.2,770.8 83.1,770.5 82,769.3C79.9,767 79.6,766.1 78.9,759.6C77.8,752.2 77.8,745.4 78.9,737.1C79,736.3 79.3,735 79.4,734.2C80.2,730.5 83.6,720.2 84.4,718.5C84.6,718.1 85.2,716.9 85.7,715.7C96.1,692.9 106.2,681.8 123.7,673.5C126.1,672.4 129.1,671 130.2,670.4C133.5,668.8 135.6,668.2 137.5,668.3C139.9,668.4 140,668.7 138,670.2C135.7,671.9 135.5,673.3 137.1,676.7C138.1,678.6 138.3,679.3 138.1,680.3C137.9,681.1 138.4,682.7 139.7,685.5C152.6,707.5 159.6,735.8 157.9,765.3C157.3,767.9 156.6,771 156.3,772.3C155.6,775.1 153,780.7 152.2,781.3C150.5,782.4 142.7,782.6 131.3,782.3Z"/>
-    <path class="c-under c-stroke" d="M160.4,774.2C155.3,774.1 155.6,774.7 157.2,768.6C159.6,735.2 153.1,708 139.5,685.2C137,678.9 138.1,678 143.8,681.2C154.8,686.6 169.9,687.8 176.7,683.8C180,681.9 181,681.9 182.2,683.6C183.4,685.4 186.2,696.4 187.9,704.6C188.3,706.1 188.7,707.9 188.8,708.5C191.6,719.4 196.3,759.5 195.1,768.5C194,772.7 194.1,772.6 191.5,772.8C190.6,772.9 189,773 187.9,773.2C182.4,773.9 173.8,774.2 160.4,774.2Z"/>
-    <path class="c-main c-stroke" d="M193.4,780.1C192.5,779.7 192.7,777.4 195.1,769C196.4,759.7 192.6,725 189.1,709.7C186,693.7 183.2,683.4 180.9,682.5C180.6,682.3 180.3,681.8 180.3,681.3C180.3,680 178.6,677.3 177.2,676.4C174.9,675.1 176.7,672.7 179.5,673.3C186.8,675.1 199.2,683.2 205.2,689.9C212.3,698.1 220.4,716 225.9,736.1C227.4,741 228.7,744.4 230.3,748.9C230.7,750.1 231.5,751.7 231.9,752.5C232.2,753.3 232.8,754.8 233.2,755.7C233.4,756.6 234,758.5 234.5,759.8C235.4,762.5 235.2,764.5 234.2,766C233.6,766.8 233.5,767.4 233.5,769.1C233.3,771.4 232.7,771.8 229.3,772.8C228,773.2 225.6,774 223.8,774.6C221.8,775.3 218.9,775.9 217.2,776.1C213.7,776.3 213.4,776.4 212.7,777.7C212.2,778.6 208.2,779.7 204.3,780.1C196.6,780.4 194.3,780.4 193.4,780.1Z"/>
-    <path class="c-skin" d="M159.1,684.3C153.7,683.5 145.6,680.9 145.7,680C145.8,679.4 176.5,679.5 177.4,680.1C181.1,682.8 168.4,685.6 159.1,684.3Z"/>
-    <path class="c-open c-stroke c-fine" d="M212.7,774.4C213.6,773.5 216.2,770.7 216.9,768.8C217.5,766.9 218.1,771.3 216.8,763C214.8,754.7 206.6,716.6 204.5,706.3"/>
-    <path class="c-open c-stroke c-fine" d="M123.1,775.1C123,774.7 122.1,774 122.1,772.9C122,771.8 121.9,770.3 122.4,768.8C122.8,767.4 124.9,766.7 124.8,764.3C124.8,761.9 121.6,760.4 121.6,754C121.5,747 123.9,722.3 124.5,715.4"/>
-    <path class="c-open c-stroke c-hair" d="M122.5,711.8C122.1,710.5 121,706.6 119.9,704.2C118.9,701.7 117.7,699.5 116.1,697.3C114.6,695.1 112.3,692.5 110.7,691.2C109,689.9 106.8,689.8 106,689.5"/>
-    <path class="c-open c-stroke c-hair" d="M147.4,769.4C147.8,769.2 149.9,768.9 150.4,768.4C150.9,767.8 150.6,766.6 150.2,766C149.7,765.5 148.1,765.3 147.6,765.1"/>
-    <path class="c-open c-stroke c-hair" d="M148.6,748.8C148.2,748.9 146.9,749.2 146.2,748.9C145.5,748.5 144.2,747.6 144.4,746.9C144.4,746.1 146.4,744.8 146.9,744.4"/>
-    <path class="c-open c-stroke c-hair" d="M112,768.4C108.9,768.5 96.6,769.2 93.6,769.3"/>
-    <circle class="c-dot" cx="147.7" cy="746.8" r="5.7"/>
-    <circle class="c-dot" cx="147.3" cy="767.4" r="5.9"/>
   </g>
 </svg>

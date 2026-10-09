@@ -47,16 +47,17 @@ def garment_svg(garment, title):
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vb}">\n  <title>{title}</title>\n{groups}\n</svg>\n'
 
 
-def write_garment(out_dir, gid, title, garment, on=None):
-    """`on` = la sagoma su cui è disegnato il capo (id, per esempio "femmina/ragazza"), se non è quella del gruppo;
-    `landmarks` del capo, se ci sono, sostituiscono quelli della sagoma nel punto di partenza dell'adattamento;
-    `replaces` = parti del corpo (arms) che il capo disegna al posto di quelle della sagoma."""
+def write_garment(out_dir, gid, title, garment, drawn_on_reference=False):
+    """`drawn_on_reference`: il capo è disegnato sul corpo di riferimento della cartella (`reference.json`) invece che
+    sulla sagoma stessa: `build.mjs` lo adatta alla sagoma. `landmarks` del capo, se ci sono, sostituiscono quelli della
+    sagoma nel punto di partenza dell'adattamento; `replaces` = parti del corpo (arms) che il capo disegna al posto di
+    quelle della sagoma."""
     os.makedirs(out_dir, exist_ok=True)
     with open(os.path.join(out_dir, gid + '.svg'), 'w', encoding='utf8') as f:
         f.write(garment_svg(garment, title))
     meta = dict(name=title, colors=garment['colors'])
-    if on:
-        meta['on'] = on
+    if drawn_on_reference:
+        meta['ref'] = 'reference'
     if garment.get('landmarks'):
         meta['landmarks'] = garment['landmarks']
     if garment.get('replaces'):

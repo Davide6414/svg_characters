@@ -1,0 +1,16 @@
+{
+  "name": "Jeans a zampa",
+  "colors": {
+    "main": "#889eb4"
+  },
+  "landmarks": {
+    "pants-bl": [
+      602.5,
+      872.7
+    ],
+    "pants-br": [
+      766.5,
+      872.7
+    ]
+  }
+}

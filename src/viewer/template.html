@@ -329,8 +329,8 @@
   // nome del personaggio: quello del preset finché ha la sua sagoma, altrimenti il nome della sagoma
   const nameOf = (v) => (v.preset.name && v.body.id === v.preset.body ? v.preset.name : v.body.name);
   const variants = DATA.presets.map(makeVariant);
-  // i capi disponibili per il gruppo della sagoma attuale
-  const outfitOf = (v) => DATA.clothes[v.body.group] ?? { tops: [], bottoms: [] };
+  // i capi disponibili per la sagoma attuale: ogni capo sta solo sulla sagoma per cui è disegnato
+  const outfitOf = (v) => DATA.clothes[v.body.id] ?? { tops: [], bottoms: [] };
   // parti del corpo che maglia e pantaloni scelti disegnano al posto di quelle della sagoma (per esempio le braccia)
   const replacedParts = (v) => new Set([['tops', v.top], ['bottoms', v.bottom]].flatMap(([list, id]) => outfitOf(v)[list].find(c => c.id === id)?.replaces ?? []));
   const uniq = (items) => [...new Map(items.map(i => [i.id, i])).values()];
@@ -507,7 +507,7 @@
     const v = variants[state.selected], c = outfitOf(v);
     const list = (kind, items, base, current) => `${[{ id: 'base', name: base }, ...items].map(i =>
       `<label><input type="radio" name="${kind}" value="${i.id}" ${i.id === current ? 'checked' : ''}>${i.name}</label>`).join('')}${
-      items.length ? '' : '<p class="hint">Per questo gruppo non ci sono ancora capi.</p>'}`;
+      items.length ? '' : '<p class="hint">Per questa sagoma non ci sono ancora capi.</p>'}`;
     $('top-list').innerHTML = list('top', c.tops, 'Maglietta', v.top);
     $('bottom-list').innerHTML = list('bottom', c.bottoms, 'Base', v.bottom);
   }
@@ -705,11 +705,11 @@
     const v = variants[state.selected];
     const before = defaultColors(v);
     mutate(v);
-    // un capo che il gruppo della nuova sagoma non ha torna alla versione base
-    const c = outfitOf(v);
+    // un capo che la nuova sagoma non ha (i capi sono per sagoma) lascia il posto all'abito di partenza di quella sagoma
+    const c = outfitOf(v), home = DATA.presets.find(p => p.body === v.body.id);
     if (!v.body.hair.includes(v.hair)) v.hair = v.body.hair.includes(v.preset.hair) ? v.preset.hair : v.body.hair[0];
-    if (!c.tops.some(t => t.id === v.top)) v.top = 'base';
-    if (!c.bottoms.some(b => b.id === v.bottom)) v.bottom = 'base';
+    if (v.top !== 'base' && !c.tops.some(t => t.id === v.top)) v.top = home?.top ?? 'base';
+    if (v.bottom !== 'base' && !c.bottoms.some(b => b.id === v.bottom)) v.bottom = home?.bottom ?? 'base';
     follow(v, before, defaultColors(v));
   };
 

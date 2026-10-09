@@ -278,9 +278,10 @@ def between_arms(arms, center):
 
 def back_strip(garment, arms, rows=None):
     """Livello dietro di un capo: una striscia larga fino a BACK px oltre i suoi fianchi, solo dove sulla figura c'è un
-    braccio (che la nasconde). Su un altro corpo, dove fra braccio e capo resterebbe una fessura sottile, la striscia la
-    riempie; uno spazio largo fra braccio e fianco resta com'è. `rows` = (prima, ultima) riga in cui vale."""
-    # solo fra le braccia: fuori (oltre il braccio lontano, o dalla manica in fuori) su un altro corpo sporgerebbe
+    braccio (che la nasconde). Quando il capo si abbina a un altro disegnato su un foglio diverso (o alla maglietta
+    base) e fra braccio e capo resterebbe una fessura sottile, la striscia la riempie; uno spazio largo fra braccio e
+    fianco resta com'è. `rows` = (prima, ultima) riga in cui vale."""
+    # solo fra le braccia: fuori (oltre il braccio lontano, o dalla manica in fuori) la striscia sporgerebbe
     center = np.nonzero(garment)[1].mean()
     strip = hdilate(garment, BACK * K) & ~garment & dilate(arms, 2 * K) & between_arms(arms, center)
     if rows is not None:
@@ -316,9 +317,9 @@ def default_colors(parts):
 # ---------------------------------------------------------------- punti di riferimento
 def landmarks(cells, cls, to_xy):
     """Punti di riferimento del corpo, nelle coordinate finali: collo (sinistro e destro, un poco sopra la
-    maglia) e gli angoli del riquadro di busto, braccia e pantaloni. Servono per adattare i vestiti: i vestiti
-    sono disegnati su un corpo di riferimento e vengono deformati perché questi punti coincidano con quelli di
-    ogni sagoma. Il pugno (riga di massima larghezza del braccio) tiene allineate le cuffie al polso. `cells` deve avere i pantaloni prima dell'estensione sotto le scarpe."""
+    maglia) e gli angoli del riquadro di busto, braccia e pantaloni. Servono alla build per i capi disegnati su un
+    corpo di riferimento (i primi dieci capi maschili: vengono deformati perché questi punti coincidano con quelli
+    della sagoma) e per i punti che un capo corregge da sé. Il pugno (riga di massima larghezza del braccio) tiene allineate le cuffie al polso. `cells` deve avere i pantaloni prima dell'estensione sotto le scarpe."""
     def box(prefix, mask):
         ys, xs = np.nonzero(mask)
         u0, u1, v0, v1 = xs.min(), xs.max() + 1, ys.min(), ys.max() + 1

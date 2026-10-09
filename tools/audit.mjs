@@ -37,11 +37,11 @@ for (const id of manifest.bodies) {
                 hair: [...svg.matchAll(/<g id="hair-([a-z0-9-]+)">/g)].map((m) => m[1]) });
 }
 const clothes = {};
-for (const [g, lists] of Object.entries(manifest.clothes)) {
-  clothes[g] = { tops: [{ id: 'base', name: 'Maglietta base', replaces: [] }], bottoms: [{ id: 'base', name: 'Pantaloni base', replaces: [] }] };
-  for (const kind of ['tops', 'bottoms']) for (const id of lists[kind]) {
-    const meta = await json(`src/clothes/${g}/${kind}/${id}.json`);
-    clothes[g][kind].push({ id, name: meta.name, replaces: meta.replaces ?? [] });
+for (const b of bodies) {
+  clothes[b.id] = { tops: [{ id: 'base', name: 'Maglietta base', replaces: [] }], bottoms: [{ id: 'base', name: 'Pantaloni base', replaces: [] }] };
+  for (const kind of ['tops', 'bottoms']) for (const id of manifest.clothes[b.id]?.[kind] ?? []) {
+    const meta = await json(`src/clothes/${b.id}/${kind}/${id}.json`);
+    clothes[b.id][kind].push({ id, name: meta.name, replaces: meta.replaces ?? [] });
   }
 }
 const hairNames = Object.fromEntries(await Promise.all(manifest.hair.map(async (h) => [h, (await json(`src/hair/${h}.json`)).name])));
@@ -74,7 +74,7 @@ function browserSide() {
   let B, C;                                      // dati delle sagome e dei vestiti (da Node)
 
   function styled(b, o) {
-    const g = C[b.group], scale = o.scale ?? S;
+    const g = C[b.id], scale = o.scale ?? S;
     const v = { '--idle-n': '0', ...(o.audit ? AUDIT : {}), ...(o.vars ?? {}) };
     for (const t of g.tops) v[`--show-top-${t.id}`] = t.id === o.top ? 'inline' : 'none';
     for (const t of g.bottoms) v[`--show-bottom-${t.id}`] = t.id === o.bottom ? 'inline' : 'none';
@@ -292,7 +292,7 @@ function browserSide() {
     async init(bodies, clothes) { B = bodies; C = clothes; for (const b of B) prepared[b.id] = await prepare(b); return Object.fromEntries(B.map((b) => [b.id, { crotch: prepared[b.id].crotch / S + prepared[b.id].vb[1] }])); },
     // maglia × pantaloni (senza capelli), con e senza i livelli sotto, e nel fotogramma estremo del respiro
     async outfits(id) {
-      const P = prepared[id], b = P.b, g = C[b.group], res = [];
+      const P = prepared[id], b = P.b, g = C[b.id], res = [];
       for (const t of g.tops) for (const bo of g.bottoms) {
         const o = { top: t.id, bottom: bo.id, audit: true };
         const cls = classify(await raster(styled(b, o), P.W, P.H), P.N);
@@ -310,7 +310,7 @@ function browserSide() {
     },
     // capelli × maglie (pantaloni base)
     async hair(id) {
-      const P = prepared[id], b = P.b, g = C[b.group], res = [];
+      const P = prepared[id], b = P.b, g = C[b.id], res = [];
       for (const h of b.hair) {
         let hairBase = 0;
         for (const t of g.tops) {
@@ -336,7 +336,7 @@ function browserSide() {
         const o = { top: c.top, bottom: c.bottom, hair: c.hair, audit: true };
         const cls = classify(await raster(styled(b, { ...o, css }), P.W, P.H), P.N);
         const cls2 = ['underArm', 'underOut', 'pantsHigh'].includes(key) ? classify(await raster(styled(b, { ...o, css: NO_UNDER }), P.W, P.H), P.N) : null;
-        const rp = [...C[b.group].tops.find((t) => t.id === c.top).replaces, ...C[b.group].bottoms.find((t) => t.id === c.bottom).replaces].includes('arms');
+        const rp = [...C[b.id].tops.find((t) => t.id === c.top).replaces, ...C[b.id].bottoms.find((t) => t.id === c.bottom).replaces].includes('arms');
         const m = metrics(P, cls, cls2, !!c.hair, rp);
         idx = key === 'animGap' ? [...m.pixels.gapTrunk, ...m.pixels.gapArm, ...m.pixels.newHoles]
             : key === 'eyes' ? [] : (m.pixels[key] ?? []);
@@ -379,7 +379,7 @@ async function exportCheck(page) {
     for (const body of bodies) {
       const vi = variants.findIndex((x) => x.body === body);
       if (vi < 0) continue;
-      const c = DATA.clothes[body.group];
+      const c = DATA.clothes[body.id];
       const cases = [...c.tops.map((t) => ({ top: t.id })), ...c.bottoms.map((t) => ({ bottom: t.id })), ...body.hair.map((h) => ({ hair: h }))];
       for (const k of cases) {
         state.selected = vi;

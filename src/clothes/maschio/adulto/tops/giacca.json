@@ -1,0 +1,10 @@
+{
+  "name": "Giacca",
+  "colors": {
+    "main": "#403b37",
+    "trim": "#3a3432",
+    "accent": "#b0aaa8",
+    "under": "#f5f1eb"
+  },
+  "ref": "reference"
+}

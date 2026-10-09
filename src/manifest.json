@@ -18,39 +18,33 @@
            "arruffati", "due-chignon", "caschetto", "rasati-lato", "ricci",
            "calvizie", "stempiato", "pettinati-indietro", "coda-grigia", "chignon-grigio"],
   "clothes": {
-    "maschio": {
-      "tops": ["felpa", "giacca", "polo", "maglione", "camicia",
-               "maglietta-riga", "felpa-rossa", "camicia-risvoltata", "polo-blu", "cardigan-grigio"],
-      "bottoms": ["jeans", "chino", "jogger", "cargo", "larghi",
-                  "bermuda-cargo", "jeans-grigi", "pantaloni-kaki", "pantaloni-cintura", "jeans-chiari"]
-    },
-    "femmina": {
-      "tops": ["maglietta-fiore", "felpa-cappuccio", "top-corto", "maglietta-v", "cardigan",
-               "abitino", "maglia-righe", "giacca-jeans", "maglione-v", "cardigan-fiori"],
-      "bottoms": ["pantaloncini", "jeans-scuri", "jeans-a-zampa", "pantaloni-neri", "pantaloni-marroni",
-                  "leggings", "jeans-cargo", "jeans-neri", "pantaloni-oliva", "pantaloni-scuri"]
-    }
+    "maschio/bambino": {"tops": ["maglietta-riga"], "bottoms": ["bermuda-cargo"]},
+    "maschio/ragazzo": {"tops": ["felpa-rossa"], "bottoms": ["jeans-grigi"]},
+    "maschio/slanciato": {"tops": ["camicia-risvoltata"], "bottoms": ["pantaloni-kaki"]},
+    "maschio/adulto": {"tops": ["felpa", "giacca", "polo", "maglione", "camicia", "polo-blu"], "bottoms": ["jeans", "chino", "jogger", "cargo", "larghi", "pantaloni-cintura"]},
+    "maschio/robusto": {"tops": ["cardigan-grigio"], "bottoms": ["jeans-chiari"]},
+    "femmina/bambina": {"tops": ["maglietta-fiore", "abitino"], "bottoms": ["pantaloncini", "leggings"]},
+    "femmina/ragazza": {"tops": ["felpa-cappuccio", "maglia-righe"], "bottoms": ["jeans-scuri", "jeans-cargo"]},
+    "femmina/slanciata": {"tops": ["top-corto", "giacca-jeans"], "bottoms": ["jeans-a-zampa", "jeans-neri"]},
+    "femmina/adulta": {"tops": ["maglietta-v", "maglione-v"], "bottoms": ["pantaloni-neri", "pantaloni-oliva"]},
+    "femmina/robusta": {"tops": ["cardigan", "cardigan-fiori"], "bottoms": ["pantaloni-marroni", "pantaloni-scuri"]}
   },
   "presets": [
-    {"body": "maschio/bambino", "hair": "spettinati", "top": "felpa", "bottom": "jeans"},
-    {"body": "maschio/ragazzo", "hair": "coda", "top": "giacca", "bottom": "chino"},
-    {"body": "maschio/slanciato", "hair": "chignon", "top": "polo", "bottom": "jogger"},
-    {"body": "maschio/adulto", "hair": "ciuffo-scuro", "top": "maglione", "bottom": "cargo"},
-    {"body": "maschio/robusto", "hair": "ciuffo-castano", "top": "camicia", "bottom": "larghi"},
     {"body": "maschio/bambino", "name": "Bambino · riga", "hair": "ricci", "top": "maglietta-riga", "bottom": "bermuda-cargo", "colors": {"hair": "#b5562a", "shoe-upper-l": "#303848", "shoe-upper-r": "#323b4c", "shoe-toe": "#2f3646", "shoe-tongue": "#f5f5f4", "shoe-lace": "#f6f6f6", "shoe-sole": "#f8f5f2"}},
     {"body": "maschio/ragazzo", "name": "Ragazzo · felpa", "hair": "arruffati", "top": "felpa-rossa", "bottom": "jeans-grigi", "colors": {"skin": "#c68642", "hair": "#1f1a17", "shoe-upper-l": "#f8f5f1", "shoe-upper-r": "#9f9c9c", "shoe-toe": "#faf7f5", "shoe-tongue": "#f5f4f2", "shoe-lace": "#f5f3ee", "shoe-sole": "#f9f6f2"}},
     {"body": "maschio/slanciato", "name": "Slanciato · camicia", "hair": "rasati-lato", "top": "camicia-risvoltata", "bottom": "pantaloni-kaki", "colors": {"hair": "#d8b062", "shoe-upper-l": "#333331", "shoe-upper-r": "#363534", "shoe-toe": "#363534", "shoe-tongue": "#e3e1dc", "shoe-lace": "#f4f4f4", "shoe-sole": "#faf6f1"}},
+    {"body": "maschio/adulto", "hair": "ciuffo-scuro", "top": "maglione", "bottom": "cargo"},
     {"body": "maschio/adulto", "name": "Adulto · polo", "hair": "stempiato", "top": "polo-blu", "bottom": "pantaloni-cintura", "colors": {"skin": "#8d5524", "hair": "#9a958e", "shoe-upper-l": "#403731", "shoe-upper-r": "#3f3630", "shoe-toe": "#494039", "shoe-tongue": "#413731", "shoe-lace": "#695f57", "shoe-sole": "#4c433c"}},
     {"body": "maschio/robusto", "name": "Robusto · cardigan", "hair": "calvizie", "top": "cardigan-grigio", "bottom": "jeans-chiari", "colors": {"hair": "#a8a39c", "shoe-upper-l": "#f9f5f0", "shoe-upper-r": "#a49383", "shoe-toe": "#f9f6f1", "shoe-tongue": "#f5f5f3", "shoe-lace": "#f7f4ef", "shoe-sole": "#f9f5f0"}},
     {"body": "femmina/bambina", "hair": "coda", "top": "maglietta-fiore", "bottom": "pantaloncini", "colors": {"shoe-upper-l": "#e57d8d", "shoe-upper-r": "#ec8295", "shoe-toe": "#fbfbfb", "shoe-tongue": "#f999a9", "shoe-lace": "#f7f7f7", "shoe-sole": "#fbfbfb"}},
-    {"body": "femmina/ragazza", "hair": "chignon", "top": "felpa-cappuccio", "bottom": "jeans-scuri", "colors": {"shoe-upper-l": "#a38dbc", "shoe-upper-r": "#a18ab6", "shoe-toe": "#fbfbfb", "shoe-tongue": "#b19dc3", "shoe-lace": "#f2f2f2", "shoe-sole": "#fbfbfb"}},
-    {"body": "femmina/slanciata", "hair": "coda", "top": "top-corto", "bottom": "jeans-a-zampa"},
-    {"body": "femmina/adulta", "hair": "chignon", "top": "maglietta-v", "bottom": "pantaloni-neri", "colors": {"shoe-tongue": "#f9f9f8"}},
-    {"body": "femmina/robusta", "hair": "ciuffo-castano", "top": "cardigan", "bottom": "pantaloni-marroni", "colors": {"shoe-upper-l": "#cebcab", "shoe-upper-r": "#cfbdac", "shoe-toe": "#cfbdac", "shoe-tongue": "#e1d2c3", "shoe-lace": "#e1d2c3", "shoe-sole": "#f4e9dd"}},
     {"body": "femmina/bambina", "name": "Bambina · abitino", "hair": "due-chignon", "top": "abitino", "bottom": "leggings", "colors": {"hair": "#d8b062", "shoe-upper-l": "#e888a0", "shoe-upper-r": "#e5859e", "shoe-toe": "#fafbfa", "shoe-tongue": "#f7abc0", "shoe-lace": "#fafbfa", "shoe-sole": "#fcf8f9"}},
+    {"body": "femmina/ragazza", "hair": "chignon", "top": "felpa-cappuccio", "bottom": "jeans-scuri", "colors": {"shoe-upper-l": "#a38dbc", "shoe-upper-r": "#a18ab6", "shoe-toe": "#fbfbfb", "shoe-tongue": "#b19dc3", "shoe-lace": "#f2f2f2", "shoe-sole": "#fbfbfb"}},
     {"body": "femmina/ragazza", "name": "Ragazza · righe", "hair": "caschetto", "top": "maglia-righe", "bottom": "jeans-cargo", "colors": {"skin": "#a0662f", "hair": "#1f1a17", "shoe-upper-l": "#fafaf8", "shoe-upper-r": "#e4e1dc", "shoe-toe": "#fbfbfb", "shoe-tongue": "#fdfdfd", "shoe-lace": "#f4f5f4", "shoe-sole": "#fcfcfc"}},
+    {"body": "femmina/slanciata", "hair": "coda", "top": "top-corto", "bottom": "jeans-a-zampa"},
     {"body": "femmina/slanciata", "name": "Slanciata · giacca", "hair": "coda-grigia", "top": "giacca-jeans", "bottom": "jeans-neri", "colors": {"hair": "#b5562a", "shoe-upper-l": "#2b2b2b", "shoe-upper-r": "#2a2a2a", "shoe-toe": "#fcfcfc", "shoe-tongue": "#f7f7f7", "shoe-lace": "#f7f7f7", "shoe-sole": "#fbfafa"}},
+    {"body": "femmina/adulta", "hair": "chignon", "top": "maglietta-v", "bottom": "pantaloni-neri", "colors": {"shoe-tongue": "#f9f9f8"}},
     {"body": "femmina/adulta", "name": "Adulta · maglione", "hair": "pettinati-indietro", "top": "maglione-v", "bottom": "pantaloni-oliva", "colors": {"skin": "#e0ac69", "hair": "#3b2a20", "shoe-upper-l": "#5f483a", "shoe-upper-r": "#604a3c", "shoe-toe": "#604a3c", "shoe-tongue": "#654d3e", "shoe-lace": "#594438", "shoe-sole": "#60493b"}},
+    {"body": "femmina/robusta", "hair": "ciuffo-castano", "top": "cardigan", "bottom": "pantaloni-marroni", "colors": {"shoe-upper-l": "#cebcab", "shoe-upper-r": "#cfbdac", "shoe-toe": "#cfbdac", "shoe-tongue": "#e1d2c3", "shoe-lace": "#e1d2c3", "shoe-sole": "#f4e9dd"}},
     {"body": "femmina/robusta", "name": "Robusta · fiori", "hair": "chignon-grigio", "top": "cardigan-fiori", "bottom": "pantaloni-scuri", "colors": {"hair": "#b9b4ad", "shoe-upper-l": "#ebdece", "shoe-upper-r": "#e8d9c8", "shoe-toe": "#e8d9c8", "shoe-tongue": "#ebdece", "shoe-lace": "#e8d9c8", "shoe-sole": "#f4e9db"}}
   ]
 }

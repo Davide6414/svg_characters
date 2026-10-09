@@ -2,14 +2,15 @@
 """Traccia i vestiti da due fogli di riferimento: pantaloni e capi per il busto, disegnati sullo stesso corpo.
 
 Uso:
-  python3 tools/trace_clothes.py --group maschio --out src/clothes/maschio \\
+  python3 tools/trace_clothes.py --out src/clothes/maschio/adulto \\
       --bottoms reference/vestiti-maschili-pantaloni.webp --tops reference/vestiti-maschili-maglie.webp
 
-Scrive in --out:
+Scrive in --out (la cartella della sagoma a cui i capi appartengono, la più simile al corpo del foglio):
   reference.json            punti di riferimento del corpo su cui sono disegnati i vestiti (prima figura dei pantaloni)
   bottoms/<id>.svg + .json  pantaloni
   tops/<id>.svg + .json     capi per il busto
-I vestiti sono nel riquadro di quel corpo; `build.mjs` li adatta a ogni sagoma.
+I vestiti sono nel riquadro di quel corpo; `build.mjs` li adatta alla sagoma della cartella (che deve avere proporzioni
+simili: i capi non si adattano ad altre corporature).
 
 Come si tara un capo (tabelle BOTTOMS e TOPS, una riga per figura, da sinistra a destra):
   id, nome, e le correzioni dei ruoli {indice regione: ruolo}. Il ruolo di ogni regione (main, trim, accent,
@@ -44,8 +45,7 @@ TOPS = [
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('--group', required=True, help='gruppo dei corpi su cui sono disegnati (es. maschio)')
-    ap.add_argument('--out', required=True, help='cartella di destinazione (es. src/clothes/maschio)')
+    ap.add_argument('--out', required=True, help='cartella della sagoma di destinazione (es. src/clothes/maschio/adulto)')
     ap.add_argument('--bottoms', required=True, help='foglio dei pantaloni')
     ap.add_argument('--tops', required=True, help='foglio dei capi per il busto')
     ap.add_argument('-v', '--verbose', action='store_true')
@@ -57,7 +57,7 @@ def main():
     ref = dict(head=ref_body['head'], landmarks=ref_body['landmarks'])
     os.makedirs(a.out, exist_ok=True)
     with open(os.path.join(a.out, 'reference.json'), 'w', encoding='utf8') as f:
-        json.dump(dict(group=a.group, head={k: round(v, 1) for k, v in ref['head'].items()}, landmarks=ref['landmarks']),
+        json.dump(dict(head={k: round(v, 1) for k, v in ref['head'].items()}, landmarks=ref['landmarks']),
                   f, ensure_ascii=False, indent=2)
         f.write('\n')
 
@@ -70,7 +70,7 @@ def main():
                 print(f'{folder}/{gid}')
             garment = trace_garment(sheet, box, kind, ref=None if sheet is bottoms and box == boxes[0] else ref,
                                     overrides=overrides, verbose=a.verbose)
-            write_garment(os.path.join(a.out, folder), gid, name, garment)
+            write_garment(os.path.join(a.out, folder), gid, name, garment, drawn_on_reference=True)
             print(f'{folder}/{gid}: {len(garment["regions"])} regioni, {len(garment["seams"])} linee, {len(garment["dots"])} puntini, colori {garment["colors"]}')
 
 
