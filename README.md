@@ -432,8 +432,8 @@ I colori di partenza sono i default scritti nel CSS di ogni SVG, più i `colors`
 - **Stile di capelli**: `tools/trace_hair.py` o a mano in `src/human/hair/<id>.svg` + `.json`, poi l'id in `hair` nel manifest.
 - **Barba**: `tools/trace_beards.py` (tabella `BEARDS` con gruppi ed età) in `src/human/beards/<id>.svg` + `.json`, poi l'id in `beards` nel manifest; un preset può averne una (`beard`, e `beard` in `colors`).
 - **Vestiti**: ogni capo sta su una sola sagoma, quindi si traccia su quella. Con un foglio in cui ogni figura indossa un outfit sul proprio corpo (come per le femmine): `tools/trace_outfits.py`, con le regioni di ogni figura assegnate a mano nella sua tabella `OUTFITS` (la riga dice la sagoma). Con due fogli di figure sullo stesso corpo (pantaloni e maglie, come per la prima serie maschile): `tools/trace_clothes.py --out src/clothes/<gruppo>/<sagoma>`; il corpo di riferimento è la prima figura del foglio dei pantaloni e i capi vengono deformati dalla build su quella sagoma (deve essere simile). Poi i capi nel manifest, in `clothes["<gruppo>/<sagoma>"]` (`tops` e `bottoms`), e se si vuole in un preset (`top`, `bottom`, `colors`).
-- **Alieni**: `tools/trace_alien.py` su un foglio di figure affiancate, poi `bodies` e `presets` in `src/alien/manifest.json` (vedi *Alieni*).
-- Poi `node build.mjs`, e se si vuole l'audit degli umani (sotto).
+- **Alieni**: `tools/trace_alien.py` su un foglio di figure affiancate, poi `bodies` e `presets` in `src/alien/manifest.json`; i vestiti con `tools/trace_alien_outfits.py` da un foglio dei vestiti allineato a quello delle sagome (vedi *Alieni*).
+- Poi `node build.mjs`, e se si vuole l'audit (sotto).
 
 ## Audit delle combinazioni (umani)
 
@@ -450,3 +450,14 @@ e le spalle non conta: fa parte del disegno); controlla anche
 che l'SVG esportato dal visualizzatore sia uguale a quello mostrato e che i file siano validi (XML, id unici, ogni parte
 con un colore). Scrive `audit/report.html` (per ogni difetto le combinazioni peggiori, col difetto colorato) e
 `audit/report.json`. Per rifare solo una parte: `--only=femmina/robusta`, `--skip=hair,export`.
+
+## Audit delle combinazioni (alieni)
+
+```
+NODE_PATH=$(npm root -g) node tools/audit_alien.mjs      # serve playwright, circa 40 secondi
+```
+
+Rende nel browser ogni sagoma aliena con ogni combinazione di maglia e pantaloni (di base o del capo: 32 combinazioni) e controlla due
+cose: che nel fotogramma estremo del respiro (busto e braccia allungati, testa su) non si apra fra le parti nessun vuoto che nella posa
+base non c'era, e che l'SVG esportato dal visualizzatore sia uguale a quello mostrato. `AUDIT_ONLY=curvo` limita il controllo alle
+sagome che contengono quel testo.
