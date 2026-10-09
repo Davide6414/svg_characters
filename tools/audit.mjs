@@ -254,7 +254,23 @@ function browserSide() {
     const bgc = components(bgMask, W, H, false), dist = distance(bgMask, W, H), thick = new Float32Array(bgc.n + 1), nh = [];
     for (let i = 0; i < N; i++) { const l = bgc.lab[i]; if (l && !bgc.border[l] && !P.baseHole[i] && dist[i] > thick[l]) thick[l] = dist[i]; }
     const maxI = headOnly ? P.ny * W : N;
-    for (let i = 0; i < maxI; i++) { const l = bgc.lab[i]; if (l && !bgc.border[l] && !P.baseHole[i] && thick[l] <= THIN * S) nh.push(i); }
+    // nei capelli lunghi lo sfondo racchiuso fra ciocche, testa e spalle (a meno di un contorno dai capelli) fa parte del
+    // disegno, sono le "finestre" del foglio: non conta come fessura nuova (sono grandi e cambiano con la sagoma)
+    const hairHole = new Set();
+    if (headOnly) {
+      const r = Math.max(1, Math.round(6 * S));        // fra i capelli e lo sfondo c'è il loro contorno (5.4 px)
+      for (let i = 0; i < maxI; i++) {
+        if (cls[i] !== HAIR) continue;
+        const x = i % W;
+        for (let d = 1; d <= r; d += 2) for (const j of [i - d, i + d, i - d * W, i + d * W]) {
+          if (j >= 0 && j < N && Math.abs((j % W) - x) <= d && bgc.lab[j] && !bgc.border[bgc.lab[j]]) hairHole.add(bgc.lab[j]);
+        }
+      }
+    }
+    for (let i = 0; i < maxI; i++) {
+      const l = bgc.lab[i];
+      if (l && !bgc.border[l] && !P.baseHole[i] && !hairHole.has(l) && thick[l] <= THIN * S) nh.push(i);
+    }
     take('newHoles', nh);
     const fg = components(cls.map((c) => (c ? 1 : 0)), W, H, true);
     let main = 0; for (let k = 1; k <= fg.n; k++) if (fg.area[k] > (fg.area[main] ?? 0)) main = k;

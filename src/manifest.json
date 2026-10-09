@@ -16,7 +16,8 @@
   },
   "hair": ["spettinati", "coda", "chignon", "ciuffo-scuro", "ciuffo-castano",
            "arruffati", "due-chignon", "caschetto", "rasati-lato", "ricci",
-           "calvizie", "stempiato", "pettinati-indietro", "coda-grigia", "chignon-grigio"],
+           "calvizie", "stempiato", "pettinati-indietro", "coda-grigia", "chignon-grigio",
+           "caschetto-scalato", "coda-alta", "lisci-frangia", "lunghi-mossi", "coda-laterale"],
   "clothes": {
     "maschio/bambino": {"tops": ["maglietta-riga"], "bottoms": ["bermuda-cargo"]},
     "maschio/ragazzo": {"tops": ["felpa-rossa"], "bottoms": ["jeans-grigi"]},

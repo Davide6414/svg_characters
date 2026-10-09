@@ -49,12 +49,24 @@ Se cambiano i punti di riferimento (`landmarks`) vanno rigenerate anche le sagom
 
 ```
 python3 tools/trace_hair.py reference/capelli.webp --out src/hair
+python3 tools/trace_hair.py reference/capelli-3.webp --out src/hair
 ```
 
-Traccia gli stili elencati nella tabella `HAIRS` in cima al file: ognuno ha il riquadro nel foglio, il punto
-dell'orecchio e la scala che lo allineano alla testa di riferimento (`hairFrame` nel manifest), e quali linee
-interne tenere. Per un nuovo stile: aggiungere una riga alla tabella (conviene provare scala e punto di appoggio
-sovrapponendo lo stile alla testa di riferimento), poi aggiungere l'id a `hair` nel manifest.
+Per i fogli di **soli capelli su sfondo trasparente** (RGBA). La tabella `HAIRS[nome del foglio]` ha una riga per
+stile: il riquadro nel foglio, il punto di appoggio (`notch`) e dove deve finire nel riquadro dei capelli (`ear`), la
+scala (`s`) e quali linee interne tenere (`keep`, `thick`). `seed` è un punto dentro lo stile: resta solo la sua
+componente connessa (negli stili vicini i riquadri si sovrappongono). Se un filo sottile (il laccio di una coda)
+sparisce con l'erosione del contorno la sagoma viene scritta come più isole.
+
+Per allineare un nuovo stile conviene sovrapporlo alla testa di riferimento (`hairFrame` nel manifest) e provare
+scala e punto di appoggio:
+- `capelli.webp`: il punto di appoggio è la tacca dell'orecchio, che finisce sull'orecchio della testa (`ear`);
+- `capelli-3.webp` (capelli lunghi, senza tacca): è il bordo destro dell'apertura per il viso all'altezza degli occhi,
+  che finisce poco prima del contorno destro della testa (`ear` x = 237 invece di 242: i capelli si appoggiano al
+  viso, senza striscia di sfondo), con la scala 0.80 (0.86 per i lunghi, che altrimenti lasciano scoperto il retro
+  del cranio); l'altezza si regola in modo che la cima dei capelli stia circa 12 px sopra il cranio.
+
+Poi aggiungere l'id a `hair` nel manifest e lanciare `node build.mjs`.
 
 ## Capelli da figure intere: `trace_hair_figures.py`
 

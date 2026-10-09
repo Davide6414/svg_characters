@@ -6,7 +6,7 @@ capelli": la testa di riferimento a cui i capelli sono stati allineati (orecchio
 """
 import numpy as np
 
-from .geom import (catmull_d, dilate, erode, fmt, rdp, skeleton_lines, trace_paths, upsample)
+from .geom import (catmull_d, dilate, erode, fmt, label_components, rdp, skeleton_lines, trace_paths, upsample)
 
 K = 3
 LINE_W = 5.4       # spessore del contorno nelle coordinate finali
@@ -21,6 +21,19 @@ class HairSheet:
         self.rgb = a[..., :3]
         lum = 0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2]
         self.lum = np.where(self.alpha > 128, lum, 255.0)    # bianco fuori dalla sagoma
+        self._comps = None
+
+    def cut(self, cfg):
+        """Canale alpha ritagliato sul riquadro dello stile. Con `seed` (un punto dentro lo stile) resta solo la sua
+        componente connessa: negli stili vicini i riquadri si sovrappongono un poco."""
+        x0, y0, x1, y1 = cfg['box']
+        alpha = self.alpha[y0:y1, x0:x1]
+        if 'seed' in cfg:
+            if self._comps is None:
+                self._comps = label_components(self.alpha > 127, conn=8)[0]
+            sx, sy = cfg['seed']
+            alpha = np.where(self._comps[y0:y1, x0:x1] == self._comps[sy, sx], alpha, 0.0)
+        return alpha
 
 
 def _to_final(cfg):
@@ -38,16 +51,16 @@ def _crop(arr, box):
 
 def silhouette(sheet, cfg):
     """Percorso chiuso della sagoma, al centro del contorno."""
-    s_mask = upsample(_crop(sheet.alpha, cfg['box']), K) > 127
+    s_mask = upsample(sheet.cut(cfg), K) > 127
     inner = erode(s_mask, (LINE_W / cfg['s'] / 2) * K)
     paths = trace_paths(inner, _to_final(cfg), opttol=2.5, alphamax=1.0, turd=30)
-    assert len(paths) == 1, f'la sagoma dovrebbe essere un solo percorso, trovati {len(paths)}'
-    return paths[0]
+    assert paths, 'sagoma vuota'
+    return ''.join(paths)        # più isole se una parte sottile (il laccio di una coda) sparisce con l'erosione
 
 
 def fill_color(sheet, cfg):
     """Colore di riempimento: mediana dei pixel interni della sagoma."""
-    s_mask = upsample(_crop(sheet.alpha, cfg['box']), K) > 127
+    s_mask = upsample(sheet.cut(cfg), K) > 127
     inner = erode(s_mask, 8 * K)
     x0, y0, x1, y1 = cfg['box']
     rgb = np.stack([upsample(sheet.rgb[y0:y1, x0:x1, c], K) for c in range(3)], -1)
@@ -88,7 +101,7 @@ def interior_lines(sheet, cfg, long_raw=150, minlen=10.0):
     """Linee interne: [{d, raw}] dalla più lunga. Le corte (cunei che partono dalle tacche) sono archi
     quadratici che finiscono sul contorno; le lunghe sono curve Catmull-Rom."""
     to_final = _to_final(cfg)
-    s_mask = upsample(_crop(sheet.alpha, cfg['box']), K) > 127
+    s_mask = upsample(sheet.cut(cfg), K) > 127
     lum = upsample(_crop(sheet.lum, cfg['box']), K)
     dark = (lum < 30) & s_mask
     e = erode(s_mask, (LINE_W / cfg['s'] / 2) * K)

@@ -1,7 +1,7 @@
 # svg_characters
 
 Personaggi in SVG pensati per essere **combinati**: dieci sagome (cinque maschili e cinque femminili, da bambino a
-adulto) × quindici stili di capelli × maglie e pantaloni × colori a piacere, più un visualizzatore HTML per provare gli
+adulto) × venti stili di capelli × maglie e pantaloni × colori a piacere, più un visualizzatore HTML per provare gli
 incroci.
 
 ## Organizzazione
@@ -16,7 +16,8 @@ src/                        ← QUI si lavora: tutto ciò che si modifica a mano
     femmina/                bambina · ragazza · slanciata · adulta · robusta
   hair/                     spettinati · coda · chignon · ciuffo-scuro · ciuffo-castano ·        (.svg + .json)
                             arruffati · due-chignon · caschetto · rasati-lato · ricci ·
-                            calvizie · stempiato · pettinati-indietro · coda-grigia · chignon-grigio
+                            calvizie · stempiato · pettinati-indietro · coda-grigia · chignon-grigio ·
+                            caschetto-scalato · coda-alta · lisci-frangia · lunghi-mossi · coda-laterale
   clothes/<gruppo>/<sagoma>/  ogni capo sta SOLO sulla sagoma per cui è disegnato (.svg + .json)
     tops/ · bottoms/        le maglie e i pantaloni di quella sagoma
     reference.json          solo maschio/adulto: il corpo su cui sono disegnati i primi cinque capi per tipo
@@ -31,7 +32,7 @@ lib/fit.mjs                 deformazione (thin-plate spline) che adatta capelli 
 serve.mjs                   server statico opzionale:  node serve.mjs → http://localhost:5191
 
 reference/                  fogli di riferimento da cui sono tracciate le sorgenti
-  sagome-maschili · sagome-femminili · capelli · capelli-2 · capelli-anziani ·
+  sagome-maschili · sagome-femminili · capelli · capelli-2 · capelli-3 · capelli-anziani ·
   vestiti-maschili-pantaloni · vestiti-maschili-maglie ·
   vestiti-maschili-outfit · vestiti-femminili · vestiti-femminili-2 · archivio/
 tools/                      strumenti Python per tracciare i fogli (vedi tools/README.md)
@@ -134,6 +135,17 @@ se il cranio è un poco più alto o più basso di quello del foglio. Ogni livell
 | `pettinati-indietro` | Pettinati all'indietro · ragazzi e adulti | `#d3c4bc` |
 | `coda-grigia` | Coda bassa · ragazzi e adulti | `#a2948c` |
 | `chignon-grigio` | Chignon basso · ragazzi e adulti | `#c7b8af` |
+| `caschetto-scalato` | Caschetto scalato (frangia da un lato, lunghezza del mento) | `#4e332a` |
+| `coda-alta` | Coda alta con frangia (la coda sale a sinistra) | `#513328` |
+| `lisci-frangia` | Lisci con frangia dritta (lunghi, scendono sulle spalle) | `#3b2d28` |
+| `lunghi-mossi` | Lunghi mossi con la riga di lato | `#623a26` |
+| `coda-laterale` | Coda laterale bassa (cade a sinistra, con un laccio) | `#885d44` |
+
+**Capelli lunghi.** Gli ultimi cinque stili (`capelli-3`) scendono ai lati del viso fino alle spalle. Stanno nel gruppo
+della testa come gli altri, quindi la maglia (disegnata dopo la testa) li copre dove si sovrappongono: i capelli
+restano dietro le spalle e sporgono solo fuori dal busto. Come la `coda` hanno un'apertura per il viso: la testa di ogni
+sagoma ci sta dentro e le ciocche a destra arrivano al contorno della faccia. Un po' di sfondo resta visibile fra le
+ciocche, il collo e le spalle (le "finestre" del foglio), per esempio fra la coda e la guancia.
 
 **Età.** Le acconciature da anziani non si danno ai bambini: uno stile può dire a quali età vale (`ages` nel suo `.json`) e
 le età delle sagome sono in `ages` del manifest (bambino, ragazzo, adulto). Una sagoma contiene solo gli stili della sua
@@ -223,14 +235,15 @@ I colori di partenza sono i default scritti nel CSS di ogni SVG, più i `colors`
 ## Audit delle combinazioni
 
 ```
-NODE_PATH=$(npm root -g) node tools/audit.mjs      # serve playwright (npm i -g playwright), circa 80 secondi
+NODE_PATH=$(npm root -g) node tools/audit.mjs      # serve playwright (npm i -g playwright), circa 2 minuti
 ```
 
 Rende nel browser, per ogni sagoma, ogni maglia con ogni pantalone **della sua sagoma** (compresi la maglietta e i
-pantaloni base) e ogni stile di capelli con ogni maglia: 701 combinazioni, circa 80 secondi. Cerca i difetti
+pantaloni base) e ogni stile di capelli con ogni maglia: 901 combinazioni, circa 2 minuti. Cerca i difetti
 confrontando ogni combinazione con la sagoma base: vuoti nel busto, nelle braccia e alle caviglie, fessure sottili
 chiuse dalla figura, pezzi staccati, parti tagliate dal riquadro, l'estensione dei pantaloni che si vede, livelli sotto
-che coprono il braccio o sporgono, vuoti nel fotogramma estremo del respiro, occhi coperti dai capelli; controlla anche
+che coprono il braccio o sporgono, vuoti nel fotogramma estremo del respiro, occhi coperti dai capelli (lo sfondo racchiuso fra le ciocche dei capelli lunghi, la testa
+e le spalle non conta: fa parte del disegno); controlla anche
 che l'SVG esportato dal visualizzatore sia uguale a quello mostrato e che i file siano validi (XML, id unici, ogni parte
 con un colore). Scrive `audit/report.html` (per ogni difetto le combinazioni peggiori, col difetto colorato) e
 `audit/report.json`. Per rifare solo una parte: `--only=femmina/robusta`, `--skip=hair,export`.

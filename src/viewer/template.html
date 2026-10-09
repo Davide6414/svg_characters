@@ -138,7 +138,7 @@
 <body>
 <header class="top">
   <h1>Personaggi</h1>
-  <p>Sagome maschili e femminili in SVG, ricolorabili per parti e combinabili con 15 stili di capelli (quelli da anziani solo per ragazzi e adulti). Stessa scala e stessa linea del suolo per tutte, così le altezze si confrontano.</p>
+  <p>Sagome maschili e femminili in SVG, ricolorabili per parti e combinabili con <span id="hair-count">20</span> stili di capelli (quelli da anziani solo per ragazzi e adulti). Stessa scala e stessa linea del suolo per tutte, così le altezze si confrontano.</p>
 </header>
 
 <main class="layout">
@@ -288,6 +288,7 @@
   ];
 
   const HAIR = DATA.hair;
+  document.getElementById('hair-count').textContent = HAIR.length;
 
   // Sagome: ogni SVG composto ha già tutti gli stili di capelli, adattati alla sua testa.
   const bodies = DATA.bodies.map(({ id, group, name, svg, hair }) => {
