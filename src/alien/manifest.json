@@ -10,13 +10,21 @@
     {
       "id": "maschio",
       "name": "Maschio"
+    },
+    {
+      "id": "femmina",
+      "name": "Femmina"
     }
   ],
   "bodies": [
     "maschio/bambino",
     "maschio/ragazzo",
     "maschio/adulto",
-    "maschio/curvo"
+    "maschio/curvo",
+    "femmina/bambina",
+    "femmina/ragazza",
+    "femmina/adulta",
+    "femmina/curva"
   ],
   "presets": [
     {
@@ -34,6 +42,22 @@
     {
       "body": "maschio/curvo",
       "name": "Curvo"
+    },
+    {
+      "body": "femmina/bambina",
+      "name": "Bambina"
+    },
+    {
+      "body": "femmina/ragazza",
+      "name": "Ragazza"
+    },
+    {
+      "body": "femmina/adulta",
+      "name": "Adulta"
+    },
+    {
+      "body": "femmina/curva",
+      "name": "Curva"
     }
   ]
 }

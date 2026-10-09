@@ -4,7 +4,7 @@ Personaggi in SVG pensati per essere **combinati**, in due sezioni separate:
 
 - **Umani**: dieci sagome (cinque maschili e cinque femminili, da bambino a adulto) × venti stili di capelli × cinque barbe
   (per gli uomini) × maglie e pantaloni × colori a piacere;
-- **Alieni**: quattro sagome aliene maschili (bambino, ragazzo, adulto, curvo) con la loro maglia e i loro pantaloncini, ricolorabili per parti (vedi *Alieni*).
+- **Alieni**: otto sagome aliene (quattro maschili e quattro femminili: bambino, ragazzo, adulto e una sagoma curva) con la loro maglia e i loro pantaloncini, ricolorabili per parti (vedi *Alieni*).
 
 Un visualizzatore HTML (`index.html`, con una scheda per sezione) permette di provare gli incroci.
 
@@ -54,7 +54,7 @@ reference/                  fogli di riferimento da cui sono tracciate le sorgen
   sagome-maschili · sagome-femminili · capelli · capelli-2 · capelli-3 · capelli-anziani · barbe ·
   vestiti-maschili-pantaloni · vestiti-maschili-maglie ·
   vestiti-maschili-outfit · vestiti-femminili · vestiti-femminili-2 · vestiti-femminili-3 · vestiti-femminili-4 · archivio/
-  alieno-modello (l'alieno nudo da cui parte lo stile) · sagome-aliene-maschili (le quattro sagome da tracciare)
+  alieno-modello (l'alieno nudo da cui parte lo stile) · sagome-aliene-maschili · sagome-aliene-femminili
 tools/                      strumenti Python per tracciare i fogli (vedi tools/README.md)
 ```
 
@@ -277,6 +277,7 @@ Non hanno capelli, barbe o capi da scegliere: ogni sagoma ha la sua maglia e i s
 | Gruppo | Sagome | Dal foglio |
 | --- | --- | --- |
 | Maschio | `bambino` · `ragazzo` · `adulto` · `curvo` (spalle e testa piegate in avanti) | `reference/sagome-aliene-maschili.webp` |
+| Femmina | `bambina` · `ragazza` · `adulta` · `curva` (spalle e testa piegate in avanti) | `reference/sagome-aliene-femminili.webp` |
 
 Il disegno di partenza dello stile (un alieno nudo) è `reference/alieno-modello.webp`.
 
@@ -291,8 +292,8 @@ src/alien/bodies/<gruppo>/  <nome>.svg (geometria) + <nome>.json (nome, misure d
 e contorno; poi narici `c-dot` e occhi `c-eye c-alien-blink`) → `alien-arm-right` → `alien-legs` (`alien-leg-left` e `alien-leg-right`, coi
 piedi e le linee delle dita) → `alien-pants` (i pantaloncini) → `alien-arm-left` → `alien-torso` (la maglia). Ogni parte è una regione
 chiusa col suo contorno; le regioni vicine si toccano a metà del tratto scuro del foglio, e le linee interne (dita delle mani e dei
-piedi, cucitura dei pantaloncini, cuciture della maglia) sono linee aperte. Le pieghe grigie della maglia (`c-fold`, per ora solo
-`curvo`) sono linee sottili col colore del contorno al 40%, così stanno bene su qualunque colore di maglia. Il riempimento della testa
+piedi, cucitura dei pantaloncini, cuciture della maglia) sono linee aperte. Le pieghe più scure della stoffa (`c-fold`: la maglia del
+`curvo` e `curva`, le tasche dei pantaloncini rosa) sono linee sottili col colore del contorno al 40%, così stanno bene su qualunque colore. Il riempimento della testa
 scende di 10 px sotto il colletto (nascosto dalla maglia): quando la testa si alza nell'idle non si apre una fessura. Il sorgente
 contiene solo la geometria: colori, CSS e riquadro comune (stessa scala e stessa linea del suolo per tutte) li aggiunge la build.
 
@@ -309,10 +310,12 @@ aprono vuoti fra le parti (controllato su tutte le sagome).
 ```
 python3 tools/trace_alien.py reference/sagome-aliene-maschili.webp --out src/alien/bodies/maschio \
     --names bambino,ragazzo,adulto,curvo
+python3 tools/trace_alien.py reference/sagome-aliene-femminili.webp --out src/alien/bodies/femmina \
+    --names bambina,ragazza,adulta,curva
 ```
 
 Poi: le sagome in `bodies` e un preset per ognuna in `src/alien/manifest.json`, lo spessore del contorno stampato dallo strumento in
-`lineWidth`, e `node build.mjs`. Un gruppo nuovo (per esempio *Femmina*) è una cartella in più e una voce in `groups`.
+`lineWidth`, e `node build.mjs`. Un gruppo nuovo è una cartella in più e una voce in `groups`.
 
 ## Visualizzatore
 

@@ -23,10 +23,6 @@ def _is_white(r):
     return r['rgb'].min() > 205 and r['rgb'].max() - r['rgb'].min() < 40
 
 
-def _is_grey(r):
-    return r['lum'] < 150 and r['rgb'].max() - r['rgb'].min() < 30
-
-
 def _is_skin(r):
     red, green, blue = r['rgb']
     return green > red + 3 and green > blue + 18 and r['lum'] > 100
@@ -44,7 +40,8 @@ def classify_alien(seg, roles=None):
     h = y1 - y0
     cls = {head: 'head'}
     cls[max((i for i, r in inner.items() if _is_white(r) and r['cy'] < y0 + 0.65 * h), key=lambda i: inner[i]['area'])] = 'torso'
-    cls[max((i for i, r in inner.items() if _is_grey(r)), key=lambda i: inner[i]['area'])] = 'pants'
+    # i pantaloncini: la regione più grande che non è né bianca né di pelle, sotto la metà alta della figura (grigi, rosa…)
+    cls[max((i for i, r in inner.items() if i not in cls and not _is_white(r) and not _is_skin(r) and r['cy'] > y0 + 0.35 * h), key=lambda i: inner[i]['area'])] = 'pants'
     # le quattro regioni di pelle più grandi (dopo la testa): le due più in basso sono le gambe (coi piedi), le altre le braccia
     skin = sorted((i for i, r in inner.items() if _is_skin(r) and i not in cls and r['area'] >= 300), key=lambda i: -info[i]['area'])[:4]
     if len(skin) < 4:
@@ -162,7 +159,9 @@ def trace_alien_body(sheet, box, scale, ground=GROUND, roles=None, bridge=(), se
 
     # linee interne (dita delle mani e dei piedi, pieghe della maglia, tasche dei pantaloncini): pixel scuri con una sola
     # regione intorno; sulla maglia e sui pantaloncini sono sottili, sulla pelle come il contorno
-    seams = find_seams(seg, g, set(cls), to_xy) + find_folds(seg, g, shirt, to_xy, minlen=16.0)       # e le pieghe grigie della maglia
+    seams = [s for s in find_seams(seg, g, set(cls), to_xy) if s['thick'] >= 1.5]     # le linee sottilissime sono ombre dove due contorni si incrociano
+    pants = max((i for i, c in cls.items() if c == 'pants'), key=lambda i: info[i]['area'])
+    seams += find_folds(seg, g, shirt, to_xy, minlen=16.0) + find_folds(seg, g, pants, to_xy, minlen=12.0)    # pieghe della maglia e tasche dei pantaloncini
     for s in seams:
         s['part'] = cls[s['label']]
         s['fine'] = s['part'] in ('torso', 'pants')

@@ -233,12 +233,14 @@ scarpe, `to_shoes`) sono i pantaloni.
 ```
 python3 tools/trace_alien.py reference/sagome-aliene-maschili.webp --out src/alien/bodies/maschio \
     --names bambino,ragazzo,adulto,curvo
+python3 tools/trace_alien.py reference/sagome-aliene-femminili.webp --out src/alien/bodies/femmina \
+    --names bambina,ragazza,adulta,curva
 ```
 
 Per un foglio di **figure aliene affiancate** su sfondo chiaro (stessa idea di `trace_bodies.py`, ma con ruoli propri: gli alieni
 sono tutti della stessa pelle, quindi testa, braccia e gambe si distinguono per posizione e non per colore, e non ci sono scarpe).
 Cosa si aspetta il foglio: figure con un contorno scuro continuo, due occhi (macchie scure staccate dal contorno), la maglia
-chiara, i pantaloncini scuri e quattro regioni di pelle oltre alla testa (due braccia, due gambe coi piedi); il collo sta nella testa.
+chiara, i pantaloncini (di un colore qualunque: grigi, rosa…) e quattro regioni di pelle oltre alla testa (due braccia, due gambe coi piedi); il collo sta nella testa.
 Per ogni figura scrive `<nome>.svg` (solo geometria, vedi *Alieni* nel README principale) e `<nome>.json` (nome visualizzato, misure
 della testa, punti di riferimento, colori di partenza di pelle, maglia, pantaloncini e occhi).
 
@@ -247,14 +249,15 @@ Come lavora (`lib/alien.py`, `lib/alien_export.py`; la segmentazione è quella d
 1. Le regioni sono le componenti connesse del foglio fra i tratti scuri; le due macchie scure staccate in alto sono gli occhi, i
    puntini tondi sul viso (anche piccoli, 6 px²) le narici.
 2. **Ruoli**: la testa è la regione con gli occhi; la maglia è la regione bianca più grande nella parte alta, i pantaloncini la regione
-   grigia più grande; le quattro regioni di pelle più grandi sono braccia e gambe (le due più in basso sono le gambe, le altre le
+   più grande che non è né bianca né di pelle; le quattro regioni di pelle più grandi sono braccia e gambe (le due più in basso sono le gambe, le altre le
    braccia; sinistra e destra per posizione). Una regione piccola che tocca **una sola** parte (un dito o una punta chiusi da una
    linea) ne fa parte, restando una regione a sé col suo contorno; la pelle fra testa e maglia (il collo) va alla testa. Lo sfondo
    racchiuso fra i piedi, che tocca più parti, resta fuori.
 3. Ogni parte è la cella di Voronoi della sua regione (il confine cade a metà del tratto) tracciata con potrace. I buchi chiari
    minuscoli dentro il tratto (un granello dove due contorni si sovrappongono) sono tratto, non regioni: se no il confine fra due
    parti ci gira intorno e il contorno viene un nodo. Le linee interne (dita, cuciture) sono i pixel scuri con una sola regione
-   intorno, come per le sagome umane; le pieghe grigie della maglia (più scure della stoffa, `find_folds`) sono linee `c-fold`.
+   intorno, come per le sagome umane; le pieghe della maglia e le tasche dei pantaloncini (più scure della stoffa, `find_folds`) sono linee `c-fold`. Le linee
+   sottilissime (spessore < 1.5 px) sono ombre dove due contorni si incrociano e si scartano.
    Il riempimento della testa scende sotto il colletto (`NECK_FILL`) per non lasciare fessure quando la testa si alza.
 4. **Scala e suolo**: la stessa scala per tutte le figure del foglio (la più alta diventa alta `--height` px, 690 come un adulto
    umano, così le altezze restano confrontabili) e i piedi su y = 900. Alla fine lo strumento stampa lo spessore del contorno nella scala
