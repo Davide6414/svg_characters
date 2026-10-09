@@ -269,6 +269,44 @@ regione si fonde con lo sfondo), la tabella `FIXES` in cima a `trace_alien.py` h
 
 Dopo la tracciatura: le sagome in `bodies` e un preset per ognuna in `src/alien/manifest.json`, poi `node build.mjs`.
 
+## Vestiti alieni: `trace_alien_outfits.py`
+
+```
+python3 tools/trace_alien_outfits.py reference/vestiti-alieni-maschili.webp \
+    --bodies-sheet reference/sagome-aliene-maschili.webp --bodies src/alien/bodies/maschio \
+    --names bambino,ragazzo,adulto,curvo --out src/alien/clothes/maschio
+python3 tools/trace_alien_outfits.py reference/vestiti-alieni-femminili.webp \
+    --bodies-sheet reference/sagome-aliene-femminili.webp --bodies src/alien/bodies/femmina \
+    --names bambina,ragazza,adulta,curva --out src/alien/clothes/femmina
+```
+
+Per un foglio in cui **ogni figura aliena indossa un abito sulla propria sagoma**, disegnato sopra il foglio delle sagome nude (stessa
+posa, stessa scala, stesse teste e piedi: scarto misurato < 0.3 px). Per ogni figura scrive in `--out/<sagoma>/` `tops/<id>.svg|json` (la
+maglia) e `bottoms/<id>.svg|json` (i pantaloni o la gonna). `--only a,b` traccia solo alcune sagome; `-v` stampa gli indici di regione
+(area, colore), i ruoli assegnati, i dettagli e le fasce. Le regioni di ogni figura si assegnano a mano ai ruoli di colore (`main`, `trim`,
+`accent`, `accent2`, `skin`) nella tabella `OUTFITS` in cima al file, con queste opzioni per capo: `split` (dettagli senza contorno
+ricavati dal colore dentro la regione: strisce, un rombo), `absorb`, `back` (regioni dietro le braccia: la coda di un mantello),
+`under_down` / `under_up` (la fascia con cui la maglia scende dietro i pantaloncini di base, o i pantaloni salgono dietro la maglietta),
+`folds`, `smooth`, `neck`; per figura `arms` / `legs` (se la scelta automatica non va), `ignore`, `bridge`, `seal`, `dark`.
+
+Come lavora (`lib/alien_outfits.py`, `lib/alien_clothes_export.py`; segmentazione e linee interne come per le sagome):
+
+1. **Ancoraggio**: le coordinate si ancorano agli occhi della sagoma (`head.eyeX/eyeY` del suo `.json`) e alla scala del foglio delle
+   sagome (`--bodies-sheet`): nessuna deformazione, il capo cade sul corpo.
+2. **Capi**: ogni regione è la cella di Voronoi del suo contorno, tracciata con potrace; l'ordine di disegno è regioni, dettagli senza
+   contorno, contorni sopra i dettagli, linee interne (cuciture, pieghe).
+3. **Parti sostituite**: le due braccia (maglia) o le due gambe (pantaloni), le regioni di pelle più grandi del foglio, con le loro
+   linee (dita, piedi): così una manica corta o un orlo alto scoprono ciò che sotto la maglietta e i pantaloncini di base è nascosto.
+4. **Collo**: dove il foglio dei vestiti non ha il contorno inferiore della testa della sagoma (uno scollo più basso, una spalla
+   scoperta) il capo ha un pezzo di pelle che lo copre (`stale` in `lib/alien_outfits.py`: il contorno della testa della sagoma, ±2 px,
+   che nel foglio dei vestiti non c'è, sulla pelle). Con una spalla scoperta che si fonde col collo (`arms=(None, …)`) il pezzo è il
+   braccio intero e il suo contorno è solo quello vero (`_outline_runs`: il bordo che cade sul tratto scuro, non il taglio).
+5. **Fasce**: `under_down` (maglia) e `under_up` (pantaloni) sono rettangoli larghi come l'orlo, o come i pantaloncini di base
+   (`width='pants'`, per la pancia scoperta `role='skin'`), che arrivano al fondo della maglietta di base.
+
+Dopo la tracciatura: i capi in `clothes["<gruppo>/<sagoma>"]` del manifest (`src/alien/manifest.json`) e, per un personaggio di
+partenza, in un preset (`top`, `bottom`), poi `node build.mjs`. Rifacendo le sagome (`trace_alien.py`) vanno rifatti anche i vestiti.
+
 ## Protuberanze: `trace_protrusions.py`
 
 ```

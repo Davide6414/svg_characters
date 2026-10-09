@@ -1,0 +1,12 @@
+{
+  "name": "Gonna avvolgente",
+  "colors": {
+    "main": "#f7f1e5",
+    "trim": "#ac747c",
+    "accent": "#beab7f",
+    "accent2": "#7b5a63"
+  },
+  "replaces": [
+    "legs"
+  ]
+}

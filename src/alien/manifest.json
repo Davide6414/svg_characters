@@ -118,6 +118,54 @@
       "body": "femmina/adulta",
       "name": "Adulta · antenna a perline",
       "prot": "antenna-a-perline"
+    },
+    {
+      "body": "maschio/bambino",
+      "name": "Bambino · tunica",
+      "top": "tunica-cappuccio",
+      "bottom": "gonnellino"
+    },
+    {
+      "body": "maschio/ragazzo",
+      "name": "Ragazzo · kilt",
+      "top": "tunica-banda",
+      "bottom": "kilt-scuro"
+    },
+    {
+      "body": "maschio/adulto",
+      "name": "Adulto · poncho",
+      "top": "poncho",
+      "bottom": "kilt-verde"
+    },
+    {
+      "body": "maschio/curvo",
+      "name": "Curvo · mantellina",
+      "top": "mantellina",
+      "bottom": "bermuda"
+    },
+    {
+      "body": "femmina/bambina",
+      "name": "Bambina · tunica",
+      "top": "tunica-spallina",
+      "bottom": "gonna-avvolgente"
+    },
+    {
+      "body": "femmina/ragazza",
+      "name": "Ragazza · monospalla",
+      "top": "tunica-monospalla",
+      "bottom": "gonna-malva"
+    },
+    {
+      "body": "femmina/adulta",
+      "name": "Adulta · corpetto",
+      "top": "corpetto-pendente",
+      "bottom": "gonna-pannello"
+    },
+    {
+      "body": "femmina/curva",
+      "name": "Curva · mantello",
+      "top": "mantello",
+      "bottom": "gonna-sbieca"
     }
   ],
   "protrusions": [
@@ -133,5 +181,71 @@
     "antenne-lunghe",
     "antenna-a-perline",
     "antenne-a-pagaia"
-  ]
+  ],
+  "clothes": {
+    "maschio/bambino": {
+      "tops": [
+        "tunica-cappuccio"
+      ],
+      "bottoms": [
+        "gonnellino"
+      ]
+    },
+    "maschio/ragazzo": {
+      "tops": [
+        "tunica-banda"
+      ],
+      "bottoms": [
+        "kilt-scuro"
+      ]
+    },
+    "maschio/adulto": {
+      "tops": [
+        "poncho"
+      ],
+      "bottoms": [
+        "kilt-verde"
+      ]
+    },
+    "maschio/curvo": {
+      "tops": [
+        "mantellina"
+      ],
+      "bottoms": [
+        "bermuda"
+      ]
+    },
+    "femmina/bambina": {
+      "tops": [
+        "tunica-spallina"
+      ],
+      "bottoms": [
+        "gonna-avvolgente"
+      ]
+    },
+    "femmina/ragazza": {
+      "tops": [
+        "tunica-monospalla"
+      ],
+      "bottoms": [
+        "gonna-malva"
+      ]
+    },
+    "femmina/adulta": {
+      "tops": [
+        "corpetto-pendente"
+      ],
+      "bottoms": [
+        "gonna-pannello"
+      ]
+    },
+    "femmina/curva": {
+      "tops": [
+        "mantello"
+      ],
+      "bottoms": [
+        "gonna-sbieca"
+      ]
+    }
+  }
 }

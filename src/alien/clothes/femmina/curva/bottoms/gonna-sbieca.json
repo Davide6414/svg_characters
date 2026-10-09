@@ -1,0 +1,10 @@
+{
+  "name": "Gonna sbieca",
+  "colors": {
+    "main": "#c79c9f",
+    "trim": "#775660"
+  },
+  "replaces": [
+    "legs"
+  ]
+}

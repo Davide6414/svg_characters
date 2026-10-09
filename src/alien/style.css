@@ -13,10 +13,16 @@
 
 /* Parti: il visualizzatore le nasconde con --show-alien-NOME (inline | none). */
 #alien-head  { display: var(--show-alien-head, inline) }
-#alien-torso { display: var(--show-alien-torso, inline) }
+#alien-torso, #alien-back { display: var(--show-alien-torso, inline) }
 #alien-arm-left, #alien-arm-right { display: var(--show-alien-arms, inline) }
 #alien-pants { display: var(--show-alien-pants, inline) }
 #alien-legs  { display: var(--show-alien-legs, inline) }
+
+/* Vestiti: maglia e pantaloni (o gonna) si scelgono con --show-alien-top-NOME / --show-alien-bottom-NOME; col capo scelto la
+   maglietta e i pantaloncini della sagoma (`base`) si spengono, e così le braccia e le gambe della sagoma se il capo porta le sue.
+   Ruoli di colore: --shirt e --pants (principale), poi -trim, -accent, -accent2. */
+{{clothes-show}}
+{{clothes-fills}}
 
 /* Protuberanze (corna, pinne…): una alla volta, nessuna di default; --show-alien-prot: none le nasconde tutte. Il colore è quello
    della pelle, salvo --prot. Quelle dietro la testa sono nel gruppo della testa, prima del suo riempimento. */
@@ -35,6 +41,8 @@
   animation-delay: var(--idle-delay, 0s);
 }
 .c-alien-torso { transform-origin: 50% 100%; animation-name: alien-breathe }
+/* il busto e tutto ciò che ci sta sopra (maglie, parti dietro e sotto) respirano attorno allo stesso punto, per sagoma */
+{{idle-origin}}
 .c-alien-arm   { transform-origin: 50% 100%; animation-name: alien-arms }
 .c-alien-head  { transform-origin: 50% 100%; animation-name: alien-head; animation-delay: calc(var(--idle-delay, 0s) + 0.14s) }
 .c-alien-blink { transform-origin: 50% 50%; animation-name: alien-blink; animation-duration: 4.6s; animation-direction: normal; animation-timing-function: linear }

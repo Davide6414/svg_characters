@@ -1,0 +1,11 @@
+{
+  "name": "Corpetto con pendente",
+  "colors": {
+    "main": "#f8f2e7",
+    "trim": "#795863",
+    "accent": "#b8a67a"
+  },
+  "replaces": [
+    "arms"
+  ]
+}

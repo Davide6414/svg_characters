@@ -1,0 +1,10 @@
+{
+  "name": "Poncho con rombo",
+  "colors": {
+    "main": "#f7f0e1",
+    "trim": "#626850"
+  },
+  "replaces": [
+    "arms"
+  ]
+}

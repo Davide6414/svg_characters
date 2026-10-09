@@ -1,0 +1,11 @@
+{
+  "name": "Gonna malva",
+  "colors": {
+    "main": "#c79b9e",
+    "trim": "#795862",
+    "accent": "#f8f3e9"
+  },
+  "replaces": [
+    "legs"
+  ]
+}

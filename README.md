@@ -4,7 +4,7 @@ Personaggi in SVG pensati per essere **combinati**, in due sezioni separate:
 
 - **Umani**: dieci sagome (cinque maschili e cinque femminili, da bambino a adulto) × venti stili di capelli × cinque barbe
   (per gli uomini) × maglie e pantaloni × colori a piacere;
-- **Alieni**: otto sagome aliene (quattro maschili e quattro femminili: bambino, ragazzo, adulto e una sagoma curva) con la loro maglia e i loro pantaloncini, dodici protuberanze (corna, palchi, pinne, creste, antenne) e colori a piacere (vedi *Alieni*).
+- **Alieni**: otto sagome aliene (quattro maschili e quattro femminili: bambino, ragazzo, adulto e una sagoma curva) con la loro maglietta e i loro pantaloncini oppure un abito su misura (otto capi: maglia + pantaloni o gonna), dodici protuberanze (corna, palchi, pinne, creste, antenne) e colori a piacere (vedi *Alieni*).
 
 Un visualizzatore HTML (`index.html`, con una scheda per sezione) permette di provare gli incroci.
 
@@ -31,6 +31,7 @@ src/                        ← QUI si lavora: tutto ciò che si modifica a mano
     manifest.json           palette, spessore del contorno, gruppi, sagome, preset del visualizzatore
     style.css               classi dei colori, visibilità delle parti, animazione idle
     bodies/<gruppo>/        le sagome aliene   (.svg = geometria, .json = misure)
+    clothes/<gruppo>/<sagoma>/{tops,bottoms}/   i capi alieni di quella sagoma
   viewer/                   il visualizzatore: una sezione della pagina per ogni tipo di sagoma
     template.html           guscio della pagina (intestazione, schede Umani/Alieni, stili comuni)
     common.js               utilità comuni: colori rapidi, export, cambio di sezione
@@ -55,6 +56,7 @@ reference/                  fogli di riferimento da cui sono tracciate le sorgen
   vestiti-maschili-pantaloni · vestiti-maschili-maglie ·
   vestiti-maschili-outfit · vestiti-femminili · vestiti-femminili-2 · vestiti-femminili-3 · vestiti-femminili-4 · archivio/
   alieno-modello (l'alieno nudo da cui parte lo stile) · sagome-aliene-maschili · sagome-aliene-femminili ·
+  vestiti-alieni-maschili · vestiti-alieni-femminili ·
   protuberanze-teste · protuberanze-figure · protuberanze-antenne
 tools/                      strumenti Python per tracciare i fogli (vedi tools/README.md)
 ```
@@ -273,8 +275,9 @@ Con `prefers-reduced-motion` l'SVG resta fermo. Nel visualizzatore c'è l'interr
 
 Gli alieni sono una sezione a parte: risorse in `src/alien/`, composizione in `build/alien.mjs`, file in `characters/alieno/`. Con gli
 umani hanno in comune solo la scala (stessa linea del suolo `y = 900`, la figura più alta come un adulto) e le utilità della pagina.
-Non hanno capelli, barbe o capi da scegliere: ogni sagoma ha la sua maglia e i suoi pantaloncini (colori a piacere) e, a scelta, una
-**protuberanza** (corna, palchi, pinne, creste, antenne: vedi sotto).
+Non hanno capelli né barbe: ogni sagoma ha la sua maglietta e i suoi pantaloncini (colori a piacere) oppure, a scelta, un **abito** disegnato
+sulla sagoma (una maglia e dei pantaloni o una gonna: vedi *Vestiti*) e, a scelta, una **protuberanza** (corna, palchi, pinne, creste,
+antenne: vedi sotto).
 
 | Gruppo | Sagome | Dal foglio |
 | --- | --- | --- |
@@ -285,16 +288,19 @@ Il disegno di partenza dello stile (un alieno nudo) è `reference/alieno-modello
 
 ```
 src/alien/manifest.json     palette di default (skin, shirt, pants, eye), lineWidth (spessore di partenza del contorno),
-                            gruppi, sagome (`gruppo/nome`), protuberanze e preset (sagoma + nome + colori di partenza
-                            + eventuale protuberanza `prot`)
+                            gruppi, sagome (`gruppo/nome`), protuberanze, capi (`clothes`: per sagoma i suoi `tops` e
+                            `bottoms`) e preset (sagoma + nome + colori di partenza + eventuale `prot`, `top`, `bottom`)
 src/alien/style.css         classi dei colori, visibilità delle parti e delle protuberanze, animazione idle
 src/alien/bodies/<gruppo>/  <nome>.svg (geometria) + <nome>.json (nome, misure della testa, punti di riferimento, colori)
 src/alien/protrusions/      <id>.svg (geometria) + <id>.json (nome e testa di riferimento)
+src/alien/clothes/<gruppo>/<sagoma>/tops/ e bottoms/    <id>.svg (geometria) + <id>.json (nome, colori per ruolo, parti sostituite)
 ```
 
 **Struttura dell'SVG di una sagoma.** Dal fondo al primo piano: `alien-head` (testa e collo, in due passate come per gli umani: riempimento
 e contorno; poi narici `c-dot` e occhi `c-eye c-alien-blink`) → `alien-arm-right` → `alien-legs` (`alien-leg-left` e `alien-leg-right`, coi
-piedi e le linee delle dita) → `alien-pants` (i pantaloncini) → `alien-arm-left` → `alien-torso` (la maglia). Ogni parte è una regione
+piedi e le linee delle dita) → `alien-pants` (i pantaloncini) → `alien-arm-left` → `alien-torso` (la maglia). Il disegno della sagoma sta in
+un gruppo `alien-base-…` dentro ogni parte (`alien-base-torso`, `alien-base-pants`, `alien-base-arms`, `alien-base-legs`), accanto ai
+segnaposto dove la build mette i capi (vedi *Vestiti*). Ogni parte è una regione
 chiusa col suo contorno; le regioni vicine si toccano a metà del tratto scuro del foglio, e le linee interne (dita delle mani e dei
 piedi, cucitura dei pantaloncini, cuciture della maglia) sono linee aperte. Le pieghe più scure della stoffa (`c-fold`: la maglia del
 `curvo` e `curva`, le tasche dei pantaloncini rosa) sono linee sottili col colore del contorno al 40%, così stanno bene su qualunque colore. Il riempimento della testa
@@ -326,10 +332,48 @@ altri stanno **davanti** (`alien-prot-<id>`, sopra il contorno e sotto gli occhi
 Valgono per tutte le sagome; una alla volta (nessuna di default, o quella del preset: `prot` nel manifest). Il colore è quello della pelle
 finché non se ne sceglie un altro (`--prot`).
 
-**Variabili CSS.** `--skin`, `--shirt`, `--pants`, `--eye`, `--outline`, `--line-w`, `--prot` (colore delle protuberanze; se manca vale
+**Vestiti.** Ogni capo è disegnato su una sola sagoma e si vede solo su quella (come per gli umani): `tops/` (la maglia) e `bottoms/` (i
+pantaloni o la gonna). I fogli dei vestiti (`reference/vestiti-alieni-*.webp`) sono i fogli delle sagome nude con un abito disegnato sopra
+a ogni figura, nella stessa posa e alla stessa scala (scarto < 0.3 px): le coordinate sono quelle della sagoma e la build non deforma
+nulla. L'abito della figura si divide in maglia (collo, mantelline, tuniche…) e pantaloni (cintura, gonna, bermuda). Ogni capo ha:
+
+- i **ruoli di colore** `main`, `trim`, `accent`, `accent2` (variabili `--shirt`, `--shirt-trim`, `--shirt-accent`, `--shirt-accent2` per le
+  maglie; `--pants` e le stesse con `pants-` per i pantaloni): ogni regione del foglio è assegnata a mano a un ruolo, e i dettagli senza
+  contorno (strisce, un rombo) si ricavano dal colore dentro la regione. I colori di partenza sono quelli del foglio. `skin` = pelle
+  (`--skin`) che il capo lascia scoperta fra le sue parti;
+- le **parti del corpo che sostituisce**: una maglia porta le proprie *braccia* (una manica più corta, o nessuna, scopre il braccio più in
+  alto di dove comincia quello della sagoma, che sotto la maglietta è nascosto) e dei pantaloni le proprie *gambe* (un orlo più alto scopre
+  la coscia). Le parti sono tracciate dalla stessa figura, quindi dita e piedi coincidono con quelli della sagoma, che il CSS spegne
+  (`--show-alien-base-arms`, `--show-alien-base-legs`). Un capo che scende sul collo (o lascia una spalla scoperta che si fonde col collo)
+  ha anche il **pezzo di collo** che copre il contorno inferiore della testa della sagoma (e il riempimento che scende sotto il
+  colletto, `alien-neckfill`, si spegne con qualunque maglia: il capo ha il suo collo);
+- i **livelli**: davanti (`alien-top-<id>` dentro `alien-torso`, `alien-bottom-<id>` dentro `alien-pants`), dietro le braccia e le
+  gambe (`alien-top-<id>-back`: la coda di un mantello) e dietro i pantaloni (`alien-top-<id>-under`: la fascia con cui la maglia scende fino
+  ai pantaloncini di base, o la pancia scoperta; i pantaloni salgono dietro la maglietta di base). I livelli dietro stanno in `alien-back`,
+  dopo la testa. Tutto ciò che sta sul busto respira attorno allo stesso punto (la base della maglietta, `.c-alien-o-<gruppo>-<sagoma>`).
+
+La scelta è `--show-alien-top-<id>` e `--show-alien-bottom-<id>` (`base` = la maglietta e i pantaloncini della sagoma). Gli otto capi:
+
+| Sagoma | Maglia | Pantaloni |
+| --- | --- | --- |
+| `maschio/bambino` | `tunica-cappuccio` | `gonnellino` |
+| `maschio/ragazzo` | `tunica-banda` | `kilt-scuro` |
+| `maschio/adulto` | `poncho` | `kilt-verde` |
+| `maschio/curvo` | `mantellina` | `bermuda` |
+| `femmina/bambina` | `tunica-spallina` | `gonna-avvolgente` |
+| `femmina/ragazza` | `tunica-monospalla` | `gonna-malva` |
+| `femmina/adulta` | `corpetto-pendente` | `gonna-pannello` |
+| `femmina/curva` | `mantello` | `gonna-sbieca` |
+
+Si combinano a piacere fra loro e con la maglietta e i pantaloncini di base; gli otto abiti completi sono anche i personaggi di partenza
+*… · tunica*, *… · kilt* ecc. Le combinazioni miste sono un'approssimazione: una maglia più corta dei pantaloncini di base lascia vedere
+la pancia (o, per le tuniche lunghe, la maglia che scende), dei pantaloni più bassi della maglietta salgono dietro di essa.
+
+**Variabili CSS.** `--skin`, `--shirt` (+ `-trim`, `-accent`, `-accent2`), `--pants` (+ `-trim`, `-accent`, `-accent2`), `--eye`, `--outline`, `--line-w`, `--prot` (colore delle protuberanze; se manca vale
 `--skin`), `--idle-n` (`0` spegne l'animazione), `--idle-delay`, e la visibilità di ogni parte con `--show-alien-head`, `--show-alien-torso`,
 `--show-alien-arms`, `--show-alien-pants`, `--show-alien-legs` e `--show-alien-prot` (tutte le protuberanze), più
-`--show-alien-prot-<id>` (una sola) (`inline` | `none`). Le narici seguono `--outline`.
+`--show-alien-prot-<id>` (una sola), `--show-alien-top-<id>`, `--show-alien-bottom-<id>`, `--show-alien-base-arms` e
+`--show-alien-base-legs` (`inline` | `none`). Le narici seguono `--outline`.
 
 **Animazione idle.** Come per gli umani: busto e braccia respirano (si allungano di ~1%, ancorati alla base), la testa si alza di 2 px con un
 piccolo ritardo, gli occhi sbattono ogni 4.6 s. Con `prefers-reduced-motion` l'SVG resta fermo. Nel fotogramma estremo del respiro non si
@@ -345,7 +389,23 @@ python3 tools/trace_alien.py reference/sagome-aliene-femminili.webp --out src/al
 ```
 
 Poi: le sagome in `bodies` e un preset per ognuna in `src/alien/manifest.json`, lo spessore del contorno stampato dallo strumento in
-`lineWidth`, e `node build.mjs`. Un gruppo nuovo è una cartella in più e una voce in `groups`.
+`lineWidth`, e `node build.mjs`. Un gruppo nuovo è una cartella in più e una voce in `groups`. Rifacendo le sagome vanno rifatti anche
+le protuberanze e i vestiti (si ancorano alle loro misure).
+
+I vestiti si tracciano da un foglio dei vestiti allineato a quello delle sagome, con le regioni di ogni figura assegnate a mano ai ruoli
+nella tabella `OUTFITS` di `tools/trace_alien_outfits.py` (`-v` stampa gli indici di regione):
+
+```
+python3 tools/trace_alien_outfits.py reference/vestiti-alieni-maschili.webp \
+    --bodies-sheet reference/sagome-aliene-maschili.webp --bodies src/alien/bodies/maschio \
+    --names bambino,ragazzo,adulto,curvo --out src/alien/clothes/maschio
+python3 tools/trace_alien_outfits.py reference/vestiti-alieni-femminili.webp \
+    --bodies-sheet reference/sagome-aliene-femminili.webp --bodies src/alien/bodies/femmina \
+    --names bambina,ragazza,adulta,curva --out src/alien/clothes/femmina
+```
+
+Poi i capi in `clothes["<gruppo>/<sagoma>"]` del manifest (`tops` e `bottoms`) e, per un personaggio di partenza con quell'abito, in un preset
+(`top`, `bottom`).
 
 Le protuberanze si tracciano con `tools/trace_protrusions.py` (vedi `tools/README.md`); l'id va in `protrusions` del manifest e, se si vuole
 un personaggio di partenza con quella protuberanza, in un preset (`prot`). Rifacendo le sagome vanno rifatte anche le protuberanze
@@ -355,8 +415,10 @@ un personaggio di partenza con quella protuberanza, in un preset (`prot`). Rifac
 
 La pagina ha una scheda per sezione (**Umani**, **Alieni**; l'indirizzo `#umani` / `#alieni` apre quella voluta) e ognuna ha la sua
 anteprima, il suo pannello e il suo stato: passando da una all'altra non si perde il personaggio scelto. Quanto segue descrive gli
-umani; la sezione degli alieni ha lo stesso impianto con sagoma, colori (pelle, occhi, maglia, pantaloncini, contorno), parti visibili
-(testa, maglia, braccia, pantaloncini, gambe, protuberanze), scelta della protuberanza, idle ed export.
+umani; la sezione degli alieni ha lo stesso impianto con sagoma, colori (pelle, occhi, maglia e pantaloni coi loro ruoli secondari,
+contorno), parti visibili (testa, maglia, braccia, pantaloni, gambe, protuberanze), scelta della protuberanza, della maglia e dei
+pantaloni (solo i capi della sagoma scelta; cambiando sagoma tornano la maglietta e i pantaloncini di base), idle ed export. Nella vista
+*Affiancati* le figure vanno a capo dopo otto per riga.
 
 Ci sono ventisei personaggi di partenza (i preset del manifest: uno o due per sagoma, quattro per le femmine, ognuno con un abbinamento di capi della sua sagoma; la seconda, la terza e la quarta serie femminile portano i capelli nuovi; *Adulto · polo* e *Robusto · cardigan* hanno la barba), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **barba** (solo sagome maschili: la sezione compare solo per loro e solo con le barbe che valgono per la sagoma), **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono solo quelli della sagoma scelta: se cambi sagoma, maglia e pantaloni passano all'abito di partenza di quella sagoma (il primo dei suoi preset), e se la sagoma non ha capi restano la maglietta e i pantaloni base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
 

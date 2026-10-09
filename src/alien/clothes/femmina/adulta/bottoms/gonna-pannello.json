@@ -1,0 +1,12 @@
+{
+  "name": "Gonna a pannello",
+  "colors": {
+    "main": "#c79d9f",
+    "trim": "#ac717a",
+    "accent": "#f7f1e6",
+    "accent2": "#7b5964"
+  },
+  "replaces": [
+    "legs"
+  ]
+}

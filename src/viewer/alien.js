@@ -3,17 +3,26 @@
 const DATA = PAGE_DATA.alien;
 
 // ---- dati --------------------------------------------------------------
-// sel: selettore che dice se la sagoma ha quella parte; group: sezione del pannello; palette: i colori rapidi sotto il campo
+// sel: selettore che dice se la sagoma ha quella parte; può essere una funzione del personaggio (i ruoli secondari dipendono dal capo
+// scelto); group: sezione del pannello; palette: i colori rapidi sotto il campo
+const topRole = (role) => (v) => v.top !== 'base' && `#alien-top-${v.top} .c-${role}`;
+const bottomRole = (role) => (v) => v.bottom !== 'base' && `#alien-bottom-${v.bottom} .c-${role}`;
 const COLOR_FIELDS = [
   { key: 'skin',    label: 'Pelle',                css: '--skin',    sel: '.c-skin',   group: 'body',   palette: 'alienSkin' },
   { key: 'eye',     label: 'Occhi',                css: '--eye',     sel: '.c-eye',    group: 'body',   palette: 'alienEye' },
   { key: 'prot',    label: 'Protuberanze',         css: '--prot',    sel: '.c-prot',   group: 'body',   palette: 'alienSkin' },   // null = segue la pelle
   { key: 'shirt',   label: 'Maglia',               css: '--shirt',   sel: '.c-shirt',  group: 'top',    palette: 'fabric' },
-  { key: 'pants',   label: 'Pantaloncini',         css: '--pants',   sel: '.c-pants',  group: 'bottom', palette: 'fabric' },
+  { key: 'shirtTrim',    label: 'Bordi',           css: '--shirt-trim',    sel: topRole('trim'),    group: 'top', palette: 'fabric' },
+  { key: 'shirtAccent',  label: 'Dettagli',        css: '--shirt-accent',  sel: topRole('accent'),  group: 'top', palette: 'fabric' },
+  { key: 'shirtAccent2', label: 'Dettagli 2',      css: '--shirt-accent2', sel: topRole('accent2'), group: 'top', palette: 'fabric' },
+  { key: 'pants',   label: 'Pantaloni',            css: '--pants',   sel: '.c-pants',  group: 'bottom', palette: 'fabric' },
+  { key: 'pantsTrim',    label: 'Bordi',           css: '--pants-trim',    sel: bottomRole('trim'),    group: 'bottom', palette: 'fabric' },
+  { key: 'pantsAccent',  label: 'Dettagli',        css: '--pants-accent',  sel: bottomRole('accent'),  group: 'bottom', palette: 'fabric' },
+  { key: 'pantsAccent2', label: 'Dettagli 2',      css: '--pants-accent2', sel: bottomRole('accent2'), group: 'bottom', palette: 'fabric' },
   { key: 'outline', label: 'Contorno e narici',    css: '--outline', sel: '.c-stroke', group: 'lines',  palette: 'ink' },
 ];
 const COLOR_GROUPS = [
-  { key: 'body', label: 'Corpo' }, { key: 'top', label: 'Maglia' }, { key: 'bottom', label: 'Pantaloncini' }, { key: 'lines', label: 'Contorno' },
+  { key: 'body', label: 'Corpo' }, { key: 'top', label: 'Maglia' }, { key: 'bottom', label: 'Pantaloni' }, { key: 'lines', label: 'Contorno' },
 ];
 // Colori rapidi propri degli alieni (gli altri sono in common.js): pelle verde, grigia, azzurra, viola, rosata, arancio; occhi scuri o accesi.
 PALETTES.alienSkin = ['#b8c99c', '#9fbf8a', '#7fae7a', '#c9d6a3', '#b9bec4', '#9aa3ad', '#d8dbdd', '#9db8d6', '#7fa3c9', '#b9a3d0', '#9a86c0', '#e3b3c4', '#e7b98a'];
@@ -23,9 +32,9 @@ const FIELD_BY_VAR = Object.fromEntries(COLOR_FIELDS.map(f => [f.css.slice(2), f
 // parte → id nel disegno (la visibilità è una variabile CSS --show-alien-<chiave>, definita in src/alien/style.css)
 const PARTS = [
   { key: 'head',  label: 'Testa',        ids: ['alien-head'] },
-  { key: 'torso', label: 'Maglia',       ids: ['alien-torso'] },
+  { key: 'torso', label: 'Maglia',       ids: ['alien-torso', 'alien-back'] },
   { key: 'arms',  label: 'Braccia',      ids: ['alien-arm-left', 'alien-arm-right'] },
-  { key: 'pants', label: 'Pantaloncini', ids: ['alien-pants'] },
+  { key: 'pants', label: 'Pantaloni',    ids: ['alien-pants'] },
   { key: 'legs',  label: 'Gambe',        ids: ['alien-legs'] },
   { key: 'prot',  label: 'Protuberanze', ids: ['alien-prot', 'alien-prot-back'] },
 ];
@@ -42,22 +51,37 @@ const bodyById = Object.fromEntries(bodies.map(b => [b.id, b]));
 const ASPECT = bodies.length ? bodies.reduce((t, b) => t + b.h, 0) / bodies.reduce((t, b) => t + b.w, 0) : 2.5;
 const LINE_W = DATA.lineWidth;
 
-// I colori di partenza sono i default scritti nel CSS di ogni SVG, quindi non vanno ripetuti qui.
-const cssDefault = (css, prop) => css.match(new RegExp(`var\\(\\s*${prop}\\s*,\\s*(#[0-9a-fA-F]{6})`))?.[1].toLowerCase();
-const NEUTRAL = '#888888';
-const defaultColors = (v) => Object.fromEntries(COLOR_FIELDS.map(f => [f.key, f.key === 'prot' ? null : cssDefault(v.body.css, f.css) ?? NEUTRAL]));
+// I colori di partenza sono i default scritti nel CSS di ogni SVG, quindi non vanno ripetuti qui. Maglia e pantaloni hanno i colori
+// del capo scelto ("base" = la maglietta e i pantaloncini della sagoma).
+const cssDefault = (css, prop, scope = '') =>
+  css.match(new RegExp(`${scope}[^}]*?var\\(\\s*${prop}\\s*,\\s*(#[0-9a-fA-F]{6})`))?.[1].toLowerCase();
+const NEUTRAL = '#888888';       // per i ruoli che il capo non ha (non si vedono)
+const scopeOf = (v, f) => {
+  const [, kind, role] = f.key.match(/^(shirt|pants)(Trim|Accent2|Accent)?$/) ?? [];
+  if (!kind) return '';
+  const item = kind === 'shirt' ? v.top : v.bottom;
+  if (item === 'base') return `\\.c-${kind}\\s*\\{`;
+  return `#alien-${kind === 'shirt' ? 'top' : 'bottom'}-${item} \\.c-${(role ?? 'Main').toLowerCase()}\\s*\\{`;
+};
+const defaultColors = (v) => Object.fromEntries(COLOR_FIELDS.map(f => [f.key, f.key === 'prot' ? null : cssDefault(v.body.css, f.css, scopeOf(v, f)) ?? NEUTRAL]));
 const shown = (v, key) => v.colors[key] ?? v.colors.skin;             // le protuberanze, finché non scegli un colore, hanno quello della pelle
 
-// Un personaggio = sagoma + colori. Parte da un preset del manifest; `home` è il gruppo del preset.
+// Un personaggio = sagoma + protuberanza + maglia + pantaloni + colori. Parte da un preset del manifest; `home` è il gruppo del preset.
 const makeVariant = (preset) => {
   const body = bodyById[preset.body];
-  const v = { body, home: body.group, preset, prot: preset.prot ?? 'none' };
+  const v = { body, home: body.group, preset, prot: preset.prot ?? 'none', top: preset.top ?? 'base', bottom: preset.bottom ?? 'base' };
   v.colors = defaultColors(v);
   for (const [name, value] of Object.entries(preset.colors ?? {})) if (FIELD_BY_VAR[name]) v.colors[FIELD_BY_VAR[name].key] = value.toLowerCase();
   return v;
 };
 const nameOf = (v) => (v.preset.name && v.body.id === v.preset.body ? v.preset.name : v.body.name);
 const variants = DATA.presets.map(makeVariant);
+// i capi disponibili per la sagoma attuale: ogni capo sta solo sulla sagoma per cui è disegnato
+const outfitOf = (v) => DATA.clothes[v.body.id] ?? { tops: [], bottoms: [] };
+// parti del corpo che maglia e pantaloni scelti disegnano al posto di quelle della sagoma (le braccia, le gambe)
+const replacedParts = (v) => new Set([['tops', v.top], ['bottoms', v.bottom]].flatMap(([list, id]) => outfitOf(v)[list].find(c => c.id === id)?.replaces ?? []));
+const uniq = (items) => [...new Map(items.map(i => [i.id, i])).values()];
+const ALL_TOPS = uniq(Object.values(DATA.clothes).flatMap(c => c.tops)), ALL_BOTTOMS = uniq(Object.values(DATA.clothes).flatMap(c => c.bottoms));
 
 // Cambiando sagoma i colori che non hai modificato (uguali al default di prima) seguono il nuovo default.
 const follow = (v, before, after) => {
@@ -74,6 +98,7 @@ const state = {
   idle: !matchMedia('(prefers-reduced-motion: reduce)').matches,
   parts: Object.fromEntries(PARTS.map(p => [p.key, true])),
 };
+const MAX_COLS = 8;
 const visible = () => variants.map((_, i) => i).filter(i => state.group === 'all' || variants[i].home === state.group);
 
 // ---- SVG sorgente → <symbol> riusabile (uno per sagoma) -------------------
@@ -100,6 +125,15 @@ const cssVars = (v, index = 0, animated = state.idle) => {
   for (const f of COLOR_FIELDS) if (v.colors[f.key] !== null) vars[f.css] = v.colors[f.key];       // --prot manca finché segue la pelle
   for (const pr of PROT) vars[`--show-alien-prot-${pr.id}`] = v.prot === pr.id ? 'inline' : 'none';
   for (const p of PARTS) vars[`--show-alien-${p.key}`] = state.parts[p.key] ? 'inline' : 'none';
+  // maglia e pantaloni: la scelta (o la sagoma di base) si vede se la sua parte è attiva (le parti spente nascondono il gruppo intero);
+  // le braccia e le gambe della sagoma si vedono se nessun capo scelto le sostituisce
+  for (const id of ['base', ...ALL_TOPS.map(t => t.id)]) vars[`--show-alien-top-${id}`] = v.top === id ? 'inline' : 'none';
+  for (const id of ['base', ...ALL_BOTTOMS.map(t => t.id)]) vars[`--show-alien-bottom-${id}`] = v.bottom === id ? 'inline' : 'none';
+  // le fasce di una maglia o di dei pantaloni (`-under`) servono solo con la maglietta o i pantaloncini di base dall'altra parte
+  for (const t of ALL_TOPS) vars[`--show-alien-top-${t.id}-under`] = v.top === t.id && v.bottom === 'base' ? 'inline' : 'none';
+  for (const b of ALL_BOTTOMS) vars[`--show-alien-bottom-${b.id}-under`] = v.bottom === b.id && v.top === 'base' ? 'inline' : 'none';
+  vars['--show-alien-base-arms'] = replacedParts(v).has('arms') ? 'none' : 'inline';
+  vars['--show-alien-base-legs'] = replacedParts(v).has('legs') ? 'none' : 'inline';
   vars['--idle-n'] = animated ? 'infinite' : '0';
   vars['--idle-delay'] = `${-index * 0.7}s`; // sfasa le figure: non respirano tutte all'unisono
   return vars;
@@ -116,8 +150,10 @@ function renderStage() {
   const inGroup = (g) => idx.filter(i => variants[i].home === g.id);
   const figures = A('figures');
   figures.className = `figures ${state.view}`;
-  A('stage').style.setProperty('--cols', Math.max(1, ...groups.map(g => inGroup(g).length)));
-  A('stage').style.setProperty('--rows', Math.max(1, groups.length));
+  // le figure di un gruppo vanno a capo dopo MAX_COLS (con tutti i capi e le protuberanze i personaggi sono tanti)
+  const cols = Math.min(MAX_COLS, Math.max(1, ...groups.map(g => inGroup(g).length)));
+  A('stage').style.setProperty('--cols', cols);
+  A('stage').style.setProperty('--rows', Math.max(1, groups.reduce((n, g) => n + Math.ceil(inGroup(g).length / cols), 0)));
   if (!variants.length) {
     figures.innerHTML = '<p class="hint">Nessuna sagoma aliena ancora.</p>';
   } else if (state.view === 'single') {
@@ -153,7 +189,7 @@ function renderGroupSeg() {
     `<button type="button" data-group="${g.id}" aria-pressed="${g.id === state.group}">${g.name}</button>`).join('');
 }
 
-const hasPart = (v, f) => !!v.body.source.querySelector(f.sel);
+const hasPart = (v, f) => { const sel = typeof f.sel === 'function' ? f.sel(v) : f.sel; return !!sel && !!v.body.source.querySelector(sel); };
 
 function renderColorRows() {
   const v = variants[state.selected];
@@ -196,13 +232,26 @@ function randomClothes(v) {
   const F = PALETTES.fabric, shirt = rnd(F);
   let pants = rnd(F);
   for (let k = 0; k < 20 && (pants === shirt || Math.abs(lum(pants) - lum(shirt)) < 45); k++) pants = rnd(F);
-  Object.assign(v.colors, { shirt, pants });
+  const other = (c) => { let x = rnd(F); while (x === c) x = rnd(F); return x; };
+  Object.assign(v.colors, {
+    shirt, shirtTrim: rnd([shirt, other(shirt), '#f5f1ee']), shirtAccent: other(shirt), shirtAccent2: other(shirt),
+    pants, pantsTrim: rnd([pants, other(pants)]), pantsAccent: other(pants), pantsAccent2: other(pants),
+  });
 }
 
 function renderProtrusions() {
   const v = variants[state.selected], list = PROT.filter(p => v?.body.protrusions.includes(p.id));
   A('prot-list').innerHTML = [{ id: 'none', name: 'Nessuna' }, ...list].map(p =>
     `<label><input type="radio" name="alien-prot" value="${p.id}" ${p.id === (v?.prot ?? 'none') ? 'checked' : ''}>${p.name}</label>`).join('');
+}
+
+function renderOutfit() {
+  const v = variants[state.selected], c = outfitOf(v);
+  const list = (kind, items, base, current) => `${[{ id: 'base', name: base }, ...items].map(i =>
+    `<label><input type="radio" name="alien-${kind}" value="${i.id}" ${i.id === current ? 'checked' : ''}>${i.name}</label>`).join('')}${
+    items.length ? '' : '<p class="hint">Per questa sagoma non ci sono ancora capi.</p>'}`;
+  A('top-list').innerHTML = list('top', c.tops, 'Maglietta', v.top);
+  A('bottom-list').innerHTML = list('bottom', c.bottoms, 'Pantaloncini', v.bottom);
 }
 
 function renderParts() {
@@ -222,6 +271,7 @@ function select(i) {
   state.selected = i;
   renderBodies();
   renderProtrusions();
+  renderOutfit();
   renderColorRows();
   renderStage();
 }
@@ -248,6 +298,18 @@ function buildExportSvg(animated = state.idle) {
   for (const pr of PROT) if (pr.id !== v.prot) root.querySelectorAll(`#alien-prot-${pr.id}, #alien-prot-${pr.id}-back`).forEach(n => n.remove());
   root.querySelectorAll('#alien-prot, #alien-prot-back').forEach(n => { if (!n.children.length) n.remove(); });
   for (const p of PARTS) if (!state.parts[p.key]) for (const id of p.ids) root.querySelector(`#${id}`)?.remove();
+  // di maglie e pantaloni resta solo ciò che è scelto (e della sagoma di base solo ciò che nessun capo sostituisce)
+  const layers = (kind, id) => ['', '-back', '-under', '-arm-left', '-arm-right', '-leg-left', '-leg-right'].map(x => `#alien-${kind}-${id}${x}`).join(', ');
+  for (const t of ALL_TOPS) if (t.id !== v.top) root.querySelectorAll(layers('top', t.id)).forEach(n => n.remove());
+  for (const b of ALL_BOTTOMS) if (b.id !== v.bottom) root.querySelectorAll(layers('bottom', b.id)).forEach(n => n.remove());
+  if (v.bottom !== 'base') root.querySelectorAll(`#alien-top-${v.top}-under`).forEach(n => n.remove());       // le fasce: vedi cssVars
+  if (v.top !== 'base') root.querySelectorAll(`#alien-bottom-${v.bottom}-under`).forEach(n => n.remove());
+  if (v.top !== 'base') root.querySelectorAll('#alien-base-torso, .alien-neckfill').forEach(n => n.remove());
+  if (v.bottom !== 'base') root.querySelectorAll('#alien-base-pants').forEach(n => n.remove());
+  const replaced = replacedParts(v);
+  if (replaced.has('arms')) root.querySelectorAll('.alien-base-arms').forEach(n => n.remove());
+  if (replaced.has('legs')) root.querySelectorAll('.alien-base-legs').forEach(n => n.remove());
+  root.querySelectorAll('#alien-back').forEach(n => { if (!n.children.length) n.remove(); });
   return XML_HEAD + new XMLSerializer().serializeToString(root);
 }
 const fileStem = () => `alieno-${variants[state.selected].body.id.replace('/', '-')}`;
@@ -347,17 +409,36 @@ A('idle').addEventListener('change', (e) => {
   refresh();
 });
 
-// Cambiando sagoma i colori che non hai modificato (uguali al default di prima) seguono il nuovo default; quelli che hai scelto restano.
+// Cambiando sagoma, maglia o pantaloni i colori che non hai modificato (uguali al default di prima) seguono il nuovo default; quelli che
+// hai scelto restano.
+const change = (mutate) => {
+  const v = variants[state.selected], before = defaultColors(v);
+  mutate(v);
+  // un capo che la nuova sagoma non ha (i capi sono per sagoma) lascia il posto alla maglietta e ai pantaloncini di base
+  const c = outfitOf(v);
+  if (v.prot !== 'none' && !v.body.protrusions.includes(v.prot)) v.prot = 'none';
+  if (v.top !== 'base' && !c.tops.some(t => t.id === v.top)) v.top = 'base';
+  if (v.bottom !== 'base' && !c.bottoms.some(b => b.id === v.bottom)) v.bottom = 'base';
+  follow(v, before, defaultColors(v));
+};
+
 A('body-list').addEventListener('change', (e) => {
   if (e.target.name !== 'alien-body') return;
-  const v = variants[state.selected], before = defaultColors(v);
-  v.body = bodyById[e.target.value];
-  if (v.prot !== 'none' && !v.body.protrusions.includes(v.prot)) v.prot = 'none';
-  follow(v, before, defaultColors(v));
+  change(v => { v.body = bodyById[e.target.value]; });
   renderProtrusions();
+  renderOutfit();
   renderColorRows();
   renderStage();
 });
+
+for (const kind of ['top', 'bottom']) {
+  A(`${kind}-list`).addEventListener('change', (e) => {
+    if (e.target.name !== `alien-${kind}`) return;
+    change(v => { v[kind] = e.target.value; });
+    renderColorRows();
+    refresh();
+  });
+}
 
 A('prot-list').addEventListener('change', (e) => {
   if (e.target.name !== 'alien-prot') return;
@@ -402,6 +483,9 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'ArrowRight' && !slider) select(idx[(pos + 1) % idx.length]);
   else if (e.key === 'ArrowLeft' && !slider) select(idx[(pos - 1 + idx.length) % idx.length]);
 });
+
+// Lo script sta in una funzione (le sezioni non condividono nomi): unico punto d'accesso dall'esterno (i test).
+window.alienViewer = { state, bodies, variants, DATA, defaultColors, cssVars, buildExportSvg };
 
 // ---- avvio -------------------------------------------------------------
 renderGroupSeg();

@@ -1,0 +1,11 @@
+{
+  "name": "Mantello con fibbia",
+  "colors": {
+    "main": "#c4989b",
+    "trim": "#f8f3e7",
+    "accent": "#bfae85"
+  },
+  "replaces": [
+    "arms"
+  ]
+}

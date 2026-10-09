@@ -40,7 +40,10 @@ def alien_svg(body, title):
          '  <g id="alien-head" class="c-alien-head">']
     # la testa (col collo, che sta sotto il colletto) in due passate: riempimento, poi contorno, come per gli umani
     L += ['    <!-- @prot-back -->']                                                       # protuberanze dietro la testa (corna, pinne…)
-    L += ['    ' + _path('c-skin', p.get('fill', p['d'])) for p in P['head']]           # il riempimento scende sotto il colletto
+    L += ['    ' + _path('c-skin', p['d']) for p in P['head']]
+    # il riempimento scende sotto il colletto della maglietta (la testa che si alza non apre fessure): un capo col proprio colletto
+    # non ne ha bisogno, e fuori dalla maglietta la pelle sporgerebbe senza contorno (`alien-neckfill`: la build lo spegne coi capi)
+    L += ['    ' + _path('c-skin alien-neckfill', p['fill']) for p in P['head'] if p.get('fill')]
     L += ['    ' + _path('c-open c-stroke', p['d']) for p in P['head']]
     L += seam_paths('head', 4)
     L += ['    <!-- @prot -->']                                                            # e quelle davanti (sopra il contorno, sotto occhi e narici)
@@ -48,12 +51,16 @@ def alien_svg(body, title):
         L.append(f'    <ellipse class="c-dot" cx="{fmt(n["cx"])}" cy="{fmt(n["cy"])}" rx="{fmt(n["rx"])}" ry="{fmt(n["ry"])}"/>')
     for e in body['eyes']:
         L.append(f'    <ellipse class="c-eye c-alien-blink" cx="{fmt(e["cx"])}" cy="{fmt(e["cy"])}" rx="{fmt(e["rx"])}" ry="{fmt(e["ry"])}"/>')
-    L += ['  </g>', '  <g id="alien-arm-right" class="c-alien-arm">'] + region('arm-right', 'c-skin', 4)
-    L += ['  </g>', '  <g id="alien-legs">', '    <g id="alien-leg-left">'] + region('leg-left', 'c-skin', 6)
-    L += ['    </g>', '    <g id="alien-leg-right">'] + region('leg-right', 'c-skin', 6)
-    L += ['    </g>', '  </g>', '  <g id="alien-pants">'] + region('pants', 'c-pants', 4)
-    L += ['  </g>', '  <g id="alien-arm-left" class="c-alien-arm">'] + region('arm-left', 'c-skin', 4)
-    L += ['  </g>', '  <g id="alien-torso" class="c-alien-torso">'] + region('torso', 'c-shirt', 4)
+    # ogni parte ha un gruppo `alien-base-…` col disegno della sagoma e un segnaposto per ciò che un capo ci aggiunge o ci mette al
+    # posto (le braccia di una maglia, le gambe di dei pantaloni): la build li riempie e il CSS spegne il gruppo di base
+    L += ['  </g>', '  <!-- @back -->', '  <g id="alien-arm-right" class="c-alien-arm">', '    <g class="alien-base-arms">'] + region('arm-right', 'c-skin', 6)
+    L += ['    </g>', '    <!-- @arm-right -->']
+    L += ['  </g>', '  <g id="alien-legs">', '    <g id="alien-leg-left">', '      <g class="alien-base-legs">'] + region('leg-left', 'c-skin', 8)
+    L += ['      </g>', '      <!-- @leg-left -->', '    </g>', '    <g id="alien-leg-right">', '      <g class="alien-base-legs">'] + region('leg-right', 'c-skin', 8)
+    L += ['      </g>', '      <!-- @leg-right -->', '    </g>', '  </g>', '  <g id="alien-pants">', '    <g id="alien-base-pants">'] + region('pants', 'c-pants', 6)
+    L += ['    </g>', '    <!-- @bottom -->', '  </g>', '  <g id="alien-arm-left" class="c-alien-arm">', '    <g class="alien-base-arms">'] + region('arm-left', 'c-skin', 6)
+    L += ['    </g>', '    <!-- @arm-left -->', '  </g>', '  <g id="alien-torso" class="c-alien-torso">', '    <g id="alien-base-torso">'] + region('torso', 'c-shirt', 6)
+    L += ['    </g>', '    <!-- @top -->']
     L += ['  </g>', '</svg>']
     return '\n'.join(L) + '\n'
 
