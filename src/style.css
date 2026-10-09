@@ -18,11 +18,17 @@
 .c-eye      { fill: var(--eye, #1a1613) }
 .c-dot      { fill: var(--outline, #15100c) }
 {{hair-fills}}
+.c-bdot { fill: none; stroke-width: 2.6; stroke-linecap: round }
+{{beard-fills}}
 
 /* Capelli: uno stile alla volta (default: {{hair-default}}). Il visualizzatore sceglie lo stile con
    --show-hair-NOME (inline | none) e può nascondere tutto con --show-hair. */
 #hair, #hair-back, #hair-skin { display: var(--show-hair, inline) }
 {{hair-show}}
+
+/* Barba: nessuna di default; --show-beard-NOME (inline | none), --show-beard: none la nasconde tutta. */
+#beard, #beard-skin { display: var(--show-beard, inline) }
+{{beard-show}}
 
 /* Vestiti: uno per tipo alla volta (default: {{outfit-default}}). Il visualizzatore sceglie con
    --show-top-NOME / --show-bottom-NOME (inline | none); "base" è la maglietta e i pantaloni della sagoma.

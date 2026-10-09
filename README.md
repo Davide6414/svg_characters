@@ -1,7 +1,7 @@
 # svg_characters
 
 Personaggi in SVG pensati per essere **combinati**: dieci sagome (cinque maschili e cinque femminili, da bambino a
-adulto) × venti stili di capelli × maglie e pantaloni × colori a piacere, più un visualizzatore HTML per provare gli
+adulto) × venti stili di capelli × cinque barbe (per gli uomini) × maglie e pantaloni × colori a piacere, più un visualizzatore HTML per provare gli
 incroci.
 
 ## Organizzazione
@@ -18,6 +18,7 @@ src/                        ← QUI si lavora: tutto ciò che si modifica a mano
                             arruffati · due-chignon · caschetto · rasati-lato · ricci ·
                             calvizie · stempiato · pettinati-indietro · coda-grigia · chignon-grigio ·
                             caschetto-scalato · coda-alta · lisci-frangia · lunghi-mossi · coda-laterale
+  beards/                   barba-incolta · barba-corta · barba-piena · pizzetto · barba-lunga   (.svg + .json)
   clothes/<gruppo>/<sagoma>/  ogni capo sta SOLO sulla sagoma per cui è disegnato (.svg + .json)
     tops/ · bottoms/        le maglie e i pantaloni di quella sagoma
     reference.json          solo maschio/adulto: il corpo su cui sono disegnati i primi cinque capi per tipo
@@ -32,7 +33,7 @@ lib/fit.mjs                 deformazione (thin-plate spline) che adatta capelli 
 serve.mjs                   server statico opzionale:  node serve.mjs → http://localhost:5191
 
 reference/                  fogli di riferimento da cui sono tracciate le sorgenti
-  sagome-maschili · sagome-femminili · capelli · capelli-2 · capelli-3 · capelli-anziani ·
+  sagome-maschili · sagome-femminili · capelli · capelli-2 · capelli-3 · capelli-anziani · barbe ·
   vestiti-maschili-pantaloni · vestiti-maschili-maglie ·
   vestiti-maschili-outfit · vestiti-femminili · vestiti-femminili-2 · archivio/
 tools/                      strumenti Python per tracciare i fogli (vedi tools/README.md)
@@ -46,6 +47,7 @@ Regola pratica: **si modifica `src/`, poi `node build.mjs`**. `characters/` e `i
 
 - **il CSS comune** (`style.css`) con i colori di default di quella sagoma, presi dal suo `.json`;
 - **gli stili di capelli adatti alla sua età** (vedi sotto), adattati alla sua testa;
+- **le barbe** che valgono per il suo gruppo e la sua età (solo uomini, vedi *Barbe*), adattate alla sua testa;
 - **i suoi vestiti** (`src/clothes/<gruppo>/<sagoma>/`), quelli elencati per lei in `clothes` nel manifest.
 
 Poi scrive `characters/<gruppo>/<sagoma>.svg`. Gli stili di capelli sono disegnati una volta sola e **si adattano a ogni
@@ -72,7 +74,7 @@ riscritte, quindi lo spessore del contorno resta uguale ovunque.
 ## Struttura dell'SVG di una sagoma
 
 Parti separate in gruppi con `id`, dal fondo al primo piano (uguali in tutte le sagome):
-`neck-fill` e i livelli dietro (`pants-fill`, `torso-fill`, `bottom-<id>-back`, `top-<id>-back`) → `head` (riempimento e contorno separati, con i capelli in tre livelli, vedi *Capelli*; gli occhi per ultimi) → parti sotto i pantaloni (`pants-under`, `bottom-<id>-under`, `top-<id>-under`) → `arm-right` → `pants` (e i `bottom-<id>`) → `shoes` (`shoe-left`, `shoe-right`) → `arm-left` → `torso` (e i `top-<id>`).
+`neck-fill` e i livelli dietro (`pants-fill`, `torso-fill`, `bottom-<id>-back`, `top-<id>-back`) → `head` (riempimento e contorno separati, con capelli e barba in livelli, vedi *Capelli* e *Barbe*; gli occhi per ultimi) → parti sotto i pantaloni (`pants-under`, `bottom-<id>-under`, `top-<id>-under`) → `arm-right` → `pants` (e i `bottom-<id>`) → `shoes` (`shoe-left`, `shoe-right`) → `arm-left` → `torso` (e i `top-<id>`).
 
 - Ogni parte è una regione chiusa col suo contorno, e le regioni vicine si toccano a metà del tratto scuro del foglio, quindi non ci sono buchi né sovrapposizioni fra le linee.
 - Dentro le regioni ci sono le linee aperte: orecchio, cuciture delle maniche e del busto, cucitura interna e pieghe all'orlo dei pantaloni. Nei bambini c'è anche la tasca (un dettaglio dei pantaloni).
@@ -86,7 +88,7 @@ Parti separate in gruppi con `id`, dal fondo al primo piano (uguali in tutte le 
   con pantaloni disegnati su un altro foglio, o con la maglietta e i pantaloni base): l'audit li ha tenuti perché senza
   tornano buchi piccoli sul collo, sotto le braccia e in vita.
 - Scarpe, come regioni riempite: suola, tomaia (`c-upper-l` / `c-upper-r`), linguetta a sinistra, punta e zona lacci (`c-toe`, `c-lace`) a destra. Alcune sagome non hanno la punta come regione a parte: `--shoe-toe` non ha effetto su di loro (il visualizzatore non mostra quel campo).
-- Il sorgente in `src/bodies/` contiene solo la geometria e i segnaposto `<!-- @hair-back -->`, `<!-- @hair-skin -->` e `<!-- @hair -->` dentro `head`; colori, capelli e vestiti li aggiunge la build.
+- Il sorgente in `src/bodies/` contiene solo la geometria e i segnaposto `<!-- @hair-back -->`, `<!-- @hair-skin -->`, `<!-- @beard-skin -->`, `<!-- @beard -->` e `<!-- @hair -->` dentro `head`; colori, capelli, barbe e vestiti li aggiunge la build.
 
 ### Scala e riquadro
 
@@ -157,6 +159,29 @@ grigi, ma come per gli altri il colore si cambia con `--hair`.
 
 Per sceglierne un altro basta impostare `--show-hair-<id>: none` / `inline` (per esempio nello `style` dell'elemento `<svg>`); `--show-hair: none` nasconde tutti i capelli. Il colore si cambia con `--hair`, uguale per tutti gli stili.
 
+## Barbe
+
+Una barba è un'altra opzione del viso, come i capelli: si sceglie con `--show-beard-<id>: inline` (nessuna di default,
+`--show-beard: none` le nasconde tutte), il colore si cambia con `--beard`. Valgono solo per le sagome maschili e,
+tranne la barba incolta (anche ragazzi), per gli adulti (`groups` e `ages` nel `.json` di ogni barba). Vengono dal
+foglio `reference/barbe.webp`, tracciate con `tools/trace_beards.py`.
+
+| Barba (`id`) | Nome | Colore di default |
+| --- | --- | --- |
+| `barba-incolta` | Barba incolta (puntini sul mento e sulla mascella) · ragazzi e adulti | `#130f0c` |
+| `barba-corta` | Barba corta (lungo la mascella, con i baffi) | `#4b382c` |
+| `barba-piena` | Barba piena | `#4a372a` |
+| `pizzetto` | Baffi e pizzetto | `#443328` |
+| `barba-lunga` | Barba lunga a punte | `#493629` |
+
+Sono nel gruppo della testa, dopo il contorno e sotto i capelli. Come per la zona rasata dei capelli, la testa di ogni sagoma
+ha un contorno un po' diverso da quello del foglio: la barba ha perciò due parti. Quella **davanti** è la sagoma con
+il suo contorno e il buco della bocca (dove si vede la pelle); quella **sotto il contorno della testa** (`beard-skin`,
+classe `c-skinlayer`) è la stessa sagoma allargata di qualche px verso l'esterno e ritagliata sulla testa
+(`clip-path`, lo stesso `head-clip-…` dei capelli): la barba arriva sempre fino al bordo del viso e non resta una striscia
+di pelle fra la barba e il mento. Le parti che scendono oltre il mento restano davanti, sopra il contorno. La barba
+incolta è fatta di puntini (un solo percorso, con gli estremi tondi) nello stesso livello.
+
 ## Vestiti
 
 La maglietta (`torso`) e i pantaloni (`pants`) della sagoma sono la versione **base**. In più ogni sagoma ha i suoi capi,
@@ -216,20 +241,21 @@ Con `prefers-reduced-motion` l'SVG resta fermo. Nel visualizzatore c'è l'interr
 
 ## Variabili CSS
 
-`--outline`, `--line-w`, `--skin`, `--hair`, `--shirt` (+ `-trim`, `-accent`, `-accent2`, `-under`), `--pants` (+ `-trim`, `-accent`, `-under`), `--shoe-upper-l`, `--shoe-upper-r`, `--shoe-toe`, `--shoe-tongue`, `--shoe-lace`, `--shoe-sole`, `--eye`, più `--idle-n` (`0` spegne l'animazione), `--idle-delay` (sfasa più istanze), `--show-hair` / `--show-hair-<id>`, `--show-top-<id>` e `--show-bottom-<id>` (`inline` | `none`), `--show-arms` e `--show-body-arms`.
+`--outline`, `--line-w`, `--skin`, `--hair`, `--shirt` (+ `-trim`, `-accent`, `-accent2`, `-under`), `--pants` (+ `-trim`, `-accent`, `-under`), `--shoe-upper-l`, `--shoe-upper-r`, `--shoe-toe`, `--shoe-tongue`, `--shoe-lace`, `--shoe-sole`, `--eye`, più `--idle-n` (`0` spegne l'animazione), `--idle-delay` (sfasa più istanze), `--show-hair` / `--show-hair-<id>`, `--beard` e `--show-beard` / `--show-beard-<id>`, `--show-top-<id>` e `--show-bottom-<id>` (`inline` | `none`), `--show-arms` e `--show-body-arms`.
 
 ## Visualizzatore
 
-Ci sono sedici personaggi di partenza (i preset del manifest: uno o due per sagoma, ognuno con un abbinamento di capi della sua sagoma; la seconda serie femminile porta i capelli nuovi), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono solo quelli della sagoma scelta: se cambi sagoma, maglia e pantaloni passano all'abito di partenza di quella sagoma (il primo dei suoi preset), e se la sagoma non ha capi restano la maglietta e i pantaloni base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
+Ci sono sedici personaggi di partenza (i preset del manifest: uno o due per sagoma, ognuno con un abbinamento di capi della sua sagoma; la seconda serie femminile porta i capelli nuovi), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **barba** (solo sagome maschili: la sezione compare solo per loro e solo con le barbe che valgono per la sagoma), **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono solo quelli della sagoma scelta: se cambi sagoma, maglia e pantaloni passano all'abito di partenza di quella sagoma (il primo dei suoi preset), e se la sagoma non ha capi restano la maglietta e i pantaloni base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
 
 **Colori.** I campi sono divisi per parte (corpo, maglia, pantaloni, scarpe, contorno e occhi) e mostrano solo i ruoli che il capo scelto ha. Sotto ogni campo ci sono dei colori rapidi: toni della pelle, colori di capelli naturali e di fantasia, una tavolozza di tessuti; per le scarpe una tavolozza unica per la tomaia e una per la suola. `↺` riporta un campo al suo colore di default; *Vestiti a caso* e *Pelle e capelli a caso* pescano dalle tavolozze (maglia e pantaloni ben distinti), *Colori di default* azzera tutto.
 
-I colori di partenza sono i default scritti nel CSS di ogni SVG, più i `colors` del preset (pelle, capelli, scarpe). Il bottone *Scarica SVG* scrive i valori scelti direttamente nel file (e tiene solo i capelli, la maglia e i pantaloni scelti), quindi il risultato si apre anche in Illustrator, Inkscape o Figma (che ignorano `var()`).
+I colori di partenza sono i default scritti nel CSS di ogni SVG, più i `colors` del preset (pelle, capelli, scarpe). Il bottone *Scarica SVG* scrive i valori scelti direttamente nel file (e tiene solo i capelli, la barba, la maglia e i pantaloni scelti), quindi il risultato si apre anche in Illustrator, Inkscape o Figma (che ignorano `var()`).
 
 ## Aggiungere una sagoma, uno stile di capelli o dei vestiti
 
 - **Sagoma**: tracciarla con `tools/trace_bodies.py` (o scrivere a mano `src/bodies/<gruppo>/<nome>.svg` + `.json` con la stessa struttura, compresi i punti `head` e `landmarks`), poi aggiungerla a `bodies` e a `presets` in `src/manifest.json`. Un gruppo nuovo (per esempio *Anziani*) è una cartella in più, più una voce in `groups`.
 - **Stile di capelli**: `tools/trace_hair.py` o a mano in `src/hair/<id>.svg` + `.json`, poi l'id in `hair` nel manifest.
+- **Barba**: `tools/trace_beards.py` (tabella `BEARDS` con gruppi ed età) in `src/beards/<id>.svg` + `.json`, poi l'id in `beards` nel manifest; un preset può averne una (`beard`, e `beard` in `colors`).
 - **Vestiti**: ogni capo sta su una sola sagoma, quindi si traccia su quella. Con un foglio in cui ogni figura indossa un outfit sul proprio corpo (come per le femmine): `tools/trace_outfits.py`, con le regioni di ogni figura assegnate a mano nella sua tabella `OUTFITS` (la riga dice la sagoma). Con due fogli di figure sullo stesso corpo (pantaloni e maglie, come per la prima serie maschile): `tools/trace_clothes.py --out src/clothes/<gruppo>/<sagoma>`; il corpo di riferimento è la prima figura del foglio dei pantaloni e i capi vengono deformati dalla build su quella sagoma (deve essere simile). Poi i capi nel manifest, in `clothes["<gruppo>/<sagoma>"]` (`tops` e `bottoms`), e se si vuole in un preset (`top`, `bottom`, `colors`).
 - Poi `node build.mjs`, e se si vuole l'audit (sotto).
 

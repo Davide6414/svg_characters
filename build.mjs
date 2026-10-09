@@ -41,10 +41,21 @@ const hair = await Promise.all(manifest.hair.map(async (id) => {
   return { id, ...(await readJson(`src/hair/${id}.json`)), group, back, skin };
 }));
 
+// Le barbe sono come i capelli ma stanno sul viso: un percorso `c-skinlayer` va fra il riempimento della testa e il suo
+// contorno (ritagliato sulla testa), il resto davanti alla testa; si applicano solo alle sagome dei gruppi e delle età
+// scritte nel loro .json.
+const beards = await Promise.all((manifest.beards ?? []).map(async (id) => {
+  const svg = await read(`src/beards/${id}.svg`);
+  const whole = svg.match(/<g id="beard-[\s\S]*<\/g>/)?.[0];
+  if (!whole) throw new Error(`src/beards/${id}.svg: gruppo <g id="beard-…"> non trovato`);
+  const rows = whole.split('\n'), isSkin = (l) => l.includes('c-skinlayer');
+  return { id, ...(await readJson(`src/beards/${id}.json`)), group: rows.filter((l) => !isSkin(l)).join('\n'), skin: rows.filter(isSkin).join('\n') };
+}));
+
 const bodies = await Promise.all(manifest.bodies.map(async (path) => {
   const [group, file] = path.split('/');
   const svg = await read(`src/bodies/${path}.svg`);
-  for (const mark of ['@hair-back', '@hair-skin', '@hair']) if (!svg.includes(`<!-- ${mark} -->`)) throw new Error(`src/bodies/${path}.svg: manca il segnaposto <!-- ${mark} -->`);
+  for (const mark of ['@hair-back', '@hair-skin', '@beard-skin', '@beard', '@hair']) if (!svg.includes(`<!-- ${mark} -->`)) throw new Error(`src/bodies/${path}.svg: manca il segnaposto <!-- ${mark} -->`);
   const inner = svg.slice(svg.indexOf('</title>') + '</title>'.length, svg.lastIndexOf('</svg>'));
   // i riempimenti di fondo hanno un id per sagoma (il visualizzatore mette tutte le sagome nella stessa pagina)
   const fills = {};
@@ -124,10 +135,19 @@ function hairFor(body) {
   return hair.filter((h) => !h.ages || h.ages.includes(ageOf(body.id))).map((h) => ({ ...h, group: mapPaths(h.group, f), back: mapPaths(h.back, f), skin: mapPaths(h.skin, f) }));
 }
 for (const b of bodies) b.hair = hairFor(b);
+// le barbe seguono la testa come i capelli (stessa deformazione) e stanno solo sulle sagome che il loro .json indica
+function beardsFor(body) {
+  const { L, R, T, eyeY } = body.head;
+  const sx = (R - L) / (F.R - F.L), sy = (eyeY - T) / (F.eyeY - F.T);
+  const f = (x, y) => [L + sx * (x - F.L), T + sy * (y - F.T)];
+  return beards.filter((bd) => (!bd.groups || bd.groups.includes(body.group)) && (!bd.ages || bd.ages.includes(ageOf(body.id))))
+    .map((bd) => ({ ...bd, group: mapPaths(bd.group, f), skin: mapPaths(bd.skin, f) }));
+}
+for (const b of bodies) b.beards = beardsFor(b);
 
 // ---- riquadro comune: stessa scala e linea del suolo, spazio per i capelli ------------
 const ext = (b) => {
-  const pts = [...coords(b.inner), ...b.hair.flatMap((h) => coords(h.group + h.back + h.skin)), ...b.clothes.flatMap((g) => coords(g.content + g.under + g.back))];
+  const pts = [...coords(b.inner), ...b.hair.flatMap((h) => coords(h.group + h.back + h.skin)), ...b.beards.flatMap((bd) => coords(bd.group + bd.skin)), ...b.clothes.flatMap((g) => coords(g.content + g.under + g.back))];
   const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
   return [Math.min(...xs) - 3.5, Math.min(...ys) - 3.5, Math.max(...xs) + 3.5, Math.max(...ys) + 3.5];
 };
@@ -167,6 +187,8 @@ function css(body, defaultHair, defaults, preset) {
   let out = styleTemplate.replace(/\{\{([\w-]+)\}\}/g, (m, k) => {
     if (k === 'hair-fills') return body.hair.map((h) => `.c-hair-${h.id} { fill: var(--hair, ${preset?.colors?.hair ?? h.color}) }`).join('\n');
     if (k === 'hair-show') return body.hair.map((h) => `${[`#hair-${h.id}`, ...(h.back ? [`#hair-${h.id}-back`] : []), ...(h.skin ? [`#hair-${h.id}-skin`] : [])].join(', ')} { display: var(--show-hair-${h.id}, ${h.id === defaultHair ? 'inline' : 'none'}) }`).join('\n');
+    if (k === 'beard-fills') return body.beards.map((bd) => `.c-beard-${bd.id} { fill: var(--beard, ${bd.color}) }\n.c-bdot-${bd.id} { stroke: var(--beard, ${bd.color}) }`).join('\n');
+    if (k === 'beard-show') return body.beards.map((bd) => `#beard-${bd.id}, #beard-${bd.id}-skin { display: var(--show-beard-${bd.id}, ${bd.id === preset?.beard ? 'inline' : 'none'}) }`).join('\n');
     if (k === 'hair-default') return defaultHair;
     if (k === 'outfit-default') return `${defaults.top} + ${defaults.bottom}`;
     if (k === 'body-arms-default') return body.clothes.some((g) => defaults[g.kind] === g.id && g.replaces?.includes('arms')) ? 'none' : 'inline';
@@ -182,6 +204,7 @@ function css(body, defaultHair, defaults, preset) {
 function compose(body) {
   const preset = manifest.presets.find((p) => p.body === body.id);
   const defaultHair = preset?.hair ?? body.hair[0].id;
+  if (preset?.beard && !body.beards.some((bd) => bd.id === preset.beard)) throw new Error(`preset di ${body.id}: la barba ${preset.beard} non vale per questa sagoma`);
   if (!body.hair.some((h) => h.id === defaultHair)) throw new Error(`preset di ${body.id}: lo stile ${defaultHair} non vale per questa sagoma`);
   const defaults = { top: preset?.top ?? 'base', bottom: preset?.bottom ?? 'base' };
   // le maglie respirano col busto (stessa animazione della maglietta base), i pantaloni stanno fermi
@@ -211,7 +234,12 @@ function compose(body) {
   const headFill = body.inner.match(/<!-- @hair-back -->\s*<path class="c-skin" d="([^"]*)"/)?.[1];
   if (!headFill) throw new Error(`src/bodies/${body.id}.svg: riempimento della testa non trovato`);
   // i pantaloni vanno prima delle scarpe, le maglie dopo il busto
+  // barba: sul viso, dopo il contorno della testa (e sotto i capelli); la parte `c-skinlayer` sotto il contorno
+  const beardFront = body.beards.length ? `    <g id="beard">\n${body.beards.map((bd) => bd.group.split('\n').map((l) => '    ' + l).join('\n')).join('\n')}\n    </g>` : '';
+  const beardSkin = body.beards.length ? `    <g id="beard-skin" clip-path="url(#${clipId})">\n${body.beards.map((bd) => `      <g id="beard-${bd.id}-skin">\n${bd.skin.split('\n').map((l) => '    ' + l).join('\n')}\n      </g>`).join('\n')}\n    </g>` : '';
   let inner = body.inner.replace('    <!-- @hair -->', hairXml.replace(/^\n/, '\n'))
+    .replace('    <!-- @beard -->', beardFront)
+    .replace('    <!-- @beard-skin -->', beardSkin)
     .replace('    <!-- @hair-back -->', layerXml('back', 'back'))
     .replace('    <!-- @hair-skin -->', layerXml('skin', 'skin', ` clip-path="url(#${clipId})"`))
     .replace('  </defs>', `    <clipPath id="${clipId}"><path d="${headFill}"/></clipPath>\n  </defs>`)
@@ -249,7 +277,8 @@ for (const b of bodies) {
 const data = {
   groups: manifest.groups,
   hair: hair.map(({ id, name, color }) => ({ id, name, color })),
-  bodies: bodies.map(({ id, group, name, svg, hair: hs }) => ({ id, group, name, svg, hair: hs.map((h) => h.id) })),
+  beards: beards.map(({ id, name, color }) => ({ id, name, color })),
+  bodies: bodies.map(({ id, group, name, svg, hair: hs, beards: bs }) => ({ id, group, name, svg, hair: hs.map((h) => h.id), beards: bs.map((bd) => bd.id) })),
   clothes: Object.fromEntries(bodies.map((b) => [b.id, Object.fromEntries(Object.keys(KINDS).map((folder) =>
     [folder, b.clothes.filter((i) => i.kind === KINDS[folder]).map(({ id, name, replaces }) => ({ id, name, replaces: replaces ?? [] }))]))])),
   presets: manifest.presets,
@@ -259,4 +288,4 @@ const token = '"__DATA__"';
 if (!template.includes(token)) throw new Error(`Segnaposto ${token} non trovato in src/viewer/template.html`);
 // "<" escapato per non chiudere per sbaglio il tag <script>
 await writeFile(new URL('index.html', root), template.replace(token, () => JSON.stringify(data).replace(/</g, '\\u003c')));
-console.log(`characters/: ${bodies.length} sagome, ${hair.length} stili di capelli (${Math.min(...bodies.map((b) => b.hair.length))}-${Math.max(...bodies.map((b) => b.hair.length))} per sagoma), vestiti: ${Object.values(clothes).reduce((n, items) => n + items.length, 0)} capi, ognuno sulla sua sagoma (riquadro ${W}×${H}) · index.html generato`);
+console.log(`characters/: ${bodies.length} sagome, ${hair.length} stili di capelli (${Math.min(...bodies.map((b) => b.hair.length))}-${Math.max(...bodies.map((b) => b.hair.length))} per sagoma), ${beards.length} barbe (${bodies.filter((b) => b.beards.length).length} sagome), vestiti: ${Object.values(clothes).reduce((n, items) => n + items.length, 0)} capi, ognuno sulla sua sagoma (riquadro ${W}×${H}) · index.html generato`);

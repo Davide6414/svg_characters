@@ -138,7 +138,7 @@
 <body>
 <header class="top">
   <h1>Personaggi</h1>
-  <p>Sagome maschili e femminili in SVG, ricolorabili per parti e combinabili con <span id="hair-count">20</span> stili di capelli (quelli da anziani solo per ragazzi e adulti). Stessa scala e stessa linea del suolo per tutte, così le altezze si confrontano.</p>
+  <p>Sagome maschili e femminili in SVG, ricolorabili per parti e combinabili con <span id="hair-count">20</span> stili di capelli (quelli da anziani solo per ragazzi e adulti) e <span id="beard-count">5</span> barbe (per gli uomini). Stessa scala e stessa linea del suolo per tutte, così le altezze si confrontano.</p>
 </header>
 
 <main class="layout">
@@ -176,6 +176,10 @@
     <section>
       <h2>Capelli · stile</h2>
       <div class="parts" id="hair-styles" role="radiogroup" aria-label="Stile dei capelli"></div>
+    </section>
+    <section id="beard-section" hidden>
+      <h2>Barba</h2>
+      <div class="parts" id="beard-styles" role="radiogroup" aria-label="Barba"></div>
     </section>
     <section>
       <h2>Maglia</h2>
@@ -241,6 +245,7 @@
   const COLOR_FIELDS = [
     { key: 'skin',       label: 'Pelle',                css: '--skin', sel: '.c-skin', group: 'body', palette: 'skin' },
     { key: 'hair',       label: 'Capelli',              css: '--hair', sel: '[class*="c-hair-"]', group: 'body', palette: 'hair' },
+    { key: 'beard',      label: 'Barba',                css: '--beard', sel: (v) => v.beard !== 'none' && `#beard-${v.beard}`, group: 'body', palette: 'hair' },
     { key: 'shirt',      label: 'Maglia',               css: '--shirt', sel: '.c-shirt', group: 'top', palette: 'fabric' },
     { key: 'shirtTrim',  label: 'Bordi',                css: '--shirt-trim', sel: topRole('trim'), group: 'top', palette: 'fabric' },
     { key: 'shirtAccent', label: 'Dettagli',            css: '--shirt-accent', sel: topRole('accent'), group: 'top', palette: 'fabric' },
@@ -287,15 +292,16 @@
     { key: 'shoes', label: 'Scarpe' },
   ];
 
-  const HAIR = DATA.hair;
+  const HAIR = DATA.hair, BEARD = DATA.beards;
   document.getElementById('hair-count').textContent = HAIR.length;
+  document.getElementById('beard-count').textContent = BEARD.length;
 
   // Sagome: ogni SVG composto ha già tutti gli stili di capelli, adattati alla sua testa.
-  const bodies = DATA.bodies.map(({ id, group, name, svg, hair }) => {
+  const bodies = DATA.bodies.map(({ id, group, name, svg, hair, beards }) => {
     const source = new DOMParser().parseFromString(svg, 'image/svg+xml').documentElement;
     const viewBox = source.getAttribute('viewBox');
     const [, , w, h] = viewBox.split(/\s+/).map(Number);
-    return { id, group, name, svg, hair, source, viewBox, w, h, css: source.querySelector('style').textContent,
+    return { id, group, name, svg, hair, beards, source, viewBox, w, h, css: source.querySelector('style').textContent,
              symbol: `character-${id.replace('/', '-')}` };
   });
   const bodyById = Object.fromEntries(bodies.map(b => [b.id, b]));
@@ -309,6 +315,7 @@
   const NEUTRAL = '#888888';       // per i ruoli che il capo non ha (non si vedono)
   const scopeOf = (v, f) => {
     if (f.key === 'hair') return `\\.c-hair-${v.hair}\\s*\\{`;
+    if (f.key === 'beard') return v.beard === 'none' ? '' : `\\.c-(?:beard|bdot)-${v.beard}\\s*\\{`;
     const [, kind, role] = f.key.match(/^(shirt|pants)(Trim|Accent2|Accent|Under)?$/) ?? [];
     if (!kind) return '';
     const item = kind === 'shirt' ? v.top : v.bottom, r = (role ?? 'Main').toLowerCase();
@@ -321,7 +328,7 @@
   // gruppo del preset: resta lì (nei filtri e nelle righe) anche se poi gli dai la sagoma di un altro gruppo.
   const makeVariant = (preset) => {
     const body = bodyById[preset.body];
-    const v = { body, hair: preset.hair, top: preset.top ?? 'base', bottom: preset.bottom ?? 'base', home: body.group, preset };
+    const v = { body, hair: preset.hair, beard: preset.beard ?? 'none', top: preset.top ?? 'base', bottom: preset.bottom ?? 'base', home: body.group, preset };
     v.colors = defaultColors(v);
     // colori del preset (per esempio pelle, capelli e scarpe di un outfit), con i nomi delle variabili CSS
     for (const [name, value] of Object.entries(preset.colors ?? {})) if (FIELD_BY_VAR[name]) v.colors[FIELD_BY_VAR[name].key] = value.toLowerCase();
@@ -378,6 +385,7 @@
     for (const f of COLOR_FIELDS) vars[f.css] = v.colors[f.key];
     for (const p of PARTS) vars[`--show-${p.key}`] = state.parts[p.key] ? 'inline' : 'none';   // torso e pants: vedi sotto
     for (const h of HAIR) vars[`--show-hair-${h.id}`] = v.hair === h.id ? 'inline' : 'none';
+    for (const b of BEARD) vars[`--show-beard-${b.id}`] = v.beard === b.id ? 'inline' : 'none';
     // maglia e pantaloni: la scelta (o la sagoma base) si vede solo se la parte è attiva
     for (const id of ['base', ...ALL_TOPS.map(t => t.id)]) vars[`--show-top-${id}`] = state.parts.torso && v.top === id ? 'inline' : 'none';
     for (const id of ['base', ...ALL_BOTTOMS.map(t => t.id)]) vars[`--show-bottom-${id}`] = state.parts.pants && v.bottom === id ? 'inline' : 'none';
@@ -490,6 +498,7 @@
   function randomLook(v) {
     v.colors.skin = rnd(PALETTES.skin);
     v.colors.hair = Math.random() < 0.85 ? rnd(PALETTES.hair.slice(0, 9)) : rnd(PALETTES.hair.slice(9));
+    v.colors.beard = v.colors.hair;
   }
 
   function renderParts() {
@@ -502,6 +511,13 @@
     // solo gli stili che valgono per la sagoma (le acconciature da anziani non ci sono sui bambini)
     $('hair-styles').innerHTML = HAIR.filter(h => v.body.hair.includes(h.id)).map(h =>
       `<label><input type="radio" name="hair-style" value="${h.id}" ${h.id === current ? 'checked' : ''}>${h.name}</label>`).join('');
+  }
+
+  function renderBeards() {
+    const v = variants[state.selected], list = BEARD.filter(b => v.body.beards.includes(b.id));
+    $('beard-section').hidden = !list.length;          // le sagome senza barba (femminili, bambini) non hanno la sezione
+    $('beard-styles').innerHTML = [{ id: 'none', name: 'Nessuna' }, ...list].map(b =>
+      `<label><input type="radio" name="beard-style" value="${b.id}" ${b.id === v.beard ? 'checked' : ''}>${b.name}</label>`).join('');
   }
 
   function renderOutfit() {
@@ -525,6 +541,7 @@
     state.selected = i;
     renderBodies();
     renderHairStyles();
+    renderBeards();
     renderOutfit();
     renderColorRows();
     renderStage();
@@ -554,6 +571,8 @@
     // di capelli, maglie e pantaloni resta solo ciò che è scelto (Illustrator e Figma non rispettano display:none)
     for (const h of HAIR) if (h.id !== v.hair) root.querySelectorAll(`#hair-${h.id}, #hair-${h.id}-back, #hair-${h.id}-skin`).forEach(n => n.remove());
     root.querySelectorAll('#hair-back, #hair-skin').forEach(n => { if (!n.children.length) n.remove(); });   // livelli vuoti: lo stile scelto non li usa
+    for (const b of BEARD) if (b.id !== v.beard) root.querySelectorAll(`#beard-${b.id}, #beard-${b.id}-skin`).forEach(n => n.remove());
+    root.querySelectorAll('#beard, #beard-skin').forEach(n => { if (!n.children.length) n.remove(); });
     const parts = (kind, id) => `#${kind}-${id}, #${kind}-${id}-under, #${kind}-${id}-back`;      // il capo e i suoi livelli
     for (const t of ALL_TOPS) if (t.id !== v.top) root.querySelectorAll(parts('top', t.id)).forEach(n => n.remove());
     for (const b of ALL_BOTTOMS) if (b.id !== v.bottom) root.querySelectorAll(parts('bottom', b.id)).forEach(n => n.remove());
@@ -709,6 +728,7 @@
     mutate(v);
     // un capo che la nuova sagoma non ha (i capi sono per sagoma) lascia il posto all'abito di partenza di quella sagoma
     const c = outfitOf(v), home = DATA.presets.find(p => p.body === v.body.id);
+    if (v.beard !== 'none' && !v.body.beards.includes(v.beard)) v.beard = 'none';             // la barba solo dove la sagoma la prevede
     if (!v.body.hair.includes(v.hair)) v.hair = v.body.hair.includes(v.preset.hair) ? v.preset.hair : v.body.hair[0];
     if (v.top !== 'base' && !c.tops.some(t => t.id === v.top)) v.top = home?.top ?? 'base';
     if (v.bottom !== 'base' && !c.bottoms.some(b => b.id === v.bottom)) v.bottom = home?.bottom ?? 'base';
@@ -719,6 +739,7 @@
     if (e.target.name !== 'body') return;
     change(v => { v.body = bodyById[e.target.value]; });
     renderHairStyles();
+    renderBeards();
     renderOutfit();
     renderColorRows();
     renderStage();
@@ -727,6 +748,13 @@
   $('hair-styles').addEventListener('change', (e) => {
     if (e.target.name !== 'hair-style') return;
     change(v => { v.hair = e.target.value; });
+    renderColorRows();
+    refresh();
+  });
+
+  $('beard-styles').addEventListener('change', (e) => {
+    if (e.target.name !== 'beard-style') return;
+    change(v => { v.beard = e.target.value; });
     renderColorRows();
     refresh();
   });

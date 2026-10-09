@@ -40,6 +40,8 @@
     .c-hair-lisci-frangia { fill: var(--hair, #3b2d28) }
     .c-hair-lunghi-mossi { fill: var(--hair, #623a26) }
     .c-hair-coda-laterale { fill: var(--hair, #885d44) }
+    .c-bdot { fill: none; stroke-width: 2.6; stroke-linecap: round }
+
 
     /* Capelli: uno stile alla volta (default: coda). Il visualizzatore sceglie lo stile con
        --show-hair-NOME (inline | none) e può nascondere tutto con --show-hair. */
@@ -64,6 +66,10 @@
     #hair-lisci-frangia { display: var(--show-hair-lisci-frangia, none) }
     #hair-lunghi-mossi { display: var(--show-hair-lunghi-mossi, none) }
     #hair-coda-laterale { display: var(--show-hair-coda-laterale, none) }
+
+    /* Barba: nessuna di default; --show-beard-NOME (inline | none), --show-beard: none la nasconde tutta. */
+    #beard, #beard-skin { display: var(--show-beard, inline) }
+
 
     /* Vestiti: uno per tipo alla volta (default: top-corto + jeans-a-zampa). Il visualizzatore sceglie con
        --show-top-NOME / --show-bottom-NOME (inline | none); "base" è la maglietta e i pantaloni della sagoma.
@@ -160,9 +166,11 @@
         <path class="c-hair-rasati-lato c-shaved" d="M667.7,318.3C666.7,317.8 665.8,316.5 664,313.6C656.9,301.2 644,300.5 634.7,311.8C632.2,314.9 632.5,314.8 625,314.8C616.2,314.8 615.5,314.5 612.6,308.9C609.9,303.6 608.1,298.2 607.3,293.3L607,291.2L611.2,289.4C614.9,287.7 616,286.8 614.2,286.8C612.7,286.8 616,282.8 618.2,281.6C619.7,280.9 619.8,280.8 619.7,279.2C618.9,271.3 634.4,258.9 650,254.9C651.5,254.5 653,254 653.5,253.7C654.6,253.2 677.4,253.1 678.5,253.7C678.9,254 680,254.3 681,254.5C682,254.6 684.3,255.2 686.2,255.6C688.2,256.2 690,256.7 690.3,256.7C691.6,256.7 692.9,258.1 692.4,258.9C692.1,259.4 691.3,264.8 690.6,270.9C688.9,286.6 689.3,285.4 683.9,288.5C675,293.6 672.7,298.6 672.7,312.8C672.7,318.5 671.3,319.9 667.7,318.3ZM620.9,292.2C620.9,291.3 621.3,290.9 625,289.4C630,287 630.3,286.2 626,286.2C622.7,286.1 620.6,285.2 620.4,283.8C619.9,280.5 617.7,284 617.9,288C618.1,292 620.9,295.9 620.9,292.2Z"/>
       </g>
     </g>
+
     <path class="c-open c-stroke" d="M695.5,426.3C685.7,423.5 676.2,416.3 670.2,407C668.4,404.3 666.8,399.5 667.6,399.5C673,399.1 674.5,396.6 674.9,387.8C675.1,380.3 674.8,379.2 671.9,378.5C660.7,375.7 653.5,371.9 646.6,365.1C642.7,361.1 642.6,361.1 637,362.5C615.2,368.1 595.8,339.6 609.7,322.5C610.9,321 611.7,317.6 611,316.8C610.1,315.7 609.1,310.8 608.3,303.6C604.4,270.9 618.5,239.2 644.8,221.6C653.9,215.5 667.2,209.5 672.2,209.2C675.5,209.1 678.4,208.4 680,207.4C683.1,205.5 700.8,204.6 710.2,206C761.9,213.2 785,252.3 772,310.4C770.4,317.5 769.9,320.9 769.6,327.5C767.9,356.8 745,378.4 712.3,381.5C706.5,382 706.8,381.6 706.6,390.9C706.5,399.9 706.5,399.9 710.3,401.4L712.8,402.4L713.1,405.3C713.3,406.9 713.7,408.9 714,409.7C717.9,420.8 707.9,429.8 695.5,426.3Z"/>
     <path class="c-open c-stroke c-fine" d="M638,319.5C637.2,318.8 635.7,316.4 633,315.5C630.3,314.6 625.5,313.3 622,314C618.5,314.7 613.5,319 611.8,320"/>
     <path class="c-open c-stroke c-fine" d="M660.5,370C658.7,368.8 651.3,363.8 649.5,362.5"/>
+
 
     <!-- Capelli: nel gruppo della testa (così seguono il respiro), sotto gli occhi. Stile mostrato di default: coda -->
     <g id="hair">

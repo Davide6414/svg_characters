@@ -103,6 +103,28 @@ testa:
 La tabella `HAIRS[nome del foglio]` ha una riga per figura: id, nome, età (`ages`) e le opzioni sopra. L'età dice a quali
 sagome si applica lo stile (`ages` nel manifest): gli stili da anziani non vanno ai bambini.
 
+## Barbe: `trace_beards.py`
+
+```
+python3 tools/trace_beards.py reference/barbe.webp --out src/beards
+```
+
+Per un foglio di figure intere con la stessa testa calva e una barba diversa (`lib/beard_figures.py`). Come per i capelli da
+figure, le figure si allineano alla testa di riferimento con gli occhi e le coordinate sono quelle del riquadro dei capelli
+(`hairFrame`): la build adatta la barba a ogni testa con la stessa deformazione dei capelli. La tabella `BEARDS[nome del
+foglio]` ha una riga per figura: id, nome, `groups` e `ages` (a quali sagome vale) e le opzioni (`stubble`, soglie).
+
+1. **Barba**: i pixel scuri e caldi (marrone) nel viso basso, con un'apertura che toglie il bordo sfumato del contorno e
+   una chiusura che ricompone una barba a ciocche; la pelle e il resto si segmentano come per i capelli (le regioni
+   crescono fin dentro il contorno, il confine cade a metà del tratto). Il buco della bocca resta un buco.
+2. **Contorno e linee**: dove il foglio ha un tratto scuro, anche attorno al buco della bocca.
+3. **Sotto il contorno della testa** (`ext`, classe `c-skinlayer`): la sagoma allargata di 7 px solo verso l'esterno (mai sulla
+   pelle del viso), che la build ritaglia sulla testa della sagoma e disegna fra il riempimento e il contorno: così la barba
+   arriva sempre fino al bordo del viso, qualunque sia la testa.
+4. **Barba incolta** (`stubble`): non c'è una sagoma ma puntini grigi sulla pelle, lontani dal contorno spesso (soglia di
+   luminanza `dot_lum`, area massima `dot_max`), scritti in un solo percorso con gli estremi tondi; il segno della bocca è
+   la sola macchia più grande (`mark_max`) e diventa una linea.
+
 ## Vestiti: un capo, una sagoma
 
 Ogni capo sta **solo sulla sagoma su cui è disegnato**: i file sono in `src/clothes/<gruppo>/<sagoma>/{tops,bottoms}/`

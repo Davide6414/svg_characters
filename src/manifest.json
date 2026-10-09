@@ -18,6 +18,7 @@
            "arruffati", "due-chignon", "caschetto", "rasati-lato", "ricci",
            "calvizie", "stempiato", "pettinati-indietro", "coda-grigia", "chignon-grigio",
            "caschetto-scalato", "coda-alta", "lisci-frangia", "lunghi-mossi", "coda-laterale"],
+  "beards": ["barba-incolta", "barba-corta", "barba-piena", "pizzetto", "barba-lunga"],
   "clothes": {
     "maschio/bambino": {"tops": ["maglietta-riga"], "bottoms": ["bermuda-cargo"]},
     "maschio/ragazzo": {"tops": ["felpa-rossa"], "bottoms": ["jeans-grigi"]},
@@ -35,8 +36,8 @@
     {"body": "maschio/ragazzo", "name": "Ragazzo · felpa", "hair": "arruffati", "top": "felpa-rossa", "bottom": "jeans-grigi", "colors": {"skin": "#c68642", "hair": "#1f1a17", "shoe-upper-l": "#f8f5f1", "shoe-upper-r": "#9f9c9c", "shoe-toe": "#faf7f5", "shoe-tongue": "#f5f4f2", "shoe-lace": "#f5f3ee", "shoe-sole": "#f9f6f2"}},
     {"body": "maschio/slanciato", "name": "Slanciato · camicia", "hair": "rasati-lato", "top": "camicia-risvoltata", "bottom": "pantaloni-kaki", "colors": {"hair": "#d8b062", "shoe-upper-l": "#333331", "shoe-upper-r": "#363534", "shoe-toe": "#363534", "shoe-tongue": "#e3e1dc", "shoe-lace": "#f4f4f4", "shoe-sole": "#faf6f1"}},
     {"body": "maschio/adulto", "hair": "ciuffo-scuro", "top": "maglione", "bottom": "cargo"},
-    {"body": "maschio/adulto", "name": "Adulto · polo", "hair": "stempiato", "top": "polo-blu", "bottom": "pantaloni-cintura", "colors": {"skin": "#8d5524", "hair": "#9a958e", "shoe-upper-l": "#403731", "shoe-upper-r": "#3f3630", "shoe-toe": "#494039", "shoe-tongue": "#413731", "shoe-lace": "#695f57", "shoe-sole": "#4c433c"}},
-    {"body": "maschio/robusto", "name": "Robusto · cardigan", "hair": "calvizie", "top": "cardigan-grigio", "bottom": "jeans-chiari", "colors": {"hair": "#a8a39c", "shoe-upper-l": "#f9f5f0", "shoe-upper-r": "#a49383", "shoe-toe": "#f9f6f1", "shoe-tongue": "#f5f5f3", "shoe-lace": "#f7f4ef", "shoe-sole": "#f9f5f0"}},
+    {"body": "maschio/adulto", "name": "Adulto · polo", "hair": "stempiato", "beard": "barba-corta", "top": "polo-blu", "bottom": "pantaloni-cintura", "colors": {"skin": "#8d5524", "hair": "#9a958e", "beard": "#9a958e", "shoe-upper-l": "#403731", "shoe-upper-r": "#3f3630", "shoe-toe": "#494039", "shoe-tongue": "#413731", "shoe-lace": "#695f57", "shoe-sole": "#4c433c"}},
+    {"body": "maschio/robusto", "name": "Robusto · cardigan", "hair": "calvizie", "beard": "pizzetto", "top": "cardigan-grigio", "bottom": "jeans-chiari", "colors": {"hair": "#a8a39c", "beard": "#a8a39c", "shoe-upper-l": "#f9f5f0", "shoe-upper-r": "#a49383", "shoe-toe": "#f9f6f1", "shoe-tongue": "#f5f5f3", "shoe-lace": "#f7f4ef", "shoe-sole": "#f9f5f0"}},
     {"body": "femmina/bambina", "hair": "coda", "top": "maglietta-fiore", "bottom": "pantaloncini", "colors": {"shoe-upper-l": "#e57d8d", "shoe-upper-r": "#ec8295", "shoe-toe": "#fbfbfb", "shoe-tongue": "#f999a9", "shoe-lace": "#f7f7f7", "shoe-sole": "#fbfbfb"}},
     {"body": "femmina/bambina", "name": "Bambina · abitino", "hair": "due-chignon", "top": "abitino", "bottom": "leggings", "colors": {"hair": "#d8b062", "shoe-upper-l": "#e888a0", "shoe-upper-r": "#e5859e", "shoe-toe": "#fafbfa", "shoe-tongue": "#f7abc0", "shoe-lace": "#fafbfa", "shoe-sole": "#fcf8f9"}},
     {"body": "femmina/ragazza", "hair": "chignon", "top": "felpa-cappuccio", "bottom": "jeans-scuri", "colors": {"shoe-upper-l": "#a38dbc", "shoe-upper-r": "#a18ab6", "shoe-toe": "#fbfbfb", "shoe-tongue": "#b19dc3", "shoe-lace": "#f2f2f2", "shoe-sole": "#fbfbfb"}},

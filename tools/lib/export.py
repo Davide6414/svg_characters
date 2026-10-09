@@ -27,8 +27,8 @@ def _extent(body):
 
 def body_svg(body, title):
     """SVG della sola sagoma: stessi gruppi in tutte le sagome, dal fondo al primo piano. I colori e i capelli
-    li aggiunge `build.mjs` (i segnaposto `<!-- @hair-back -->`, `<!-- @hair-skin -->` e `<!-- @hair -->` dicono dove vanno i
-    capelli, dentro `head`)."""
+    li aggiunge `build.mjs` (i segnaposto `<!-- @hair-back -->`, `<!-- @hair-skin -->`, `<!-- @beard-skin -->`,
+    `<!-- @beard -->` e `<!-- @hair -->` dicono dove vanno capelli e barba, dentro `head`)."""
     P = body['parts']
     seams = {}
     for s in body['seams']:
@@ -70,10 +70,10 @@ def body_svg(body, title):
     # (un ciuffo che spunta oltre il cranio), sulla pelle ma sotto il contorno (una zona rasata) e davanti
     L += ['  </g>', '  <g id="head" class="c-idle-head">', '    <!-- @hair-back -->']
     L += ['    ' + _path('c-skin', p['d']) for p in P['head']]
-    L += ['    <!-- @hair-skin -->']
+    L += ['    <!-- @hair-skin -->', '    <!-- @beard-skin -->']
     L += ['    ' + _path('c-open c-stroke', p['d']) for p in P['head']]
     L += seam_paths('head', 4)
-    L += ['    <!-- @hair -->']                     # i capelli sotto gli occhi: una frangia lunga non li copre mai
+    L += ['    <!-- @beard -->', '    <!-- @hair -->']                     # i capelli sotto gli occhi: una frangia lunga non li copre mai
     for e in body['eyes']:
         L.append(f'    <ellipse class="c-eye c-blink" cx="{fmt(e["cx"])}" cy="{fmt(e["cy"])}" rx="{fmt(e["rx"])}" ry="{fmt(e["ry"])}"/>')
     L += ['  </g>', '  <g id="torso" class="c-idle-torso">']

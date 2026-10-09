@@ -34,7 +34,8 @@ for (const id of manifest.bodies) {
   const svg = await read(`characters/${id}.svg`);
   const meta = await json(`src/bodies/${id}.json`);
   bodies.push({ id, group: id.split('/')[0], name: meta.name, svg, landmarks: meta.landmarks,
-                hair: manifest.hair.filter((h) => svg.includes(`<g id="hair-${h}">`)) });
+                hair: manifest.hair.filter((h) => svg.includes(`<g id="hair-${h}">`)),
+                beards: (manifest.beards ?? []).filter((x) => svg.includes(`<g id="beard-${x}">`)) });
 }
 const clothes = {};
 for (const b of bodies) {
@@ -60,7 +61,7 @@ function browserSide() {
   const S = 1.5;                                  // scala di rendering
   const PAL = [[0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 0], [255, 0, 255], [0, 255, 255]];
   const BG = 0, LINE = 1, SKIN = 2, HAIR = 3, TOP = 4, PANTS = 5, SHOE = 6, EYE = 7;
-  const AUDIT = { '--outline': '#000000', '--skin': '#ff0000', '--hair': '#00ff00', '--eye': '#00ffff' };
+  const AUDIT = { '--outline': '#000000', '--skin': '#ff0000', '--hair': '#00ff00', '--beard': '#00ff00', '--eye': '#00ffff' };
   for (const v of ['--shirt', '--shirt-trim', '--shirt-accent', '--shirt-accent2', '--shirt-under']) AUDIT[v] = '#0000ff';
   for (const v of ['--pants', '--pants-trim', '--pants-accent', '--pants-under']) AUDIT[v] = '#ffff00';
   for (const v of ['--shoe-upper-l', '--shoe-upper-r', '--shoe-toe', '--shoe-tongue', '--shoe-lace', '--shoe-sole']) AUDIT[v] = '#ff00ff';
@@ -80,6 +81,7 @@ function browserSide() {
     for (const t of g.bottoms) v[`--show-bottom-${t.id}`] = t.id === o.bottom ? 'inline' : 'none';
     if (o.hair) for (const h of b.hair) v[`--show-hair-${h}`] = h === o.hair ? 'inline' : 'none';
     else v['--show-hair'] = 'none';
+    for (const x of b.beards ?? []) v[`--show-beard-${x}`] = x === o.beard ? 'inline' : 'none';
     const rep = [...g.tops.find((t) => t.id === o.top).replaces, ...g.bottoms.find((t) => t.id === o.bottom).replaces];
     v['--show-body-arms'] = rep.includes('arms') ? 'none' : 'inline';
     const style = Object.entries(v).map(([k, x]) => `${k}:${x}`).join(';');
@@ -341,15 +343,25 @@ function browserSide() {
       }
       return res;
     },
+    // barbe (senza capelli, maglietta e pantaloni base): contano solo i difetti della testa
+    async beards(id) {
+      const P = prepared[id], b = P.b, res = [];
+      for (const x of b.beards) {
+        const cls = classify(await raster(styled(b, { top: 'base', bottom: 'base', beard: x, audit: true }), P.W, P.H), P.N);
+        const m = metrics(P, cls, null, true);
+        res.push({ body: id, top: 'base', bottom: 'base', beard: x, out: m.out, where: m.where });
+      }
+      return res;
+    },
     // immagine (colori veri) di una combinazione, con i pixel del difetto `key` in rosa
     async shot(c, key, pad = 36) {
       const P = prepared[c.body], b = P.b, s = 2;
       const W = Math.round(P.vb[2] * s), H = Math.round(P.vb[3] * s);
       const css = key === 'animGap' ? ANIM : '';
-      const px = await raster(styled(b, { top: c.top, bottom: c.bottom, hair: c.hair, scale: s, css }), W, H);
+      const px = await raster(styled(b, { top: c.top, bottom: c.bottom, hair: c.hair, beard: c.beard, scale: s, css }), W, H);
       let idx = [];
       if (key && key !== 'exportDiff') {
-        const o = { top: c.top, bottom: c.bottom, hair: c.hair, audit: true };
+        const o = { top: c.top, bottom: c.bottom, hair: c.hair, beard: c.beard, audit: true };
         const cls = classify(await raster(styled(b, { ...o, css }), P.W, P.H), P.N);
         const cls2 = ['underArm', 'underOut', 'pantsHigh'].includes(key) ? classify(await raster(styled(b, { ...o, css: NO_UNDER }), P.W, P.H), P.N) : null;
         const rp = [...C[b.id].tops.find((t) => t.id === c.top).replaces, ...C[b.id].bottoms.find((t) => t.id === c.bottom).replaces].includes('arms');
@@ -448,7 +460,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage();
 await page.setContent('<!doctype html><body></body>');
 await page.addScriptTag({ content: `(${browserSide.toString()})()` });
-// opzioni: --only=<parte dell'id della sagoma>, --skip=hair|outfits|export (per rifare più in fretta una parte)
+// opzioni: --only=<parte dell'id della sagoma>, --skip=hair|outfits|beards|export (per rifare più in fretta una parte)
 const only = process.argv.find((a) => a.startsWith('--only='))?.slice(7);
 const skip = new Set((process.argv.find((a) => a.startsWith('--skip='))?.slice(7) ?? '').split(','));
 const todo = bodies.filter((b) => !only || b.id.includes(only));
@@ -457,8 +469,9 @@ const results = [];
 for (const b of todo) {
   const r1 = skip.has('outfits') ? [] : await page.evaluate((id) => window.audit.outfits(id), b.id);
   const r2 = skip.has('hair') ? [] : await page.evaluate((id) => window.audit.hair(id), b.id);
-  results.push(...r1, ...r2);
-  console.log(`${b.id}: ${r1.length} combinazioni di vestiti, ${r2.length} di capelli (cavallo y ${Math.round(info[b.id].crotch)}) · ${Math.round((Date.now() - t0) / 1000)} s`);
+  const r3 = skip.has('beards') ? [] : await page.evaluate((id) => window.audit.beards(id), b.id);
+  results.push(...r1, ...r2, ...r3);
+  console.log(`${b.id}: ${r1.length} combinazioni di vestiti, ${r2.length} di capelli, ${r3.length} di barbe (cavallo y ${Math.round(info[b.id].crotch)}) · ${Math.round((Date.now() - t0) / 1000)} s`);
 }
 const statics = await staticChecks(page);
 const viewer = await browser.newPage();
@@ -471,6 +484,7 @@ results.push(...exports);
 const flagged = {};
 for (const r of results) for (const [k, v] of Object.entries(r.out)) {
   if (!(k in LIMITS)) continue;
+  if (k === 'floating' && r.beard === 'barba-incolta') continue;      // i puntini della barba incolta sono staccati apposta
   const bad = k === 'eyes' ? v < LIMITS.eyes : v >= LIMITS[k];
   if (bad) (flagged[k] ??= []).push(r);
 }
@@ -480,7 +494,7 @@ for (const k of Object.keys(flagged)) flagged[k].sort((a, b) => (k === 'eyes' ? 
 const byItem = {};
 for (const [k, list] of Object.entries(flagged)) for (const r of list) {
   for (const item of [r.top && r.top !== 'base' ? `maglia ${r.top}` : null, r.bottom && r.bottom !== 'base' ? `pantaloni ${r.bottom}` : null,
-                      r.hair ? `capelli ${r.hair}` : null, `sagoma ${r.body}`].filter(Boolean)) {
+                      r.hair ? `capelli ${r.hair}` : null, r.beard ? `barba ${r.beard}` : null, `sagoma ${r.body}`].filter(Boolean)) {
     (byItem[item] ??= {})[k] = ((byItem[item] ??= {})[k] ?? 0) + 1;
   }
 }
@@ -491,8 +505,8 @@ const sections = [];
 for (const [k, list] of Object.entries(flagged)) {
   const seen = new Set(), pick = [];
   for (const r of list) {
-    const key = k === 'eyes' || r.hair ? `${r.hair}|${r.body}` : `${r.top}|${r.bottom}`;
-    const key2 = `${r.top}|${r.bottom}|${r.hair}|${r.body}`;
+    const key = k === 'eyes' || r.hair || r.beard ? `${r.hair}|${r.beard}|${r.body}` : `${r.top}|${r.bottom}`;
+    const key2 = `${r.top}|${r.bottom}|${r.hair}|${r.beard}|${r.body}`;
     if (seen.has(key) || seen.has(key2)) continue;
     seen.add(key); seen.add(key2); pick.push(r);
     if (pick.length >= PER_KIND) break;
@@ -516,11 +530,11 @@ table{border-collapse:collapse;font-size:13px}td,th{border-bottom:1px solid #e3e
 <h2>Controlli dei file</h2>${statics.length ? `<ul>${statics.map((s) => `<li>${s}</li>`).join('')}</ul>` : '<p>Nessun problema: XML valido, id unici, ogni parte ha un colore.</p>'}
 <h2>Riepilogo</h2><table><tr><th>Difetto</th><th>Combinazioni</th></tr>${Object.keys(LABELS).map((k) => `<tr><td>${LABELS[k]}</td><td>${flagged[k]?.length ?? 0}</td></tr>`).join('')}</table>
 <h2>Per capo</h2><table><tr><th>Capo</th>${Object.keys(LABELS).map((k) => `<th>${LABELS[k]}</th>`).join('')}</tr>${Object.entries(byItem).sort((a, b) => Object.values(b[1]).reduce((s, x) => s + x, 0) - Object.values(a[1]).reduce((s, x) => s + x, 0)).map(([item, c]) => `<tr><td>${item}</td>${Object.keys(LABELS).map((k) => `<td>${c[k] ?? ''}</td>`).join('')}</tr>`).join('')}</table>
-${sections.map(({ k, total, cards }) => `<h2>${LABELS[k]} · ${total}</h2><div class="cards">${cards.map(({ r, img }) => `<div class="card">${img ? `<img src="${img}">` : ''}<p><b>${r.body}</b><br>maglia ${r.top} · pantaloni ${r.bottom}${r.hair ? ` · capelli ${r.hair}` : ''}<br>${k === 'eyes' ? `occhi visibili ${Math.round(r.out[k] * 100)}%` : `${r.out[k]}${k === 'pantsHigh' ? ' px sopra l\'orlo' : k === 'exportDiff' ? ' pixel diversi' : ' px²'}`}</p></div>`).join('')}</div>`).join('')}
+${sections.map(({ k, total, cards }) => `<h2>${LABELS[k]} · ${total}</h2><div class="cards">${cards.map(({ r, img }) => `<div class="card">${img ? `<img src="${img}">` : ''}<p><b>${r.body}</b><br>maglia ${r.top} · pantaloni ${r.bottom}${r.hair ? ` · capelli ${r.hair}` : ''}${r.beard ? ` · barba ${r.beard}` : ''}<br>${k === 'eyes' ? `occhi visibili ${Math.round(r.out[k] * 100)}%` : `${r.out[k]}${k === 'pantsHigh' ? ' px sopra l\'orlo' : k === 'exportDiff' ? ' pixel diversi' : ' px²'}`}</p></div>`).join('')}</div>`).join('')}
 </html>`;
 await mkdir(new URL('audit/', root), { recursive: true });
 await writeFile(new URL('audit/report.html', root), html);
-await writeFile(new URL('audit/report.json', root), JSON.stringify({ limits: LIMITS, statics, flagged: Object.fromEntries(Object.entries(flagged).map(([k, l]) => [k, l.map(({ body, top, bottom, hair, out, where }) => ({ body, top, bottom, hair, value: out[k], where: where?.[k] }))])), results: results.map(({ body, top, bottom, hair, out }) => ({ body, top, bottom, hair, out })) }, null, 1));
+await writeFile(new URL('audit/report.json', root), JSON.stringify({ limits: LIMITS, statics, flagged: Object.fromEntries(Object.entries(flagged).map(([k, l]) => [k, l.map(({ body, top, bottom, hair, beard, out, where }) => ({ body, top, bottom, hair, beard, value: out[k], where: where?.[k] }))])), results: results.map(({ body, top, bottom, hair, beard, out }) => ({ body, top, bottom, hair, beard, out })) }, null, 1));
 await browser.close();
 console.log(`\n${results.length} combinazioni in ${Math.round((Date.now() - t0) / 1000)} s. File: ${statics.length ? statics.length + ' problemi' : 'ok'}`);
 for (const k of Object.keys(LABELS)) console.log(`  ${LABELS[k].padEnd(32)} ${flagged[k]?.length ?? 0}`);
