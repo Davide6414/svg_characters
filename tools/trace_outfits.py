@@ -247,7 +247,7 @@ OUTFITS['vestiti-maschili-2'] = [
          top=dict(id='camicia-celeste', name='Camicia celeste aperta', regions={3: 'main', 4: 'main', 5: 'under'}, arms=(6, 7), neck=True,
                   folds=(3, 4), under_down={5: (25, 0)}, back=False),
          bottom=dict(id='pantaloni-lino', name='Pantaloni di lino risvoltati', regions={8: 'main', 9: 'skin', 10: 'skin'},
-                     smooth={9: 4, 10: 4}, to_ground={9: (0, 14, 22), 10: (0, 14, 22)}, behind={8: (6, 7)}, under_up={8: 30})),
+                     smooth={9: 4, 10: 4}, to_ground={9: (0, 14, 22), 10: (0, 14, 22)}, behind={8: (6, 7)}, under_up={8: (30, True, 0, 70)})),
 ]
 
 
@@ -274,7 +274,41 @@ OUTFITS['vestiti-maschili-3'] = [
          top=dict(id='giacca-camicia', name='Giacca-camicia blu su maglietta ruggine', regions={3: 'main', 5: 'main', 4: 'main', 7: 'main', 9: 'main', 6: 'under'},
                   arms=(12, 11), neck=True, folds=(3, 5), under_down={6: (25, 0)}),
          bottom=dict(id='chino-beige', name='Chino beige risvoltati', regions={10: 'main'}, to_shoes=(10,),
-                     behind={10: (12, 11)}, under_up={10: 30})),
+                     behind={10: (12, 11)}, under_up={10: (30, True, 0)})),
+]
+
+
+OUTFITS['vestiti-maschili-4'] = [
+    dict(body='bambino',
+         top=dict(id='smoking-papillon', name='Smoking con papillon rosso', regions={17: 'main', 10: 'main', 8: 'main', 19: 'main', 15: 'main', 20: 'main', 30: 'main', 29: 'main',
+                                                                              18: 'under', 3: 'under', 4: 'under', 28: 'under', 27: 'under', 7: 'accent', 6: 'accent', 11: 'accent'},
+                  arms=(36, 33), neck=True, under_down={18: (25, 0)}),
+         bottom=dict(id='pantaloni-smoking', name='Pantaloni neri con cintura', regions={35: 'main', 23: 'trim'}, to_shoes=(35,),
+                     behind={35: (36, 33)}, under_up={35: (30, True, 0)})),
+    dict(body='ragazzo',
+         top=dict(id='gilet-camicia', name='Gilet blu su camicia con papillon', regions={6: 'main', 9: 'main', 10: 'under', 11: 'under', 16: 'under', 15: 'under', 3: 'under', 4: 'under', 14: 'under',
+                                                                                          7: 'accent', 8: 'accent', 5: 'accent'},
+                  arms=(18, 17), neck=True, under_down={6: (25, 0), 9: (25, 0)}),
+         bottom=dict(id='pantaloni-antracite', name='Pantaloni antracite', regions={19: 'main'}, to_shoes=(19,),
+                     behind={19: (18, 17)}, under_up={19: (30, True, 0)})),
+    dict(body='slanciato',
+         top=dict(id='giacca-blu', name='Giacca blu con camicia e cravatta', regions={7: 'main', 5: 'main', 6: 'main', 9: 'main', 19: 'main', 23: 'main', 24: 'main', 25: 'main', 22: 'main',
+                                                                                      15: 'under', 16: 'under', 3: 'under', 4: 'under', 30: 'under', 31: 'under', 20: 'accent', 8: 'accent'},
+                  arms=(32, 33), neck=True, under_down={15: (25, 0), 16: (25, 0)}),
+         bottom=dict(id='pantaloni-blu-cintura', name='Pantaloni blu con cintura', regions={29: 'main', 28: 'main', 26: 'trim'}, join={29: (28,)}, to_shoes=(29, 28),
+                     behind={29: (32, 33)}, under_up={29: (30, True, 0, 70)})),
+    dict(body='adulto',
+         top=dict(id='completo-nero', name='Giacca e gilet neri con cravatta rossa', regions={7: 'main', 5: 'main', 6: 'main', 9: 'main', 17: 'main', 19: 'main', 18: 'main', 16: 'main',
+                                                                                           13: 'trim', 14: 'trim', 10: 'under', 11: 'under', 3: 'under', 4: 'under', 22: 'under', 21: 'under',
+                                                                                           12: 'accent', 8: 'accent', 15: 'accent2'},
+                  arms=(24, 23), neck=True, under_down={13: (25, 0), 14: (25, 0)}),
+         bottom=dict(id='pantaloni-eleganti', name='Pantaloni neri', regions={20: 'main'}, to_shoes=(20,),
+                     behind={20: (24, 23)}, under_up={20: (30, True, 0)})),
+    dict(body='robusto',
+         top=dict(id='blazer-dolcevita', name='Blazer beige su dolcevita', regions={4: 'main', 5: 'main', 7: 'main', 9: 'main', 11: 'main', 8: 'accent2', 6: 'under', 3: 'under'},
+                  arms=(19, 18), neck=True, under_down={6: (25, 0)}),
+         bottom=dict(id='pantaloni-moro', name='Pantaloni testa di moro con cintura', regions={17: 'main', 13: 'trim', 10: 'accent'}, to_shoes=(17,), no_seams=(10,),
+                     behind={17: (19, 18)}, under_up={17: (30, True, 0, 70)})),
 ]
 
 

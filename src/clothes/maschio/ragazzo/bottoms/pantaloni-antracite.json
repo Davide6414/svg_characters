@@ -1,0 +1,24 @@
+{
+  "name": "Pantaloni antracite",
+  "colors": {
+    "main": "#3c3836"
+  },
+  "landmarks": {
+    "pants-tl": [
+      351.5,
+      658.8
+    ],
+    "pants-tr": [
+      501.0,
+      658.8
+    ],
+    "pants-bl": [
+      351.5,
+      865.6
+    ],
+    "pants-br": [
+      501.0,
+      865.6
+    ]
+  }
+}

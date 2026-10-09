@@ -1,0 +1,25 @@
+{
+  "name": "Pantaloni neri con cintura",
+  "colors": {
+    "main": "#2a2a28",
+    "trim": "#41413f"
+  },
+  "landmarks": {
+    "pants-tl": [
+      88.0,
+      756.2
+    ],
+    "pants-tr": [
+      222.5,
+      756.2
+    ],
+    "pants-bl": [
+      88.0,
+      872.6
+    ],
+    "pants-br": [
+      222.5,
+      872.6
+    ]
+  }
+}

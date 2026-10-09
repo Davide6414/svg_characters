@@ -1,0 +1,10 @@
+{
+  "name": "Giacca e gilet neri con cravatta rossa",
+  "colors": {
+    "main": "#2c2c2a",
+    "trim": "#292928",
+    "accent": "#7d2524",
+    "accent2": "#f7f7f6",
+    "under": "#f9f7f4"
+  }
+}

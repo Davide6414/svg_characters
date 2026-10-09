@@ -1,0 +1,18 @@
+{
+  "name": "Pantaloni testa di moro con cintura",
+  "colors": {
+    "main": "#43382e",
+    "trim": "#2c271d",
+    "accent": "#d8b07b"
+  },
+  "landmarks": {
+    "pants-bl": [
+      1193.5,
+      862.2
+    ],
+    "pants-br": [
+      1356.5,
+      862.2
+    ]
+  }
+}

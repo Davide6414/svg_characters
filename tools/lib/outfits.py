@@ -289,9 +289,9 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
             # con dei dettagli sopra, la regione si disegna in due tempi: riempimento, dettagli, poi il tratto del bordo
             add(base, role, cell, med[i], layer, stroke=not details, part=cs.get('parts', {}).get(i))
             if i in cs.get('under_up', {}):                       # i pantaloni salgono sotto la maglia: nessun buco con altre maglie
-                up = cs['under_up'][i]                            # px, oppure (px, True: bordo alto a gradini, la fascia è larga come i fianchi[, rientro ai lati])
-                up, wide_top, inset = (tuple(up) + (False, 5)[len(up) - 1:]) if isinstance(up, tuple) else (up, False, 5)
-                add(base, role, extend_top(plain, up, inset=inset, band_only=True, wide_top=wide_top), med[i], 'under', stroke=True)
+                up = cs['under_up'][i]                            # px, oppure (px, True: bordo alto a gradini, la fascia è larga come i fianchi[, rientro ai lati[, altezza della fascia]])
+                up, wide_top, inset, notch = (tuple(up) + (False, 5, 35)[len(up) - 1:]) if isinstance(up, tuple) else (up, False, 5, 35)
+                add(base, role, extend_top(plain, up, notch=notch, inset=inset, band_only=True, wide_top=wide_top), med[i], 'under', stroke=True)
             if i in cs.get('under_down', {}):                     # la maglia scende sotto i pantaloni: nessun buco con altri pantaloni
                 down = cs['under_down'][i]                        # px, oppure (px, rientro ai lati[, larghezza minima dell'orlo[, y dell'orlo]])
                 px, inset, wide, hem = (tuple(down) + (10, 0.0, None)[len(down) - 1:]) if isinstance(down, tuple) else (down, 10, 0.0, None)

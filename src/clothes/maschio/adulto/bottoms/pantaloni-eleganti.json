@@ -1,0 +1,24 @@
+{
+  "name": "Pantaloni neri",
+  "colors": {
+    "main": "#2d2d2b"
+  },
+  "landmarks": {
+    "pants-tl": [
+      887.5,
+      598.6
+    ],
+    "pants-tr": [
+      1060.5,
+      598.6
+    ],
+    "pants-bl": [
+      887.5,
+      860.2
+    ],
+    "pants-br": [
+      1060.5,
+      860.2
+    ]
+  }
+}

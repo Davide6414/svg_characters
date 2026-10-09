@@ -1,0 +1,17 @@
+{
+  "name": "Pantaloni blu con cintura",
+  "colors": {
+    "main": "#2d3345",
+    "trim": "#474746"
+  },
+  "landmarks": {
+    "pants-bl": [
+      622.5,
+      861.1
+    ],
+    "pants-br": [
+      767.0,
+      861.1
+    ]
+  }
+}
