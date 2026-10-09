@@ -1,0 +1,12 @@
+{
+  "name": "Kilt verde",
+  "colors": {
+    "main": "#62684f",
+    "trim": "#636a51",
+    "accent": "#3f3f3f",
+    "accent2": "#f8f3e6"
+  },
+  "replaces": [
+    "legs"
+  ]
+}

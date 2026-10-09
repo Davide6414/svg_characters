@@ -1,0 +1,251 @@
+{
+  "palette": {
+    "skin": "#b8c99c",
+    "shirt": "#f7f3ea",
+    "pants": "#58585a",
+    "eye": "#15100c"
+  },
+  "lineWidth": 3.5,
+  "groups": [
+    {
+      "id": "maschio",
+      "name": "Maschio"
+    },
+    {
+      "id": "femmina",
+      "name": "Femmina"
+    }
+  ],
+  "bodies": [
+    "maschio/bambino",
+    "maschio/ragazzo",
+    "maschio/adulto",
+    "maschio/curvo",
+    "femmina/bambina",
+    "femmina/ragazza",
+    "femmina/adulta",
+    "femmina/curva"
+  ],
+  "presets": [
+    {
+      "body": "maschio/bambino",
+      "name": "Bambino"
+    },
+    {
+      "body": "maschio/ragazzo",
+      "name": "Ragazzo"
+    },
+    {
+      "body": "maschio/adulto",
+      "name": "Adulto"
+    },
+    {
+      "body": "maschio/curvo",
+      "name": "Curvo"
+    },
+    {
+      "body": "femmina/bambina",
+      "name": "Bambina"
+    },
+    {
+      "body": "femmina/ragazza",
+      "name": "Ragazza"
+    },
+    {
+      "body": "femmina/adulta",
+      "name": "Adulta"
+    },
+    {
+      "body": "femmina/curva",
+      "name": "Curva"
+    },
+    {
+      "body": "maschio/bambino",
+      "name": "Bambino · corna a spirale",
+      "prot": "corna-a-spirale"
+    },
+    {
+      "body": "maschio/ragazzo",
+      "name": "Ragazzo · cresta a foglia",
+      "prot": "cresta-a-foglia"
+    },
+    {
+      "body": "maschio/adulto",
+      "name": "Adulto · corna lunghe",
+      "prot": "corna-lunghe"
+    },
+    {
+      "body": "maschio/curvo",
+      "name": "Curvo · cresta al vento",
+      "prot": "cresta-al-vento"
+    },
+    {
+      "body": "femmina/bambina",
+      "name": "Bambina · pinne",
+      "prot": "pinne"
+    },
+    {
+      "body": "femmina/ragazza",
+      "name": "Ragazza · palchi",
+      "prot": "palchi"
+    },
+    {
+      "body": "femmina/adulta",
+      "name": "Adulta · corno curvo",
+      "prot": "corno-curvo"
+    },
+    {
+      "body": "femmina/curva",
+      "name": "Curva · spine",
+      "prot": "spine"
+    },
+    {
+      "body": "maschio/ragazzo",
+      "name": "Ragazzo · antenne a pallina",
+      "prot": "antenne-a-pallina"
+    },
+    {
+      "body": "maschio/adulto",
+      "name": "Adulto · antenne lunghe",
+      "prot": "antenne-lunghe"
+    },
+    {
+      "body": "femmina/ragazza",
+      "name": "Ragazza · antenne a pagaia",
+      "prot": "antenne-a-pagaia"
+    },
+    {
+      "body": "femmina/adulta",
+      "name": "Adulta · antenna a perline",
+      "prot": "antenna-a-perline"
+    },
+    {
+      "body": "maschio/bambino",
+      "name": "Bambino · tunica",
+      "top": "tunica-cappuccio",
+      "bottom": "gonnellino"
+    },
+    {
+      "body": "maschio/ragazzo",
+      "name": "Ragazzo · kilt",
+      "top": "tunica-banda",
+      "bottom": "kilt-scuro"
+    },
+    {
+      "body": "maschio/adulto",
+      "name": "Adulto · poncho",
+      "top": "poncho",
+      "bottom": "kilt-verde"
+    },
+    {
+      "body": "maschio/curvo",
+      "name": "Curvo · mantellina",
+      "top": "mantellina",
+      "bottom": "bermuda"
+    },
+    {
+      "body": "femmina/bambina",
+      "name": "Bambina · tunica",
+      "top": "tunica-spallina",
+      "bottom": "gonna-avvolgente"
+    },
+    {
+      "body": "femmina/ragazza",
+      "name": "Ragazza · monospalla",
+      "top": "tunica-monospalla",
+      "bottom": "gonna-malva"
+    },
+    {
+      "body": "femmina/adulta",
+      "name": "Adulta · corpetto",
+      "top": "corpetto-pendente",
+      "bottom": "gonna-pannello"
+    },
+    {
+      "body": "femmina/curva",
+      "name": "Curva · mantello",
+      "top": "mantello",
+      "bottom": "gonna-sbieca"
+    }
+  ],
+  "protrusions": [
+    "corna-a-spirale",
+    "palchi",
+    "corna-lunghe",
+    "corno-curvo",
+    "cresta-a-foglia",
+    "pinne",
+    "cresta-al-vento",
+    "spine",
+    "antenne-a-pallina",
+    "antenne-lunghe",
+    "antenna-a-perline",
+    "antenne-a-pagaia"
+  ],
+  "clothes": {
+    "maschio/bambino": {
+      "tops": [
+        "tunica-cappuccio"
+      ],
+      "bottoms": [
+        "gonnellino"
+      ]
+    },
+    "maschio/ragazzo": {
+      "tops": [
+        "tunica-banda"
+      ],
+      "bottoms": [
+        "kilt-scuro"
+      ]
+    },
+    "maschio/adulto": {
+      "tops": [
+        "poncho"
+      ],
+      "bottoms": [
+        "kilt-verde"
+      ]
+    },
+    "maschio/curvo": {
+      "tops": [
+        "mantellina"
+      ],
+      "bottoms": [
+        "bermuda"
+      ]
+    },
+    "femmina/bambina": {
+      "tops": [
+        "tunica-spallina"
+      ],
+      "bottoms": [
+        "gonna-avvolgente"
+      ]
+    },
+    "femmina/ragazza": {
+      "tops": [
+        "tunica-monospalla"
+      ],
+      "bottoms": [
+        "gonna-malva"
+      ]
+    },
+    "femmina/adulta": {
+      "tops": [
+        "corpetto-pendente"
+      ],
+      "bottoms": [
+        "gonna-pannello"
+      ]
+    },
+    "femmina/curva": {
+      "tops": [
+        "mantello"
+      ],
+      "bottoms": [
+        "gonna-sbieca"
+      ]
+    }
+  }
+}

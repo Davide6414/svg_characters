@@ -1,0 +1,11 @@
+{
+  "name": "Tunica monospalla",
+  "colors": {
+    "main": "#f8f2e7",
+    "trim": "#785662",
+    "accent": "#c0ad81"
+  },
+  "replaces": [
+    "arms"
+  ]
+}

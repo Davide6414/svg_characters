@@ -40,7 +40,7 @@ class Seg:
         return self.n_lab
 
 
-def _eyes_and_fill(dark, box):
+def _eyes_and_fill(dark, box, dot_min=12, dot_aspect=2.2, eye_aspect=1.5, eye_zone=EYE_ZONE):
     """Separa gli occhi dalla rete del contorno: restituisce (maschera scura senza occhi, occhi, puntini).
 
     Occhi = macchie scure staccate dalla rete, allungate, nella parte alta della figura: vengono riempite (non devono
@@ -59,17 +59,18 @@ def _eyes_and_fill(dark, box):
         area = sizes[i] / (K * K)
         if area < 120:
             ys, xs = np.nonzero(m)
-            if area >= 12:                      # solo i puntini tondi: i frammenti di una linea sono allungati
+            if area >= dot_min:                 # solo i puntini tondi: i frammenti di una linea sono allungati
                 ev = np.linalg.eigvalsh(np.cov(np.vstack([xs, ys]) / K))
-                if ev[1] <= 2.2 * max(ev[0], 1e-6):
-                    dots.append(dict(cx=float(xs.mean() / K + x0), cy=float(ys.mean() / K + y0), r=float(np.sqrt(area / np.pi))))
+                if ev[1] <= dot_aspect * max(ev[0], 1e-6):
+                    sd = np.sqrt(np.diag(np.cov(np.vstack([xs, ys]) / K)))
+                    dots.append(dict(cx=float(xs.mean() / K + x0), cy=float(ys.mean() / K + y0), r=float(np.sqrt(area / np.pi)), rx=float(2 * sd[0]), ry=float(2 * sd[1])))
             dark = dark & ~m
             continue
         ys, xs = np.nonzero(m)
         cov = np.cov(np.vstack([xs, ys]) / K)
         rx, ry = 2 * np.sqrt(cov[0, 0]), 2 * np.sqrt(cov[1, 1])
         cy = ys.mean() / K + y0
-        if cy < y0 + EYE_ZONE * (y1 - y0) and ry > 1.5 * rx:
+        if cy < y0 + eye_zone * (y1 - y0) and ry > eye_aspect * rx:
             eyes.append(dict(cx=float(xs.mean() / K + x0), cy=float(cy), area=float(area), rx=float(rx), ry=float(ry)))
             dark = dark & ~m
     eyes.sort(key=lambda e: e['cx'])
@@ -146,12 +147,15 @@ def _split_merged_shoes(lab, dark, lum, box):
     return lab, dark | (lab == 0)
 
 
-def segment(sheet, box, bridge=(), seal=0, dark=DARK):
+def segment(sheet, box, bridge=(), seal=0, dark=DARK, dots=(12, 2.2), eye_aspect=1.5, eye_zone=EYE_ZONE):
     """Segmenta la figura inclusa in `box` del foglio. `bridge`: segmenti ((x1, y1), (x2, y2)), in px del foglio, che
     chiudono un'interruzione del contorno (nei fogli generati a volte manca un pezzo di tratto e la regione si fonde con
     lo sfondo): si disegnano come tratto scuro prima di dividere le regioni. `seal` (px del foglio): ispessisce il tratto
     per chiudere le crepe di un pixel (un contorno sottile o sfumato, sopra la soglia di luminanza in qualche punto).
-    `dark`: soglia di luminanza del contorno, se un tratto interno (un fiocco, un risvolto) è più chiaro del contorno solito."""
+    `dark`: soglia di luminanza del contorno, se un tratto interno (un fiocco, un risvolto) è più chiaro del contorno solito.
+    `dots`: (area minima in px², rapporto massimo fra gli assi) dei puntini tondi da registrare (narici, bottoni);
+    `eye_aspect`: quanto deve essere più alta che larga una macchia scura per essere un occhio; `eye_zone`: la frazione alta della
+    figura in cui cercarli (0.35 per le figure intere, 1 per un busto)."""
     x0, y0, x1, y1 = box
     lum = upsample(sheet.lum[y0:y1, x0:x1], K)
     rgb = np.stack([upsample(sheet.rgb[y0:y1, x0:x1, c], K) for c in range(3)], -1)
@@ -164,7 +168,7 @@ def segment(sheet, box, bridge=(), seal=0, dark=DARK):
         dark0 = dark0 | (np.asarray(img) > 127)
     if seal:
         dark0 = dilate(dark0, seal * K)
-    dark, eyes, dots = _eyes_and_fill(dark0, box)
+    dark, eyes, dots = _eyes_and_fill(dark0, box, dots[0], dots[1], eye_aspect, eye_zone)
     lab, n = label_components(~dark, conn=4)
     lab, dark = _split_merged_shoes(lab, dark, lum, box)
     # rinumera 1..n senza buchi

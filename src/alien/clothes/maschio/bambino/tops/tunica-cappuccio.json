@@ -1,0 +1,10 @@
+{
+  "name": "Tunica con cappuccio",
+  "colors": {
+    "main": "#f7f1e2",
+    "trim": "#636951"
+  },
+  "replaces": [
+    "arms"
+  ]
+}

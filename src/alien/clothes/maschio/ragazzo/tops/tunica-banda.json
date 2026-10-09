@@ -1,0 +1,10 @@
+{
+  "name": "Tunica a banda",
+  "colors": {
+    "main": "#f8f1e1",
+    "trim": "#3e3e3e"
+  },
+  "replaces": [
+    "arms"
+  ]
+}

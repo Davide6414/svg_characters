@@ -3,7 +3,7 @@
 
 Uso:
   python3 tools/trace_outfits.py reference/vestiti-femminili.webp \\
-      --bodies src/bodies/femmina --out src/clothes/femmina
+      --bodies src/human/bodies/femmina --out src/human/clothes/femmina
 
 La tabella delle figure si sceglie dal nome del foglio (OUTFITS[nome senza estensione]).
 
@@ -315,8 +315,8 @@ OUTFITS['vestiti-maschili-4'] = [
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('sheet', help='foglio con gli outfit')
-    ap.add_argument('--bodies', required=True, help='cartella delle sagome tracciate (es. src/bodies/femmina)')
-    ap.add_argument('--out', required=True, help='cartella dei capi del gruppo (es. src/clothes/femmina): uno strato per sagoma')
+    ap.add_argument('--bodies', required=True, help='cartella delle sagome tracciate (es. src/human/bodies/femmina)')
+    ap.add_argument('--out', required=True, help='cartella dei capi del gruppo (es. src/human/clothes/femmina): uno strato per sagoma')
     ap.add_argument('-v', '--verbose', action='store_true')
     a = ap.parse_args()
 

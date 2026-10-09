@@ -1,0 +1,9 @@
+{
+  "name": "Bermuda",
+  "colors": {
+    "main": "#404040"
+  },
+  "replaces": [
+    "legs"
+  ]
+}

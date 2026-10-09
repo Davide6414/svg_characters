@@ -1,0 +1,11 @@
+{
+  "name": "Tunica con spallina",
+  "colors": {
+    "main": "#f7f2e7",
+    "trim": "#c29699",
+    "accent": "#bfad80"
+  },
+  "replaces": [
+    "arms"
+  ]
+}

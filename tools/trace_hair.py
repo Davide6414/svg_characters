@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Traccia gli stili di capelli da un foglio di soli capelli su sfondo trasparente.
 
-Uso:  python3 tools/trace_hair.py reference/capelli.webp --out src/hair
-      python3 tools/trace_hair.py reference/capelli-3.webp --out src/hair
+Uso:  python3 tools/trace_hair.py reference/capelli.webp --out src/human/hair
+      python3 tools/trace_hair.py reference/capelli-3.webp --out src/human/hair
 
 La tabella si sceglie dal nome del foglio (HAIRS[nome senza estensione]), una riga per stile.
 Scrive `<id>.svg` (sagoma + linee interne, nelle coordinate del riquadro dei capelli) e `<id>.json`
@@ -57,7 +57,7 @@ def hair_svg(h, sil, lines):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('sheet', help='foglio dei capelli (RGBA)')
-    ap.add_argument('--out', required=True, help='cartella di destinazione (es. src/hair)')
+    ap.add_argument('--out', required=True, help='cartella di destinazione (es. src/human/hair)')
     a = ap.parse_args()
     sheet = HairSheet(Image.open(a.sheet))
     os.makedirs(a.out, exist_ok=True)

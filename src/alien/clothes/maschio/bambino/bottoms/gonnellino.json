@@ -1,0 +1,12 @@
+{
+  "name": "Gonnellino con cintura",
+  "colors": {
+    "main": "#f7f0e1",
+    "trim": "#404040",
+    "accent": "#bbcba4",
+    "accent2": "#595d49"
+  },
+  "replaces": [
+    "legs"
+  ]
+}

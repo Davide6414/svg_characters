@@ -1,0 +1,11 @@
+{
+  "name": "Mantellina",
+  "colors": {
+    "main": "#61674f",
+    "trim": "#f7f0e1",
+    "accent": "#f6efde"
+  },
+  "replaces": [
+    "arms"
+  ]
+}

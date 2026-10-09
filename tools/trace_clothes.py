@@ -2,7 +2,7 @@
 """Traccia i vestiti da due fogli di riferimento: pantaloni e capi per il busto, disegnati sullo stesso corpo.
 
 Uso:
-  python3 tools/trace_clothes.py --out src/clothes/maschio/adulto \\
+  python3 tools/trace_clothes.py --out src/human/clothes/maschio/adulto \\
       --bottoms reference/vestiti-maschili-pantaloni.webp --tops reference/vestiti-maschili-maglie.webp
 
 Scrive in --out (la cartella della sagoma a cui i capi appartengono, la più simile al corpo del foglio):
@@ -45,7 +45,7 @@ TOPS = [
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('--out', required=True, help='cartella della sagoma di destinazione (es. src/clothes/maschio/adulto)')
+    ap.add_argument('--out', required=True, help='cartella della sagoma di destinazione (es. src/human/clothes/maschio/adulto)')
     ap.add_argument('--bottoms', required=True, help='foglio dei pantaloni')
     ap.add_argument('--tops', required=True, help='foglio dei capi per il busto')
     ap.add_argument('-v', '--verbose', action='store_true')

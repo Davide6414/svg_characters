@@ -1,0 +1,12 @@
+{
+  "name": "Kilt scuro",
+  "colors": {
+    "main": "#414141",
+    "trim": "#3f3f3f",
+    "accent": "#becda6",
+    "accent2": "#f8f3e7"
+  },
+  "replaces": [
+    "legs"
+  ]
+}

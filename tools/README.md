@@ -12,9 +12,9 @@ Sono deterministici: rigenerando da `reference/` si ottengono file identici a qu
 ## Sagome: `trace_bodies.py`
 
 ```
-python3 tools/trace_bodies.py reference/sagome-maschili.webp  --out src/bodies/maschio \
+python3 tools/trace_bodies.py reference/sagome-maschili.webp  --out src/human/bodies/maschio \
     --names bambino,ragazzo,slanciato,adulto,robusto
-python3 tools/trace_bodies.py reference/sagome-femminili.webp --out src/bodies/femmina \
+python3 tools/trace_bodies.py reference/sagome-femminili.webp --out src/human/bodies/femmina \
     --names bambina,ragazza,slanciata,adulta,robusta
 ```
 
@@ -42,14 +42,14 @@ Come lavora (moduli in `lib/`):
 4. Tutte le sagome vengono spostate in verticale perché le suole poggino su y = 900: stessa linea del suolo.
 5. `export.py` scrive i file.
 
-Dopo la tracciatura: aggiungere le sagome a `bodies` e `presets` in `src/manifest.json` e lanciare `node build.mjs`.
+Dopo la tracciatura: aggiungere le sagome a `bodies` e `presets` in `src/human/manifest.json` e lanciare `node build.mjs`.
 Se cambiano i punti di riferimento (`landmarks`) vanno rigenerate anche le sagome già esistenti.
 
 ## Capelli: `trace_hair.py`
 
 ```
-python3 tools/trace_hair.py reference/capelli.webp --out src/hair
-python3 tools/trace_hair.py reference/capelli-3.webp --out src/hair
+python3 tools/trace_hair.py reference/capelli.webp --out src/human/hair
+python3 tools/trace_hair.py reference/capelli-3.webp --out src/human/hair
 ```
 
 Per i fogli di **soli capelli su sfondo trasparente** (RGBA). La tabella `HAIRS[nome del foglio]` ha una riga per
@@ -71,8 +71,8 @@ Poi aggiungere l'id a `hair` nel manifest e lanciare `node build.mjs`.
 ## Capelli da figure intere: `trace_hair_figures.py`
 
 ```
-python3 tools/trace_hair_figures.py reference/capelli-2.webp --out src/hair
-python3 tools/trace_hair_figures.py reference/capelli-anziani.webp --out src/hair
+python3 tools/trace_hair_figures.py reference/capelli-2.webp --out src/human/hair
+python3 tools/trace_hair_figures.py reference/capelli-anziani.webp --out src/human/hair
 ```
 
 Per un foglio di figure intere, ognuna con un'acconciatura diversa (`lib/hair_figures.py`). I capelli vanno isolati dalla
@@ -106,7 +106,7 @@ sagome si applica lo stile (`ages` nel manifest): gli stili da anziani non vanno
 ## Barbe: `trace_beards.py`
 
 ```
-python3 tools/trace_beards.py reference/barbe.webp --out src/beards
+python3 tools/trace_beards.py reference/barbe.webp --out src/human/beards
 ```
 
 Per un foglio di figure intere con la stessa testa calva e una barba diversa (`lib/beard_figures.py`). Come per i capelli da
@@ -127,7 +127,7 @@ foglio]` ha una riga per figura: id, nome, `groups` e `ages` (a quali sagome val
 
 ## Vestiti: un capo, una sagoma
 
-Ogni capo sta **solo sulla sagoma su cui è disegnato**: i file sono in `src/clothes/<gruppo>/<sagoma>/{tops,bottoms}/`
+Ogni capo sta **solo sulla sagoma su cui è disegnato**: i file sono in `src/human/clothes/<gruppo>/<sagoma>/{tops,bottoms}/`
 e il manifest li elenca per sagoma (`clothes["maschio/adulto"].tops`…). Mischiare i capi fra corporature diverse dava
 sempre problemi di vestibilità, quindi non esiste più nessun adattamento fra sagome. Un capo per un'altra sagoma si
 traccia di nuovo su quella sagoma. Due strumenti, secondo il foglio.
@@ -135,7 +135,7 @@ traccia di nuovo su quella sagoma. Due strumenti, secondo il foglio.
 ## Due fogli sullo stesso corpo: `trace_clothes.py`
 
 ```
-python3 tools/trace_clothes.py --out src/clothes/maschio/adulto \
+python3 tools/trace_clothes.py --out src/human/clothes/maschio/adulto \
     --bottoms reference/vestiti-maschili-pantaloni.webp --tops reference/vestiti-maschili-maglie.webp
 ```
 
@@ -161,14 +161,14 @@ destra): id, nome e le correzioni `{indice regione: ruolo}`. Per vedere gli indi
 ## Outfit: `trace_outfits.py`
 
 ```
-python3 tools/trace_outfits.py reference/vestiti-femminili.webp   --bodies src/bodies/femmina --out src/clothes/femmina
-python3 tools/trace_outfits.py reference/vestiti-femminili-2.webp --bodies src/bodies/femmina --out src/clothes/femmina
-python3 tools/trace_outfits.py reference/vestiti-femminili-3.webp --bodies src/bodies/femmina --out src/clothes/femmina
-python3 tools/trace_outfits.py reference/vestiti-femminili-4.webp --bodies src/bodies/femmina --out src/clothes/femmina
-python3 tools/trace_outfits.py reference/vestiti-maschili-outfit.webp --bodies src/bodies/maschio --out src/clothes/maschio
-python3 tools/trace_outfits.py reference/vestiti-maschili-2.webp --bodies src/bodies/maschio --out src/clothes/maschio
-python3 tools/trace_outfits.py reference/vestiti-maschili-3.webp --bodies src/bodies/maschio --out src/clothes/maschio
-python3 tools/trace_outfits.py reference/vestiti-maschili-4.webp --bodies src/bodies/maschio --out src/clothes/maschio
+python3 tools/trace_outfits.py reference/vestiti-femminili.webp   --bodies src/human/bodies/femmina --out src/human/clothes/femmina
+python3 tools/trace_outfits.py reference/vestiti-femminili-2.webp --bodies src/human/bodies/femmina --out src/human/clothes/femmina
+python3 tools/trace_outfits.py reference/vestiti-femminili-3.webp --bodies src/human/bodies/femmina --out src/human/clothes/femmina
+python3 tools/trace_outfits.py reference/vestiti-femminili-4.webp --bodies src/human/bodies/femmina --out src/human/clothes/femmina
+python3 tools/trace_outfits.py reference/vestiti-maschili-outfit.webp --bodies src/human/bodies/maschio --out src/human/clothes/maschio
+python3 tools/trace_outfits.py reference/vestiti-maschili-2.webp --bodies src/human/bodies/maschio --out src/human/clothes/maschio
+python3 tools/trace_outfits.py reference/vestiti-maschili-3.webp --bodies src/human/bodies/maschio --out src/human/clothes/maschio
+python3 tools/trace_outfits.py reference/vestiti-maschili-4.webp --bodies src/human/bodies/maschio --out src/human/clothes/maschio
 ```
 
 Per un foglio in cui **ogni figura indossa maglia e pantaloni sul proprio corpo** (le cinque sagome di un gruppo, ognuna
@@ -240,6 +240,121 @@ ricavano dal foglio e si scrivono nel preset (`colors`). Le scarpe dei fogli di 
 tacchi) non si disegnano: restano le scarpe base della sagoma e dal foglio si prendono solo i colori. Un abito si divide
 in due capi: il corpetto con le maniche è una maglia, la gonna (con cintura, fiocchi e le gambe `skin` fino alle
 scarpe, `to_shoes`) sono i pantaloni.
+
+## Sagome aliene: `trace_alien.py`
+
+```
+python3 tools/trace_alien.py reference/sagome-aliene-maschili.webp --out src/alien/bodies/maschio \
+    --names bambino,ragazzo,adulto,curvo
+python3 tools/trace_alien.py reference/sagome-aliene-femminili.webp --out src/alien/bodies/femmina \
+    --names bambina,ragazza,adulta,curva
+```
+
+Per un foglio di **figure aliene affiancate** su sfondo chiaro (stessa idea di `trace_bodies.py`, ma con ruoli propri: gli alieni
+sono tutti della stessa pelle, quindi testa, braccia e gambe si distinguono per posizione e non per colore, e non ci sono scarpe).
+Cosa si aspetta il foglio: figure con un contorno scuro continuo, due occhi (macchie scure staccate dal contorno), la maglia
+chiara, i pantaloncini (di un colore qualunque: grigi, rosa…) e quattro regioni di pelle oltre alla testa (due braccia, due gambe coi piedi); il collo sta nella testa.
+Per ogni figura scrive `<nome>.svg` (solo geometria, vedi *Alieni* nel README principale) e `<nome>.json` (nome visualizzato, misure
+della testa, punti di riferimento, colori di partenza di pelle, maglia, pantaloncini e occhi).
+
+Come lavora (`lib/alien.py`, `lib/alien_export.py`; la segmentazione è quella delle sagome umane, `lib/segment.py`):
+
+1. Le regioni sono le componenti connesse del foglio fra i tratti scuri; le due macchie scure staccate in alto sono gli occhi, i
+   puntini tondi sul viso (anche piccoli, 6 px²) le narici.
+2. **Ruoli**: la testa è la regione con gli occhi; la maglia è la regione bianca più grande nella parte alta, i pantaloncini la regione
+   più grande che non è né bianca né di pelle; le quattro regioni di pelle più grandi sono braccia e gambe (le due più in basso sono le gambe, le altre le
+   braccia; sinistra e destra per posizione). Una regione piccola che tocca **una sola** parte (un dito o una punta chiusi da una
+   linea) ne fa parte, restando una regione a sé col suo contorno; la pelle fra testa e maglia (il collo) va alla testa. Lo sfondo
+   racchiuso fra i piedi, che tocca più parti, resta fuori.
+3. Ogni parte è la cella di Voronoi della sua regione (il confine cade a metà del tratto) tracciata con potrace. I buchi chiari
+   minuscoli dentro il tratto (un granello dove due contorni si sovrappongono) sono tratto, non regioni: se no il confine fra due
+   parti ci gira intorno e il contorno viene un nodo. Le linee interne (dita, cuciture) sono i pixel scuri con una sola regione
+   intorno, come per le sagome umane; le pieghe della maglia e le tasche dei pantaloncini (più scure della stoffa, `find_folds`) sono linee `c-fold`. Le linee
+   sottilissime (spessore < 1.5 px) sono ombre dove due contorni si incrociano e si scartano.
+   Il riempimento della testa scende sotto il colletto (`NECK_FILL`) per non lasciare fessure quando la testa si alza.
+4. **Scala e suolo**: la stessa scala per tutte le figure del foglio (la più alta diventa alta `--height` px, 690 come un adulto
+   umano, così le altezze restano confrontabili) e i piedi su y = 900. Alla fine lo strumento stampa lo spessore del contorno nella scala
+   finale: si scrive in `lineWidth` di `src/alien/manifest.json`.
+
+Se una figura si classifica male o il contorno ha un'interruzione (nei fogli generati a volte manca un pezzo di tratto e la
+regione si fonde con lo sfondo), la tabella `FIXES` in cima a `trace_alien.py` ha una riga per foglio e per figura:
+`roles` (`{indice regione: ruolo}`, gli indici si vedono con `-v`), `bridge` (segmenti scuri che chiudono l'interruzione) e `seal`.
+
+Dopo la tracciatura: le sagome in `bodies` e un preset per ognuna in `src/alien/manifest.json`, poi `node build.mjs`.
+
+## Vestiti alieni: `trace_alien_outfits.py`
+
+```
+python3 tools/trace_alien_outfits.py reference/vestiti-alieni-maschili.webp \
+    --bodies-sheet reference/sagome-aliene-maschili.webp --bodies src/alien/bodies/maschio \
+    --names bambino,ragazzo,adulto,curvo --out src/alien/clothes/maschio
+python3 tools/trace_alien_outfits.py reference/vestiti-alieni-femminili.webp \
+    --bodies-sheet reference/sagome-aliene-femminili.webp --bodies src/alien/bodies/femmina \
+    --names bambina,ragazza,adulta,curva --out src/alien/clothes/femmina
+```
+
+Per un foglio in cui **ogni figura aliena indossa un abito sulla propria sagoma**, disegnato sopra il foglio delle sagome nude (stessa
+posa, stessa scala, stesse teste e piedi: scarto misurato < 0.3 px). Per ogni figura scrive in `--out/<sagoma>/` `tops/<id>.svg|json` (la
+maglia) e `bottoms/<id>.svg|json` (i pantaloni o la gonna). `--only a,b` traccia solo alcune sagome; `-v` stampa gli indici di regione
+(area, colore), i ruoli assegnati, i dettagli e le fasce. Le regioni di ogni figura si assegnano a mano ai ruoli di colore (`main`, `trim`,
+`accent`, `accent2`, `skin`) nella tabella `OUTFITS` in cima al file, con queste opzioni per capo: `split` (dettagli senza contorno
+ricavati dal colore dentro la regione: strisce, un rombo), `absorb`, `back` (regioni dietro le braccia: la coda di un mantello),
+`under_down` / `under_up` (la fascia con cui la maglia scende dietro i pantaloncini di base, o i pantaloni salgono dietro la maglietta),
+`folds`, `smooth`, `neck`; per figura `arms` / `legs` (se la scelta automatica non va), `ignore`, `bridge`, `seal`, `dark`.
+
+Come lavora (`lib/alien_outfits.py`, `lib/alien_clothes_export.py`; segmentazione e linee interne come per le sagome):
+
+1. **Ancoraggio**: le coordinate si ancorano agli occhi della sagoma (`head.eyeX/eyeY` del suo `.json`) e alla scala del foglio delle
+   sagome (`--bodies-sheet`): nessuna deformazione, il capo cade sul corpo.
+2. **Capi**: ogni regione è la cella di Voronoi del suo contorno, tracciata con potrace; l'ordine di disegno è regioni, dettagli senza
+   contorno, contorni sopra i dettagli, linee interne (cuciture, pieghe).
+3. **Parti sostituite**: le due braccia (maglia) o le due gambe (pantaloni), le regioni di pelle più grandi del foglio, con le loro
+   linee (dita, piedi): così una manica corta o un orlo alto scoprono ciò che sotto la maglietta e i pantaloncini di base è nascosto.
+4. **Collo**: dove il foglio dei vestiti non ha il contorno inferiore della testa della sagoma (uno scollo più basso, una spalla
+   scoperta) il capo ha un pezzo di pelle che lo copre (`stale` in `lib/alien_outfits.py`: il contorno della testa della sagoma, ±2 px,
+   che nel foglio dei vestiti non c'è, sulla pelle). Con una spalla scoperta che si fonde col collo (`arms=(None, …)`) il pezzo è il
+   braccio intero e il suo contorno è solo quello vero (`_outline_runs`: il bordo che cade sul tratto scuro, non il taglio).
+5. **Fasce**: `under_down` (maglia) e `under_up` (pantaloni) sono rettangoli larghi come l'orlo, o come i pantaloncini di base
+   (`width='pants'`, per la pancia scoperta `role='skin'`), che arrivano al fondo della maglietta di base.
+
+Dopo la tracciatura: i capi in `clothes["<gruppo>/<sagoma>"]` del manifest (`src/alien/manifest.json`) e, per un personaggio di
+partenza, in un preset (`top`, `bottom`), poi `node build.mjs`. Rifacendo le sagome (`trace_alien.py`) vanno rifatti anche i vestiti.
+
+## Protuberanze: `trace_protrusions.py`
+
+```
+python3 tools/trace_protrusions.py --frame src/alien/bodies/maschio/adulto.json --out src/alien/protrusions
+```
+
+Per i fogli di **teste e figure aliene con una protuberanza** (corna, palchi, pinne, creste, antenne): `reference/protuberanze-teste.webp`
+(quattro teste con il busto, che non ha il contorno in basso: lo strumento lo chiude con un segmento), `reference/protuberanze-figure.webp`
+e `reference/protuberanze-antenne.webp` (quattro figure intere ciascuno). Scrive `<id>.svg` + `<id>.json` per ogni figura della tabella `FIGURES` in cima al file. `--frame` è la sagoma
+che dà la testa di riferimento (di solito `maschio/adulto`): le coordinate delle protuberanze stanno nel suo riquadro (centro e mezza
+larghezza del cranio, cima) e la build le adatta alla testa di ogni sagoma (`lib/protrusion.py`).
+
+Nei fogli la protuberanza è **fusa con la testa**: stesso colore e, di solito, nessuna linea fra le due (le regioni non la separano), quindi
+la tabella dice dove tagliarla. Ogni figura ha `parts`:
+
+- `kind='cut'` (dietro la testa): `poly`, un poligono in px del foglio che racchiude la protuberanza e lascia fuori il cranio (il taglio
+  passa lungo la base: dove la protuberanza attacca alla testa, un poco fuori dal cranio). La parte è la silhouette dentro il poligono.
+  Il suo contorno esterno continua dentro la testa, dove quella di ogni sagoma lo copre: i bordi che arrivano al cranio si prolungano
+  lungo la loro tangente (`TAIL` px, finché restano a `REACH` px dal cranio della figura; un estremo la cui tangente corre lungo la
+  testa, fuori, non si prolunga) e il riempimento è la sagoma così chiusa. Così si chiude sul contorno di ogni sagoma, anche se la
+  sua testa è un poco più stretta o più lontana (le pinne sulla testa inclinata). Il tratto è solo sul bordo esterno. Le linee
+  interne (nervature, spirali) restano; quelle lungo il taglio (il contorno del cranio) no. Per un cranio tondo si
+  può dare `not_circle=(cx, cy, r)`: la silhouette fuori da quel cerchio (la cresta a spine);
+- `kind='region'` (davanti alla testa): `seed`, un punto dentro una regione chiusa dal tratto del foglio (un corno che passa davanti al
+  cranio); riempimento e contorno interi. `bridge` della figura chiude un'interruzione del tratto (il corno di destra delle corna a spirale).
+
+Altre opzioni della figura: `bust` (è un busto) e `fit={sx, sy, dx, dy}`, ritocchi alla posizione e alla scala sulla testa di riferimento
+(le unità del riquadro di riferimento: per esempio `dx=14` sposta la cresta al vento verso la testa, dove la base si nasconde meglio).
+
+Come adatta: la figura si porta sulla testa di riferimento con scala **uniforme** (rapporto fra le mezze larghezze della calotta del
+cranio, dalla cima fino al 60% della distanza dagli occhi), cima e centro del cranio sovrapposti. Le teste dei fogli hanno proporzioni
+un poco diverse da quelle delle sagome (un cranio più alto): una scala diversa in x e in y deformerebbe le corna.
+
+Dopo la tracciatura: gli id in `protrusions` del manifest (`src/alien/manifest.json`), poi `node build.mjs`. Se si rifanno le sagome
+(`trace_alien.py`) vanno rifatte anche le protuberanze (ne leggono la testa di riferimento).
 
 ## Limiti noti
 

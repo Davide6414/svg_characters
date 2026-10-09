@@ -28,11 +28,11 @@ const root = new URL('../', import.meta.url);
 const read = (p) => readFile(new URL(p, root), 'utf8');
 const json = async (p) => JSON.parse(await read(p));
 
-const manifest = await json('src/manifest.json');
+const manifest = await json('src/human/manifest.json');
 const bodies = [];
 for (const id of manifest.bodies) {
   const svg = await read(`characters/${id}.svg`);
-  const meta = await json(`src/bodies/${id}.json`);
+  const meta = await json(`src/human/bodies/${id}.json`);
   bodies.push({ id, group: id.split('/')[0], name: meta.name, svg, landmarks: meta.landmarks,
                 hair: manifest.hair.filter((h) => svg.includes(`<g id="hair-${h}">`)),
                 beards: (manifest.beards ?? []).filter((x) => svg.includes(`<g id="beard-${x}">`)) });
@@ -41,11 +41,11 @@ const clothes = {};
 for (const b of bodies) {
   clothes[b.id] = { tops: [{ id: 'base', name: 'Maglietta base', replaces: [] }], bottoms: [{ id: 'base', name: 'Pantaloni base', replaces: [] }] };
   for (const kind of ['tops', 'bottoms']) for (const id of manifest.clothes[b.id]?.[kind] ?? []) {
-    const meta = await json(`src/clothes/${b.id}/${kind}/${id}.json`);
+    const meta = await json(`src/human/clothes/${b.id}/${kind}/${id}.json`);
     clothes[b.id][kind].push({ id, name: meta.name, replaces: meta.replaces ?? [] });
   }
 }
-const hairNames = Object.fromEntries(await Promise.all(manifest.hair.map(async (h) => [h, (await json(`src/hair/${h}.json`)).name])));
+const hairNames = Object.fromEntries(await Promise.all(manifest.hair.map(async (h) => [h, (await json(`src/human/hair/${h}.json`)).name])));
 
 // Soglie (px della sagoma, cioè del foglio di riferimento): sotto queste un difetto non si vede o è coperto dal tratto.
 const LIMITS = { gapTrunk: 3, gapArm: 6, gapLeg: 4, hemNotch: 25, newHoles: 3, floating: 3, clip: 1, pantsHigh: 22, underArm: 6,
@@ -432,6 +432,7 @@ function browserSide() {
 // rendersi uguale al file della sagoma con le stesse variabili.
 async function exportCheck(page) {
   return page.evaluate(async () => {
+    const { state, bodies, variants, DATA, defaultColors, cssVars, buildExportSvg } = window.humanViewer;     // la sezione degli umani (src/viewer/human.js)
     const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
     const raster = async (svg, w, h) => {
       const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
