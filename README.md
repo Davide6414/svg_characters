@@ -245,7 +245,7 @@ Con `prefers-reduced-motion` l'SVG resta fermo. Nel visualizzatore c'è l'interr
 
 ## Visualizzatore
 
-Ci sono sedici personaggi di partenza (i preset del manifest: uno o due per sagoma, ognuno con un abbinamento di capi della sua sagoma; la seconda serie femminile porta i capelli nuovi), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **barba** (solo sagome maschili: la sezione compare solo per loro e solo con le barbe che valgono per la sagoma), **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono solo quelli della sagoma scelta: se cambi sagoma, maglia e pantaloni passano all'abito di partenza di quella sagoma (il primo dei suoi preset), e se la sagoma non ha capi restano la maglietta e i pantaloni base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
+Ci sono sedici personaggi di partenza (i preset del manifest: uno o due per sagoma, ognuno con un abbinamento di capi della sua sagoma; la seconda serie femminile porta i capelli nuovi; *Adulto · polo* e *Robusto · cardigan* hanno la barba), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **barba** (solo sagome maschili: la sezione compare solo per loro e solo con le barbe che valgono per la sagoma), **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono solo quelli della sagoma scelta: se cambi sagoma, maglia e pantaloni passano all'abito di partenza di quella sagoma (il primo dei suoi preset), e se la sagoma non ha capi restano la maglietta e i pantaloni base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
 
 **Colori.** I campi sono divisi per parte (corpo, maglia, pantaloni, scarpe, contorno e occhi) e mostrano solo i ruoli che il capo scelto ha. Sotto ogni campo ci sono dei colori rapidi: toni della pelle, colori di capelli naturali e di fantasia, una tavolozza di tessuti; per le scarpe una tavolozza unica per la tomaia e una per la suola. `↺` riporta un campo al suo colore di default; *Vestiti a caso* e *Pelle e capelli a caso* pescano dalle tavolozze (maglia e pantaloni ben distinti), *Colori di default* azzera tutto.
 
@@ -266,7 +266,7 @@ NODE_PATH=$(npm root -g) node tools/audit.mjs      # serve playwright (npm i -g 
 ```
 
 Rende nel browser, per ogni sagoma, ogni maglia con ogni pantalone **della sua sagoma** (compresi la maglietta e i
-pantaloni base) e ogni stile di capelli con ogni maglia: 901 combinazioni, circa 2 minuti. Cerca i difetti
+pantaloni base) e ogni stile di capelli con ogni maglia, più ogni barba sulla sagoma che la prevede: 917 combinazioni, circa 2 minuti. Cerca i difetti
 confrontando ogni combinazione con la sagoma base: vuoti nel busto, nelle braccia e alle caviglie, fessure sottili
 chiuse dalla figura, pezzi staccati, parti tagliate dal riquadro, l'estensione dei pantaloni che si vede, livelli sotto
 che coprono il braccio o sporgono, vuoti nel fotogramma estremo del respiro, occhi coperti dai capelli (lo sfondo racchiuso fra le ciocche dei capelli lunghi, la testa
