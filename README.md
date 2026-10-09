@@ -1,54 +1,78 @@
 # svg_characters
 
-Personaggi in SVG pensati per essere **combinati**: dieci sagome (cinque maschili e cinque femminili, da bambino a
-adulto) × venti stili di capelli × cinque barbe (per gli uomini) × maglie e pantaloni × colori a piacere, più un visualizzatore HTML per provare gli
-incroci.
+Personaggi in SVG pensati per essere **combinati**, in due sezioni separate:
+
+- **Umani**: dieci sagome (cinque maschili e cinque femminili, da bambino a adulto) × venti stili di capelli × cinque barbe
+  (per gli uomini) × maglie e pantaloni × colori a piacere;
+- **Alieni**: sagome aliene con la loro maglia e i loro pantaloncini, ricolorabili per parti (vedi *Alieni*).
+
+Un visualizzatore HTML (`index.html`, con una scheda per sezione) permette di provare gli incroci.
 
 ## Organizzazione
 
 ```
 src/                        ← QUI si lavora: tutto ciò che si modifica a mano o si ricava dai fogli
-  manifest.json             gruppi, ordine di sagome, capelli e vestiti, palette comune, preset del visualizzatore
+  human/                    risorse degli UMANI
+    manifest.json           gruppi, ordine di sagome, capelli e vestiti, palette comune, preset del visualizzatore
                             (un preset può dare un nome e colori di partenza: pelle, capelli, scarpe)
-  style.css                 classi dei colori, visibilità di capelli e vestiti, animazione idle (uguali per tutte)
-  bodies/
-    maschio/                bambino · ragazzo · slanciato · adulto · robusto   (.svg = geometria, .json = misure)
-    femmina/                bambina · ragazza · slanciata · adulta · robusta
-  hair/                     spettinati · coda · chignon · ciuffo-scuro · ciuffo-castano ·        (.svg + .json)
+    style.css               classi dei colori, visibilità di capelli e vestiti, animazione idle (uguali per tutte)
+    bodies/
+      maschio/              bambino · ragazzo · slanciato · adulto · robusto   (.svg = geometria, .json = misure)
+      femmina/              bambina · ragazza · slanciata · adulta · robusta
+    hair/                   spettinati · coda · chignon · ciuffo-scuro · ciuffo-castano ·        (.svg + .json)
                             arruffati · due-chignon · caschetto · rasati-lato · ricci ·
                             calvizie · stempiato · pettinati-indietro · coda-grigia · chignon-grigio ·
                             caschetto-scalato · coda-alta · lisci-frangia · lunghi-mossi · coda-laterale
-  beards/                   barba-incolta · barba-corta · barba-piena · pizzetto · barba-lunga   (.svg + .json)
-  clothes/<gruppo>/<sagoma>/  ogni capo sta SOLO sulla sagoma per cui è disegnato (.svg + .json)
-    tops/ · bottoms/        le maglie e i pantaloni di quella sagoma
-    reference.json          solo maschio/adulto: il corpo su cui sono disegnati i primi cinque capi per tipo
-  viewer/template.html      il visualizzatore
+    beards/                 barba-incolta · barba-corta · barba-piena · pizzetto · barba-lunga   (.svg + .json)
+    clothes/<gruppo>/<sagoma>/  ogni capo sta SOLO sulla sagoma per cui è disegnato (.svg + .json)
+      tops/ · bottoms/      le maglie e i pantaloni di quella sagoma
+      reference.json        solo maschio/adulto: il corpo su cui sono disegnati i primi cinque capi per tipo
+  alien/                    risorse degli ALIENI (separate da quelle degli umani, vedi *Alieni*)
+    manifest.json           palette, spessore del contorno, gruppi, sagome, preset del visualizzatore
+    style.css               classi dei colori, visibilità delle parti, animazione idle
+    bodies/<gruppo>/        le sagome aliene   (.svg = geometria, .json = misure)
+  viewer/                   il visualizzatore: una sezione della pagina per ogni tipo di sagoma
+    template.html           guscio della pagina (intestazione, schede Umani/Alieni, stili comuni)
+    common.js               utilità comuni: colori rapidi, export, cambio di sezione
+    human.html + human.js   la sezione degli umani
+    alien.html + alien.js   la sezione degli alieni
 
-characters/                 ← GENERATO da build.mjs: ogni sagoma con i suoi capelli e i suoi vestiti
-  maschio/…  femmina/…        (file SVG autonomi)
+characters/                 ← GENERATO da build.mjs: ogni sagoma composta (file SVG autonomi)
+  maschio/…  femmina/…        umani, con i loro capelli e i loro vestiti
+  alieno/<gruppo>/…           alieni
 index.html                  ← GENERATO: visualizzatore (si apre anche con doppio clic)
 
-build.mjs                   compone characters/ e index.html:  node build.mjs
-lib/fit.mjs                 deformazione (thin-plate spline) che adatta capelli e capi alla loro sagoma
+build.mjs                   orchestra la build:  node build.mjs  (scrive characters/ e index.html)
+build/human.mjs             compone gli umani (src/human/)
+build/alien.mjs             compone gli alieni (src/alien/)
+build/viewer.mjs            compone la pagina (src/viewer/) con i dati di ogni sezione
+build/util.mjs              funzioni comuni alle due sezioni (lettura dei sorgenti, coordinate dei percorsi)
+lib/fit.mjs                 deformazione (thin-plate spline) che adatta capelli e capi alla loro sagoma (umani)
 serve.mjs                   server statico opzionale:  node serve.mjs → http://localhost:5191
 
 reference/                  fogli di riferimento da cui sono tracciate le sorgenti
   sagome-maschili · sagome-femminili · capelli · capelli-2 · capelli-3 · capelli-anziani · barbe ·
   vestiti-maschili-pantaloni · vestiti-maschili-maglie ·
   vestiti-maschili-outfit · vestiti-femminili · vestiti-femminili-2 · vestiti-femminili-3 · vestiti-femminili-4 · archivio/
+  alieno-modello (l'alieno nudo da cui parte lo stile) · sagome-aliene-maschili (le quattro sagome da tracciare)
 tools/                      strumenti Python per tracciare i fogli (vedi tools/README.md)
 ```
 
 Regola pratica: **si modifica `src/`, poi `node build.mjs`**. `characters/` e `index.html` non si toccano a mano.
 
+Le due sezioni sono indipendenti: ognuna ha le sue risorse, la sua composizione (`build/human.mjs`, `build/alien.mjs`), il suo CSS, la sua
+parte del visualizzatore e i suoi id (quelli degli alieni cominciano con `alien-`, le classi dell'animazione con `c-alien-`), così in
+una stessa pagina non si influenzano. Le sezioni da *Come si compone un personaggio* a *Variabili CSS* descrivono gli **umani**; gli
+**alieni** sono in *Alieni*.
+
 ## Come si compone un personaggio
 
-`build.mjs` prende una sagoma da `src/bodies/` e le aggiunge:
+`build.mjs` prende una sagoma da `src/human/bodies/` e le aggiunge:
 
 - **il CSS comune** (`style.css`) con i colori di default di quella sagoma, presi dal suo `.json`;
 - **gli stili di capelli adatti alla sua età** (vedi sotto), adattati alla sua testa;
 - **le barbe** che valgono per il suo gruppo e la sua età (solo uomini, vedi *Barbe*), adattate alla sua testa;
-- **i suoi vestiti** (`src/clothes/<gruppo>/<sagoma>/`), quelli elencati per lei in `clothes` nel manifest.
+- **i suoi vestiti** (`src/human/clothes/<gruppo>/<sagoma>/`), quelli elencati per lei in `clothes` nel manifest.
 
 Poi scrive `characters/<gruppo>/<sagoma>.svg`. Gli stili di capelli sono disegnati una volta sola e **si adattano a ogni
 sagoma**; i vestiti **no**: ogni capo è disegnato su una sagoma e vive solo lì. In ogni file ne è visibile uno solo per
@@ -66,7 +90,7 @@ Un capo può correggere alcuni punti di riferimento della propria sagoma (`landm
 l'orlo di una manica corta o il bordo alto dei pantaloni): la build li usa per spostare quei punti. Fa eccezione la
 prima serie maschile (10 capi, due fogli disegnati sullo stesso corpo di riferimento, un adulto appena diverso dalla
 sagoma `maschio/adulto`): i suoi capi hanno `"ref": "reference"` nel `.json` e la build li adatta alla sagoma adulto
-con una deformazione morbida (thin-plate spline, `lib/fit.mjs`) dai punti di `src/clothes/maschio/adulto/reference.json`
+con una deformazione morbida (thin-plate spline, `lib/fit.mjs`) dai punti di `src/human/clothes/maschio/adulto/reference.json`
 a quelli della sagoma. Ogni sagoma ha nel suo `.json` i punti di riferimento (collo; angoli del riquadro di busto, braccia
 e pantaloni; pugni; bordi del busto; cima e suola delle scarpe e altezza del ginocchio). Le coordinate vengono sempre
 riscritte, quindi lo spessore del contorno resta uguale ovunque.
@@ -88,7 +112,7 @@ Parti separate in gruppi con `id`, dal fondo al primo piano (uguali in tutte le 
   con pantaloni disegnati su un altro foglio, o con la maglietta e i pantaloni base): l'audit li ha tenuti perché senza
   tornano buchi piccoli sul collo, sotto le braccia e in vita.
 - Scarpe, come regioni riempite: suola, tomaia (`c-upper-l` / `c-upper-r`), linguetta a sinistra, punta e zona lacci (`c-toe`, `c-lace`) a destra. Alcune sagome non hanno la punta come regione a parte: `--shoe-toe` non ha effetto su di loro (il visualizzatore non mostra quel campo).
-- Il sorgente in `src/bodies/` contiene solo la geometria e i segnaposto `<!-- @hair-back -->`, `<!-- @hair-skin -->`, `<!-- @beard-skin -->`, `<!-- @beard -->` e `<!-- @hair -->` dentro `head`; colori, capelli, barbe e vestiti li aggiunge la build.
+- Il sorgente in `src/human/bodies/` contiene solo la geometria e i segnaposto `<!-- @hair-back -->`, `<!-- @hair-skin -->`, `<!-- @beard-skin -->`, `<!-- @beard -->` e `<!-- @hair -->` dentro `head`; colori, capelli, barbe e vestiti li aggiunge la build.
 
 ### Scala e riquadro
 
@@ -185,7 +209,7 @@ incolta è fatta di puntini (un solo percorso, con gli estremi tondi) nello stes
 ## Vestiti
 
 La maglietta (`torso`) e i pantaloni (`pants`) della sagoma sono la versione **base**. In più ogni sagoma ha i suoi capi,
-disegnati su di lei e solo lì (`src/clothes/<gruppo>/<sagoma>/`, elencati per sagoma in `clothes` nel manifest):
+disegnati su di lei e solo lì (`src/human/clothes/<gruppo>/<sagoma>/`, elencati per sagoma in `clothes` nel manifest):
 
 | Sagoma | Maglie (`top-<id>`) | Pantaloni (`bottom-<id>`) |
 | --- | --- | --- |
@@ -244,7 +268,49 @@ Con `prefers-reduced-motion` l'SVG resta fermo. Nel visualizzatore c'è l'interr
 
 `--outline`, `--line-w`, `--skin`, `--hair`, `--shirt` (+ `-trim`, `-accent`, `-accent2`, `-under`), `--pants` (+ `-trim`, `-accent`, `-under`), `--shoe-upper-l`, `--shoe-upper-r`, `--shoe-toe`, `--shoe-tongue`, `--shoe-lace`, `--shoe-sole`, `--eye`, più `--idle-n` (`0` spegne l'animazione), `--idle-delay` (sfasa più istanze), `--show-hair` / `--show-hair-<id>`, `--beard` e `--show-beard` / `--show-beard-<id>`, `--show-top-<id>` e `--show-bottom-<id>` (`inline` | `none`), `--show-arms` e `--show-body-arms`.
 
+## Alieni
+
+Gli alieni sono una sezione a parte: risorse in `src/alien/`, composizione in `build/alien.mjs`, file in `characters/alieno/`. Con gli
+umani hanno in comune solo la scala (stessa linea del suolo `y = 900`, la figura più alta come un adulto) e le utilità della pagina.
+Non hanno capelli, barbe o capi da scegliere: ogni sagoma ha la sua maglia e i suoi pantaloncini, e i colori si scelgono a piacere.
+
+```
+src/alien/manifest.json     palette di default (skin, shirt, pants, eye), lineWidth (spessore di partenza del contorno),
+                            gruppi, sagome (`gruppo/nome`) e preset (sagoma + nome + colori di partenza)
+src/alien/style.css         classi dei colori, visibilità delle parti, animazione idle
+src/alien/bodies/<gruppo>/  <nome>.svg (geometria) + <nome>.json (nome, misure della testa, punti di riferimento, colori)
+```
+
+**Struttura dell'SVG di una sagoma.** Dal fondo al primo piano: `alien-head` (testa e collo, in due passate come per gli umani: riempimento
+e contorno; poi narici `c-dot` e occhi `c-eye c-alien-blink`) → `alien-arm-right` → `alien-legs` (`alien-leg-left` e `alien-leg-right`, coi
+piedi e le linee delle dita) → `alien-pants` (i pantaloncini) → `alien-arm-left` → `alien-torso` (la maglia). Ogni parte è una regione
+chiusa col suo contorno; le regioni vicine si toccano a metà del tratto scuro del foglio, e le linee interne (dita delle mani e dei
+piedi, pieghe della maglia, tasche) sono linee aperte. Il sorgente contiene solo la geometria: colori, CSS e riquadro comune
+(stessa scala e stessa linea del suolo per tutte) li aggiunge la build.
+
+**Variabili CSS.** `--skin`, `--shirt`, `--pants`, `--eye`, `--outline`, `--line-w`, `--idle-n` (`0` spegne l'animazione), `--idle-delay`, e la
+visibilità di ogni parte con `--show-alien-head`, `--show-alien-torso`, `--show-alien-arms`, `--show-alien-pants`, `--show-alien-legs`
+(`inline` | `none`). Le narici seguono `--outline`.
+
+**Animazione idle.** Come per gli umani: busto e braccia respirano (si allungano di ~1%, ancorati alla base), la testa si alza di 2 px con un
+piccolo ritardo, gli occhi sbattono ogni 4.6 s. Con `prefers-reduced-motion` l'SVG resta fermo.
+
+**Tracciatura.** `tools/trace_alien.py` ricava le sagome da un foglio di figure affiancate (vedi `tools/README.md`):
+
+```
+python3 tools/trace_alien.py reference/sagome-aliene-maschili.webp --out src/alien/bodies/maschio \
+    --names bambino,ragazzo,adulto,curvo
+```
+
+Poi: le sagome in `bodies` e un preset per ognuna in `src/alien/manifest.json`, lo spessore del contorno stampato dallo strumento in
+`lineWidth`, e `node build.mjs`. Un gruppo nuovo (per esempio *Femmina*) è una cartella in più e una voce in `groups`.
+
 ## Visualizzatore
+
+La pagina ha una scheda per sezione (**Umani**, **Alieni**; l'indirizzo `#umani` / `#alieni` apre quella voluta) e ognuna ha la sua
+anteprima, il suo pannello e il suo stato: passando da una all'altra non si perde il personaggio scelto. Quanto segue descrive gli
+umani; la sezione degli alieni ha lo stesso impianto con sagoma, colori (pelle, occhi, maglia, pantaloncini, contorno), parti visibili
+(testa, maglia, braccia, pantaloncini, gambe), idle ed export.
 
 Ci sono ventisei personaggi di partenza (i preset del manifest: uno o due per sagoma, quattro per le femmine, ognuno con un abbinamento di capi della sua sagoma; la seconda, la terza e la quarta serie femminile portano i capelli nuovi; *Adulto · polo* e *Robusto · cardigan* hanno la barba), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **barba** (solo sagome maschili: la sezione compare solo per loro e solo con le barbe che valgono per la sagoma), **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono solo quelli della sagoma scelta: se cambi sagoma, maglia e pantaloni passano all'abito di partenza di quella sagoma (il primo dei suoi preset), e se la sagoma non ha capi restano la maglietta e i pantaloni base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
 
@@ -254,13 +320,14 @@ I colori di partenza sono i default scritti nel CSS di ogni SVG, più i `colors`
 
 ## Aggiungere una sagoma, uno stile di capelli o dei vestiti
 
-- **Sagoma**: tracciarla con `tools/trace_bodies.py` (o scrivere a mano `src/bodies/<gruppo>/<nome>.svg` + `.json` con la stessa struttura, compresi i punti `head` e `landmarks`), poi aggiungerla a `bodies` e a `presets` in `src/manifest.json`. Un gruppo nuovo (per esempio *Anziani*) è una cartella in più, più una voce in `groups`.
-- **Stile di capelli**: `tools/trace_hair.py` o a mano in `src/hair/<id>.svg` + `.json`, poi l'id in `hair` nel manifest.
-- **Barba**: `tools/trace_beards.py` (tabella `BEARDS` con gruppi ed età) in `src/beards/<id>.svg` + `.json`, poi l'id in `beards` nel manifest; un preset può averne una (`beard`, e `beard` in `colors`).
+- **Sagoma**: tracciarla con `tools/trace_bodies.py` (o scrivere a mano `src/human/bodies/<gruppo>/<nome>.svg` + `.json` con la stessa struttura, compresi i punti `head` e `landmarks`), poi aggiungerla a `bodies` e a `presets` in `src/human/manifest.json`. Un gruppo nuovo (per esempio *Anziani*) è una cartella in più, più una voce in `groups`.
+- **Stile di capelli**: `tools/trace_hair.py` o a mano in `src/human/hair/<id>.svg` + `.json`, poi l'id in `hair` nel manifest.
+- **Barba**: `tools/trace_beards.py` (tabella `BEARDS` con gruppi ed età) in `src/human/beards/<id>.svg` + `.json`, poi l'id in `beards` nel manifest; un preset può averne una (`beard`, e `beard` in `colors`).
 - **Vestiti**: ogni capo sta su una sola sagoma, quindi si traccia su quella. Con un foglio in cui ogni figura indossa un outfit sul proprio corpo (come per le femmine): `tools/trace_outfits.py`, con le regioni di ogni figura assegnate a mano nella sua tabella `OUTFITS` (la riga dice la sagoma). Con due fogli di figure sullo stesso corpo (pantaloni e maglie, come per la prima serie maschile): `tools/trace_clothes.py --out src/clothes/<gruppo>/<sagoma>`; il corpo di riferimento è la prima figura del foglio dei pantaloni e i capi vengono deformati dalla build su quella sagoma (deve essere simile). Poi i capi nel manifest, in `clothes["<gruppo>/<sagoma>"]` (`tops` e `bottoms`), e se si vuole in un preset (`top`, `bottom`, `colors`).
-- Poi `node build.mjs`, e se si vuole l'audit (sotto).
+- **Alieni**: `tools/trace_alien.py` su un foglio di figure affiancate, poi `bodies` e `presets` in `src/alien/manifest.json` (vedi *Alieni*).
+- Poi `node build.mjs`, e se si vuole l'audit degli umani (sotto).
 
-## Audit delle combinazioni
+## Audit delle combinazioni (umani)
 
 ```
 NODE_PATH=$(npm root -g) node tools/audit.mjs      # serve playwright (npm i -g playwright), circa 3 minuti

@@ -1,0 +1,40 @@
+/* Ogni colore è una variabile CSS con un valore di default: il file funziona da solo
+   e il visualizzatore può ricolorare le parti sovrascrivendo le variabili. */
+.c-stroke   { stroke: var(--outline, #15100c); stroke-width: var(--line-w, {{line-w}}); stroke-linecap: round; stroke-linejoin: round }
+.c-fine     { stroke-width: calc(var(--line-w, {{line-w}}) * 0.75) }
+.c-open     { fill: none }
+.c-skin     { fill: var(--skin, {{skin}}) }
+.c-shirt    { fill: var(--shirt, {{shirt}}) }
+.c-pants    { fill: var(--pants, {{pants}}) }
+.c-eye      { fill: var(--eye, {{eye}}) }
+.c-dot      { fill: var(--outline, #15100c) }
+
+/* Parti: il visualizzatore le nasconde con --show-alien-NOME (inline | none). */
+#alien-head  { display: var(--show-alien-head, inline) }
+#alien-torso { display: var(--show-alien-torso, inline) }
+#alien-arm-left, #alien-arm-right { display: var(--show-alien-arms, inline) }
+#alien-pants { display: var(--show-alien-pants, inline) }
+#alien-legs  { display: var(--show-alien-legs, inline) }
+
+/* Idle: respiro (busto e braccia si allungano di ~1%, la testa segue con un leggero ritardo)
+   + battito di ciglia. Solo transform, ancorati alla base di ogni gruppo.
+   --idle-n = 0 spegne tutto; --idle-delay sfasa più istanze tra loro. */
+.c-alien-torso, .c-alien-arm, .c-alien-head, .c-alien-blink {
+  transform-box: fill-box;
+  animation-duration: 1.9s;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+  animation-iteration-count: var(--idle-n, infinite);
+  animation-delay: var(--idle-delay, 0s);
+}
+.c-alien-torso { transform-origin: 50% 100%; animation-name: alien-breathe }
+.c-alien-arm   { transform-origin: 50% 100%; animation-name: alien-arms }
+.c-alien-head  { transform-origin: 50% 100%; animation-name: alien-head; animation-delay: calc(var(--idle-delay, 0s) + 0.14s) }
+.c-alien-blink { transform-origin: 50% 50%; animation-name: alien-blink; animation-duration: 4.6s; animation-direction: normal; animation-timing-function: linear }
+@keyframes alien-breathe { from { transform: scaleY(1) }   to { transform: scaleY(1.014) } }
+@keyframes alien-arms    { from { transform: scaleY(1) }   to { transform: scaleY(1.01) } }
+@keyframes alien-head    { from { transform: translateY(0) rotate(0deg) } to { transform: translateY(-2px) rotate(-0.5deg) } }
+@keyframes alien-blink   { 0%, 90%, 100% { transform: scaleY(1) } 94% { transform: scaleY(0.08) } }
+@media (prefers-reduced-motion: reduce) {
+  .c-alien-torso, .c-alien-arm, .c-alien-head, .c-alien-blink { animation-iteration-count: var(--idle-n, 0) }
+}

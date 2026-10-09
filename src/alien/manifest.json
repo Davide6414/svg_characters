@@ -1,0 +1,7 @@
+{
+  "palette": { "skin": "#b8c99c", "shirt": "#f7f3ea", "pants": "#58585a", "eye": "#15100c" },
+  "lineWidth": 4,
+  "groups": [{ "id": "maschio", "name": "Maschio" }],
+  "bodies": [],
+  "presets": []
+}

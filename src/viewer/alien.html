@@ -1,1 +1,72 @@
-<div class="section" id="section-alien" role="tabpanel" aria-labelledby="tab-alien" hidden></div>
+<div class="section" id="section-alien" role="tabpanel" aria-labelledby="tab-alien" hidden>
+<p class="lead">Sagome aliene in SVG, ricolorabili per parti, con la stessa scala e la stessa linea del suolo di quelle umane. Hanno una sezione tutta loro: le risorse stanno in <code>src/alien/</code> e non si mescolano con quelle degli umani.</p>
+
+<div class="layout">
+  <section aria-label="Anteprima degli alieni">
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="Vista" id="alien-view-seg">
+        <button type="button" data-view="single" aria-pressed="true">Singolo</button>
+        <button type="button" data-view="all" aria-pressed="false">Affiancati</button>
+      </div>
+      <div class="seg" role="group" aria-label="Gruppo" id="alien-group-seg"></div>
+      <div class="seg" role="group" aria-label="Sfondo" id="alien-bg-seg">
+        <button type="button" data-bg="white" aria-pressed="true"><i class="sw" data-bg="white"></i>Bianco</button>
+        <button type="button" data-bg="check" aria-pressed="false"><i class="sw" data-bg="check"></i>Quadretti</button>
+        <button type="button" data-bg="gray" aria-pressed="false"><i class="sw" data-bg="gray"></i>Grigio</button>
+        <button type="button" data-bg="dark" aria-pressed="false"><i class="sw" data-bg="dark"></i>Scuro</button>
+      </div>
+      <label class="zoom">Zoom
+        <input type="range" id="alien-zoom" min="40" max="200" step="5" value="100">
+        <output id="alien-zoom-out" for="alien-zoom">100%</output>
+      </label>
+    </div>
+
+    <div class="stage" id="alien-stage" data-bg="white">
+      <div class="figures single" id="alien-figures"></div>
+    </div>
+
+    <div class="variants" id="alien-variants" role="group" aria-label="Varianti"></div>
+  </section>
+
+  <aside class="panel card" aria-label="Personalizzazione degli alieni">
+    <section>
+      <h2>Sagoma</h2>
+      <div class="bodies" id="alien-body-list" role="radiogroup" aria-label="Sagoma"></div>
+    </section>
+    <section>
+      <h2>Colori · <span id="alien-variant-name"></span></h2>
+      <div class="color-actions" id="alien-color-actions">
+        <button type="button" class="btn" data-colors="look">Pelle e occhi a caso</button>
+        <button type="button" class="btn" data-colors="clothes">Vestiti a caso</button>
+        <button type="button" class="btn" data-colors="default">Colori di default</button>
+      </div>
+      <div class="colors" id="alien-colors"></div>
+    </section>
+    <section>
+      <h2>Contorno</h2>
+      <div class="row">
+        <input type="range" id="alien-line-w" min="0" max="9" step="0.2" value="4" aria-label="Spessore del contorno">
+        <output id="alien-line-w-out" for="alien-line-w">4.0</output>
+      </div>
+    </section>
+    <section>
+      <h2>Parti visibili</h2>
+      <div class="parts" id="alien-parts"></div>
+    </section>
+    <section>
+      <h2>Animazione</h2>
+      <div class="parts"><label><input type="checkbox" id="alien-idle">Idle: respiro e battito di ciglia</label></div>
+    </section>
+    <section>
+      <h2>Esporta</h2>
+      <div class="actions">
+        <button type="button" class="btn primary" id="alien-dl-svg">Scarica SVG</button>
+        <button type="button" class="btn" id="alien-dl-png">Scarica PNG</button>
+        <button type="button" class="btn" id="alien-copy-svg">Copia SVG</button>
+        <button type="button" class="btn" id="alien-reset">Ripristina personaggio</button>
+      </div>
+      <p class="hint">Tasti <kbd>1</kbd>–<kbd>9</kbd>, <kbd>0</kbd> o <kbd>←</kbd> <kbd>→</kbd> per cambiare personaggio. I colori che non hai toccato seguono la sagoma scelta. L'export applica sagoma, colori, spessore e parti visibili correnti; l'SVG resta animato se l'idle è attivo, il PNG è sempre un fotogramma fermo.</p>
+    </section>
+  </aside>
+</div>
+</div>
