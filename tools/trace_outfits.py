@@ -24,8 +24,9 @@ Ogni capo ha:
              (la pancia sotto le braccia: così fra pancia e braccio non restano due tratti che si fondono in un cuneo nero)
   under_up   {indice: px} i pantaloni salgono di tanti px sotto la maglia (in un livello sotto), così con una maglia
              più corta o con un orlo diverso non resta un buco in vita
-  under_down {indice: px | (px, rientro)} lo stesso per una maglia corta o infilata: scende sotto i pantaloni (rientro ai
-             lati in px, 10 se non detto)
+  under_down {indice: px | (px, rientro[, larghezza])} lo stesso per una maglia corta o infilata: scende sotto i pantaloni
+             (rientro ai lati in px, 10 se non detto). `larghezza` (0-1): l'orlo è l'ultima riga larga almeno quella
+             frazione della più larga, non l'ultima riga della regione (la manica lunga unita al busto arriva più in basso)
   join       {indice: (altre regioni,)} regioni da unire in una sola (le gambe dei leggings sotto un abito): il confine
              resta come cucitura
   absorb     {indice: (altre regioni,)} lo stesso senza cucitura (la fessura fra braccio e pancia che il foglio lascia
@@ -36,9 +37,16 @@ Ogni capo ha:
   to_waist   regioni che salgono fino alla vita dei pantaloni della sagoma (quando nel foglio la vita è nascosta)
   neck       la pelle sotto il collo della sagoma fa parte della maglia (scollo a V, cappuccio aperto, o solo il bordo
              del colletto): True per le maglie se non detto altrimenti
+  neck_up    px: la pelle del collo sale anche sopra la riga del collo della sagoma, ma in un livello dietro la testa:
+             riempie la fessura fra il collo della sagoma e il bavero o lo scollo del foglio
   parts      {indice: 'arms'} regioni che sostituiscono le braccia della sagoma (spalle e braccia scoperte)
   arms       (braccio sinistro, braccio destro): indici delle regioni dei bracci, per le maniche corte (vedi sotto)
   folds      regioni dove cercare anche le pieghe chiare (per i pantaloni: la regione principale, in automatico)
+
+Ogni riga della tabella (figura) può avere anche, oltre a `top` e `bottom`:
+  bridge     [((x1, y1), (x2, y2)), …] segmenti scuri, in px del foglio, che chiudono un'interruzione del contorno (nei fogli
+             generati a volte manca un pezzo di tratto e la regione si fonde con lo sfondo)
+  seal       px: ispessisce il tratto per chiudere le crepe di un pixel
 """
 import argparse
 import json
@@ -109,6 +117,36 @@ OUTFITS['vestiti-femminili-2'] = [
                   split={5: [('accent', 'lilac')]}, neck=True, folds=(3, 4), under_down={5: (25, 6)}),  # fiori sulla maglia
          bottom=dict(id='pantaloni-scuri', name='Pantaloni marrone scuro', regions={10: 'main'}, to_shoes=(10,),
                      behind={10: (7, 8)}, clip_top=(10,), to_waist=(10,), under_up={10: 12})),
+]
+
+# Terzo set: abiti e gonne. Un abito sta in due capi (corpetto con le maniche e gonna con cintura e fiocchi) sulla stessa
+# figura: la gonna porta con sé le gambe nude (come i pantaloncini) e il corpetto si abbina a pantaloni qualsiasi.
+OUTFITS['vestiti-femminili-3'] = [
+    dict(body='bambina',
+         top=dict(id='abito-sbuffo', name='Abito con maniche a sbuffo', regions={3: 'main'}, arms=(4, 5), under_down={3: (30, 1)}, neck_up=20),
+         bottom=dict(id='gonna-fiocco', name='Gonna con cintura e fiocco', regions={9: 'main', 7: 'trim', 6: 'trim', 10: 'skin', 11: 'skin'},
+                     to_shoes=(10, 11), behind={9: (4, 5)}, under_up={9: 20})),
+    dict(body='ragazza', seal=1.0, bridge=[((348, 712), (346, 723)), ((484, 705), (487, 720))],     # al foglio manca un pezzo del contorno della gonna
+         top=dict(id='camicetta-colletto', name='Camicetta con colletto', regions={6: 'main', 3: 'trim', 5: 'trim'}, arms=(8, 9), under_down={6: (30, 1)}),
+         bottom=dict(id='gonna-rosa', name='Gonna a campana rosa', regions={12: 'main', 11: 'trim', 14: 'skin', 15: 'skin'},
+                     to_shoes=(14, 15), behind={12: (8, 9)}, under_up={12: 20})),
+    dict(body='slanciata',
+         top=dict(id='blusa-quadrata', name='Blusa con scollo quadrato', regions={3: 'main', 4: 'main'}, neck=True,
+                  absorb={3: (5,)}, under_down={3: (30, 1, 0.5)}),                                                                  # il cuneo fra manica e busto
+         bottom=dict(id='pantaloni-marroni-cintura', name='Pantaloni marroni con cintura',
+                     regions={9: 'main', 7: 'accent', 6: 'accent', 8: 'accent'}, to_shoes=(9,), behind={9: (10, 11)}, under_up={9: 20})),
+    dict(body='adulta',
+         top=dict(id='blazer-beige', name='Blazer beige', regions={3: 'main', 4: 'main', 6: 'main', 8: 'trim', 12: 'trim', 5: 'under'},
+                  neck=True, folds=(3, 4), under_down={5: (25, 0)}, absorb={3: (7,)}),                             # cuneo fra manica e giacca
+         bottom=dict(id='pantaloni-neri-cintura', name='Pantaloni neri con cintura', regions={13: 'main', 9: 'accent', 10: 'accent', 11: 'accent'},
+                     to_shoes=(13,), behind={13: (14, 15)}, under_up={13: 40},
+                     pad_under={13: dict(near=(3, 4, 6, 8), up=14, down=0)})),                           # il bordo alto è l'orlo del blazer
+    dict(body='robusta',
+         top=dict(id='abito-portafoglio', name='Abito a portafoglio (corpetto)', regions={3: 'main', 4: 'main'}, arms=(6, 7), neck=True,
+                  under_down={3: 85}, neck_up=40),
+         bottom=dict(id='gonna-portafoglio', name='Gonna a portafoglio con fiocco',
+                     regions={10: 'main', 8: 'trim', 9: 'trim', 11: 'trim', 12: 'trim', 13: 'trim', 14: 'skin', 15: 'skin'},
+                     to_shoes=(14, 15), behind={10: (6, 7)}, under_up={10: 20})),
 ]
 
 OUTFITS['vestiti-maschili-outfit'] = [

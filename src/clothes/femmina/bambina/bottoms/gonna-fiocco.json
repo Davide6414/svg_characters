@@ -1,0 +1,17 @@
+{
+  "name": "Gonna con cintura e fiocco",
+  "colors": {
+    "main": "#fdf4e6",
+    "trim": "#d4b397"
+  },
+  "landmarks": {
+    "pants-bl": [
+      82.5,
+      878.9
+    ],
+    "pants-br": [
+      210.5,
+      878.9
+    ]
+  }
+}

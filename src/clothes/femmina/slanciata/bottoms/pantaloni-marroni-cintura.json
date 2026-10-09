@@ -1,0 +1,17 @@
+{
+  "name": "Pantaloni marroni con cintura",
+  "colors": {
+    "main": "#837163",
+    "accent": "#625145"
+  },
+  "landmarks": {
+    "pants-bl": [
+      602.5,
+      856.8
+    ],
+    "pants-br": [
+      766.5,
+      856.8
+    ]
+  }
+}

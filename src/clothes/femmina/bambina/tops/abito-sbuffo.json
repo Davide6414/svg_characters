@@ -1,0 +1,24 @@
+{
+  "name": "Abito con maniche a sbuffo",
+  "colors": {
+    "main": "#fdf4e7"
+  },
+  "landmarks": {
+    "armL-tl": [
+      76.0,
+      703.2
+    ],
+    "armL-tr": [
+      120.0,
+      703.2
+    ],
+    "armR-tl": [
+      193.0,
+      704.2
+    ],
+    "armR-tr": [
+      223.0,
+      704.2
+    ]
+  }
+}

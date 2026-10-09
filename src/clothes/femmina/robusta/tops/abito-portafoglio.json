@@ -1,0 +1,24 @@
+{
+  "name": "Abito a portafoglio (corpetto)",
+  "colors": {
+    "main": "#929380"
+  },
+  "landmarks": {
+    "armL-tl": [
+      1192.5,
+      522.7
+    ],
+    "armL-tr": [
+      1252.0,
+      522.7
+    ],
+    "armR-tl": [
+      1333.0,
+      526.5
+    ],
+    "armR-tr": [
+      1375.5,
+      526.5
+    ]
+  }
+}

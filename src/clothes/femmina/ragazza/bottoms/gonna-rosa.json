@@ -1,0 +1,17 @@
+{
+  "name": "Gonna a campana rosa",
+  "colors": {
+    "main": "#d3a698",
+    "trim": "#c99c8e"
+  },
+  "landmarks": {
+    "pants-bl": [
+      343.0,
+      868.5
+    ],
+    "pants-br": [
+      486.0,
+      868.5
+    ]
+  }
+}

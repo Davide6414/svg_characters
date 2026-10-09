@@ -163,6 +163,7 @@ destra): id, nome e le correzioni `{indice regione: ruolo}`. Per vedere gli indi
 ```
 python3 tools/trace_outfits.py reference/vestiti-femminili.webp   --bodies src/bodies/femmina --out src/clothes/femmina
 python3 tools/trace_outfits.py reference/vestiti-femminili-2.webp --bodies src/bodies/femmina --out src/clothes/femmina
+python3 tools/trace_outfits.py reference/vestiti-femminili-3.webp --bodies src/bodies/femmina --out src/clothes/femmina
 python3 tools/trace_outfits.py reference/vestiti-maschili-outfit.webp --bodies src/bodies/maschio --out src/clothes/maschio
 ```
 
@@ -182,7 +183,8 @@ docstring del file, gestiscono i casi che i fogli maschili non avevano (`lib/out
   e il tratto del bordo della regione si ridisegna sopra (così non si copre); il colore di partenza è quello dei pixel
   del dettaglio più lontani dal fondo (i bordi sfumati non lo sbiadiscono);
 - `join`: regioni da unire in una (le gambe dei leggings, i jeans tagliati dalla cucitura centrale): il confine resta
-  come cucitura; `extend_top`: la regione sale fino in vita (i fianchi nascosti da un abito);
+  come cucitura; `absorb`: lo stesso ma **senza** cucitura, per un cuneo che il foglio lascia fra manica e busto
+  (`absorb={3: (5,)}`: la regione 5 diventa parte della 3); `extend_top`: la regione sale fino in vita (i fianchi nascosti da un abito);
 - `neck`: la pelle sotto il collo della sagoma (V, scollo ampio, cappuccio aperto) sta nella regione della testa del
   foglio, non in una regione del capo: si ritaglia sotto la riga del collo della sagoma;
 - `layers` e `pad_under`: parti che stanno in un livello sotto i pantaloni (la pancia di un top corto, e la fessura fra
@@ -192,8 +194,13 @@ docstring del file, gestiscono i casi che i fogli maschili non avevano (`lib/out
   del braccio con dei punti di riferimento corretti (`landmarks` nel json del capo);
 - `under_up`, `behind`: i pantaloni salgono sotto la maglia e proseguono dietro le braccia, così con altre maglie della
   stessa sagoma non restano buchi in vita; `under_down`: lo stesso per una maglia corta o infilata, che scende sotto i
-  pantaloni; `to_shoes`: scendono sotto le scarpe. I bordi alto e basso dei pantaloni si agganciano a quelli dei
+  pantaloni (con un terzo valore, `(30, 1, 0.5)`, l'orlo è l'ultima riga larga almeno metà della più larga: serve quando la
+  manica lunga è unita al busto); `neck_up`: la pelle del collo sale dietro la testa e chiude la fessura col bavero; `to_shoes`: scendono sotto le scarpe. I bordi alto e basso dei pantaloni si agganciano a quelli dei
   pantaloni della sagoma (`landmarks`) quando sono vicini (entro 20 px: una vita alta o una cintura restano dove sono);
+- `bridge` e `seal` (opzioni della *figura*, non del capo): nei fogli generati a volte manca un pezzo di contorno e una
+  regione (la gonna della ragazza, vicino alle mani) si fonde con lo sfondo. `bridge=[((x1, y1), (x2, y2)), …]`
+  disegna dei segmenti scuri, in px del foglio, che chiudono l'interruzione; `seal=1.0` ispessisce il tratto di quei
+  px per chiudere le crepe di un pixel (si guardano le regioni con `-v` finché la gonna non è una regione sola);
 - `folds`: dove cercare anche le pieghe chiare (per i pantaloni, la regione principale, in automatico);
 - `widen`, `clip_top`, `to_waist`: allargare una regione sotto le vicine (la pancia sotto le braccia), togliere le strisce
   strette in alto (un pezzo di pantalone che risale lungo il braccio), far salire i pantaloni fino alla vita della
@@ -207,7 +214,10 @@ docstring del file, gestiscono i casi che i fogli maschili non avevano (`lib/out
   base e con i capi di un altro foglio.
 
 Dopo la tracciatura: i capi in `clothes["<gruppo>/<sagoma>"]` del manifest; i colori delle scarpe di ogni outfit si
-ricavano dal foglio e si scrivono nel preset (`colors`).
+ricavano dal foglio e si scrivono nel preset (`colors`). Le scarpe dei fogli di abiti e gonne (ballerine, mary jane,
+tacchi) non si disegnano: restano le scarpe base della sagoma e dal foglio si prendono solo i colori. Un abito si divide
+in due capi: il corpetto con le maniche è una maglia, la gonna (con cintura, fiocchi e le gambe `skin` fino alle
+scarpe, `to_shoes`) sono i pantaloni.
 
 ## Limiti noti
 

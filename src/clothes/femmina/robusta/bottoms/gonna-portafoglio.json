@@ -1,0 +1,17 @@
+{
+  "name": "Gonna a portafoglio con fiocco",
+  "colors": {
+    "main": "#939481",
+    "trim": "#8a8a78"
+  },
+  "landmarks": {
+    "pants-bl": [
+      1188.5,
+      878.3
+    ],
+    "pants-br": [
+      1352.5,
+      878.3
+    ]
+  }
+}

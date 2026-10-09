@@ -4,8 +4,9 @@ Il contorno è la rete di pixel scuri (luminanza ≤ DARK). Le regioni sono le c
 del resto; gli occhi (macchie scure staccate dalla rete) vengono riempiti e registrati a parte.
 """
 import numpy as np
+from PIL import Image, ImageDraw
 
-from .geom import label_components, upsample, erode
+from .geom import dilate, erode, label_components, upsample
 
 K = 2          # fattore di sovracampionamento dei bitmap
 DARK = 34      # soglia di luminanza del contorno (separa il nero dei riempimenti, ≈ 44-56, dal tratto, < 25)
@@ -134,12 +135,24 @@ def _split_merged_shoes(lab, dark, lum, box):
     return lab, dark | (lab == 0)
 
 
-def segment(sheet, box):
-    """Segmenta la figura inclusa in `box` del foglio."""
+def segment(sheet, box, bridge=(), seal=0):
+    """Segmenta la figura inclusa in `box` del foglio. `bridge`: segmenti ((x1, y1), (x2, y2)), in px del foglio, che
+    chiudono un'interruzione del contorno (nei fogli generati a volte manca un pezzo di tratto e la regione si fonde con
+    lo sfondo): si disegnano come tratto scuro prima di dividere le regioni. `seal` (px del foglio): ispessisce il tratto
+    per chiudere le crepe di un pixel (un contorno sottile o sfumato, sopra la soglia di luminanza in qualche punto)."""
     x0, y0, x1, y1 = box
     lum = upsample(sheet.lum[y0:y1, x0:x1], K)
     rgb = np.stack([upsample(sheet.rgb[y0:y1, x0:x1, c], K) for c in range(3)], -1)
-    dark, eyes, dots = _eyes_and_fill(lum <= DARK, box)
+    dark0 = lum <= DARK
+    if bridge:
+        img = Image.new('L', (dark0.shape[1], dark0.shape[0]), 0)
+        draw = ImageDraw.Draw(img)
+        for (ax, ay), (bx, by) in bridge:
+            draw.line([((ax - x0) * K, (ay - y0) * K), ((bx - x0) * K, (by - y0) * K)], fill=255, width=int(4 * K))
+        dark0 = dark0 | (np.asarray(img) > 127)
+    if seal:
+        dark0 = dilate(dark0, seal * K)
+    dark, eyes, dots = _eyes_and_fill(dark0, box)
     lab, n = label_components(~dark, conn=4)
     lab, dark = _split_merged_shoes(lab, dark, lum, box)
     # rinumera 1..n senza buchi

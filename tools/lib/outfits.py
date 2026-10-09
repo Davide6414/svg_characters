@@ -118,7 +118,7 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
     """Traccia maglia e pantaloni della figura in `box`. `ref` = dati (testa, punti di riferimento) della sagoma su
     cui è disegnata. `spec` = {'top': capo, 'bottom': capo}, ogni capo con `regions` {indice: ruolo}.
     Restituisce {'top': garment, 'bottom': garment}."""
-    seg = segment(sheet, box)
+    seg = segment(sheet, box, bridge=spec.get('bridge', ()), seal=spec.get('seal', 0))
     info = region_info(seg)
     x0, y0, x1, y1 = box
     e = seg.eyes
@@ -239,9 +239,9 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
             if i in cs.get('under_up', {}):                       # i pantaloni salgono sotto la maglia: nessun buco con altre maglie
                 add(base, role, extend_top(plain, cs['under_up'][i], band_only=True), med[i], 'under', stroke=True)
             if i in cs.get('under_down', {}):                     # la maglia scende sotto i pantaloni: nessun buco con altri pantaloni
-                down = cs['under_down'][i]                        # px, oppure (px, rientro ai lati)
-                px, inset = down if isinstance(down, tuple) else (down, 10)
-                add(base, role, extend_bottom(plain, px, inset=inset, band_only=True), med[i], 'under', stroke=True)
+                down = cs['under_down'][i]                        # px, oppure (px, rientro ai lati[, larghezza minima dell'orlo])
+                px, inset, wide = (tuple(down) + (10, 0.0)[len(down) - 1:]) if isinstance(down, tuple) else (down, 10, 0.0)
+                add(base, role, extend_bottom(plain, px, inset=inset, band_only=True, wide=wide), med[i], 'under', stroke=True)
             if details:
                 add(strokes, 'open', cell, med[i], layer, stroke=True)
             if verbose:
@@ -270,6 +270,11 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
                 add(overlays, 'skin', m, (252, 190, 154), 'main', stroke=False)
                 if verbose:
                     print(f'    scollo area {m.sum() / (K * K):.0f}')
+            if cs.get('neck_up'):                                 # il collo più in su, ma dietro la testa: riempie la fessura fra
+                rows = (v_idx >= (cut - cs['neck_up'] - y0) * K) & (v_idx < (cut - y0) * K + 4 * K)    # il collo della sagoma e il bavero
+                m = _smooth_mask(erode(cells[head], 0.5 * K) & rows, 0.8, 20)
+                if m.any():
+                    add(overlays, 'skin', m, (252, 190, 154), 'back', stroke=False)
 
         # livello dietro: il capo continua sotto le braccia (non per un capo che disegna le braccia da sé: le sue braccia
         # si spostano col capo e la striscia sporgerebbe)

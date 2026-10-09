@@ -1,0 +1,17 @@
+{
+  "name": "Camicetta con colletto",
+  "colors": {
+    "main": "#fdf5e9",
+    "trim": "#fdf5eb"
+  },
+  "landmarks": {
+    "armL-tl": [
+      333.0,
+      555.8
+    ],
+    "armL-tr": [
+      389.0,
+      555.8
+    ]
+  }
+}
