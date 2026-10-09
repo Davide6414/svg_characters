@@ -206,6 +206,11 @@ docstring del file, gestiscono i casi che i fogli maschili non avevano (`lib/out
   marrone di un abito rosa, `dark=80` lo chiude in una regione) e `cuts=[(regione, y)]`: divide una regione con un taglio
   orizzontale all'altezza `y` del foglio (un abito senza la linea della vita: la parte sotto prende l'indice successivo all'ultimo,
   lo stampa `-v`);
+- `to_ground`: nei fogli con scarpe diverse da quelle della sagoma (tacchi, ballerine, sandali) l'orlo dei pantaloni e le gambe di pelle finiscono
+  in un punto che non combacia con le scarpe della sagoma (orli a gradini, gambe che galleggiano, un cinturino fuso nella caviglia).
+  `to_ground={indice: rientro}` prolunga ogni gamba della regione con un rettangolo fino al suolo (e taglia i gradini a ±3 px), così
+  la scarpa, disegnata sopra, la nasconde. `(rientro, px sopra il suolo, px sopra l'orlo)`: per pantaloni molto larghi la gamba si ferma a
+  `px` dal suolo (la cima della scarpa, 34-40) e il terzo valore (10 di solito) è dove si misura la larghezza della gamba (26 se il piede punta di lato).
 - `no_seams`, `min_seam`, `smooth`: ripulire un abito scuro dai ghirigori. `no_seams` toglie le linee interne di certe regioni (una gamba
   o un braccio di pelle, i pannelli fusi con `absorb`); `min_seam` alza la lunghezza minima delle linee (px del foglio) per
   perdere i trattini corti dei bordi doppi; `smooth={indice: px}` apre la regione (erosione e dilatazione) e toglie i

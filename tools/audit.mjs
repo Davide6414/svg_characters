@@ -48,10 +48,10 @@ for (const b of bodies) {
 const hairNames = Object.fromEntries(await Promise.all(manifest.hair.map(async (h) => [h, (await json(`src/hair/${h}.json`)).name])));
 
 // Soglie (px della sagoma, cioè del foglio di riferimento): sotto queste un difetto non si vede o è coperto dal tratto.
-const LIMITS = { gapTrunk: 3, gapArm: 6, gapLeg: 4, newHoles: 3, floating: 3, clip: 1, pantsHigh: 22, underArm: 6,
+const LIMITS = { gapTrunk: 3, gapArm: 6, gapLeg: 4, hemNotch: 25, newHoles: 3, floating: 3, clip: 1, pantsHigh: 22, underArm: 6,
                  underOut: 6, animGap: 8, eyes: 0.9, exportDiff: 30 };
 const LABELS = {
-  gapTrunk: 'Vuoto nel busto', gapArm: 'Vuoto nelle braccia', gapLeg: 'Vuoto alle caviglie', newHoles: 'Fessura chiusa',
+  gapTrunk: 'Vuoto nel busto', gapArm: 'Vuoto nelle braccia', gapLeg: 'Vuoto alle caviglie', hemNotch: 'Orlo a gradini ai piedi', newHoles: 'Fessura chiusa',
   floating: 'Pezzo staccato', clip: 'Tagliato dal riquadro', pantsHigh: 'Estensione dei pantaloni visibile', underArm: 'Livello sotto copre il braccio',
   underOut: 'Livello sotto sporge', animGap: 'Vuoto durante il respiro', eyes: 'Occhi coperti dai capelli', exportDiff: 'Export diverso',
 };
@@ -158,6 +158,24 @@ function browserSide() {
     return m;
   }
 
+  // chiusura (dilatazione e poi erosione con un quadrato di raggio r) di una fascia di bh righe: riempie le tacche e le fessure strette
+  function closing(m, W, bh, r) {
+    const pass = (src, vertical, wantMax) => {
+      const out = new Uint8Array(src.length), len = vertical ? bh : W, lines = vertical ? W : bh;
+      for (let l = 0; l < lines; l++) for (let k = 0; k < len; k++) {
+        let v = wantMax ? 0 : 1;
+        for (let d = -r; d <= r; d++) {
+          const q = k + d;
+          const t = q < 0 || q >= len ? (wantMax ? 0 : 1) : src[vertical ? q * W + l : l * W + q];
+          if (wantMax ? t : !t) { v = wantMax ? 1 : 0; break; }
+        }
+        out[vertical ? k * W + l : l * W + k] = v;
+      }
+      return out;
+    };
+    return pass(pass(pass(pass(m, false, true), true, true), false, false), true, false);
+  }
+
   // distanza (chamfer 3-4) di ogni pixel della maschera dal pixel più vicino fuori dalla maschera, in px di rendering
   function distance(mask, W, H) {
     const d = new Float32Array(W * H);
@@ -230,7 +248,15 @@ function browserSide() {
     const baseHole = new Uint8Array(N);
     for (let i = 0; i < N; i++) if (holes.lab[i] && !holes.border[holes.lab[i]]) baseHole[i] = 1;
     let eyes = 0; for (let i = 0; i < N; i++) if (base[i] === EYE) eyes++;
-    return { b, vb, W, H, N, base, trunk, arm, leg, baseHole, hem, tx0, tx1, ny, crotch, eyes, px0, px1, py0, py1, shoeTop };
+    // l'attaccatura pantaloni-piedi: la fascia dalle caviglie (45 px sopra la cima delle scarpe) al suolo. Una chiusura (4 px)
+    // riempie le tacche e le fessure strette dell'orlo; quelle che la sagoma base ha già non contano
+    let minTop = H; for (let x = 0; x < W; x++) if (shoeTop[x] >= 0) minTop = Math.min(minTop, shoeTop[x]);
+    const footTop = Math.max(0, minTop - Math.round(45 * S)), footH = H - footTop;
+    const bandOf = (c) => { const m = new Uint8Array(W * footH); for (let i = 0; i < m.length; i++) m[i] = c[footTop * W + i] ? 1 : 0; return m; };
+    const baseBand = bandOf(base), baseClosed = closing(baseBand, W, footH, Math.round(3 * S));
+    const footAdded = new Uint8Array(W * footH);
+    for (let i = 0; i < footAdded.length; i++) footAdded[i] = baseClosed[i] && !baseBand[i] ? 1 : 0;
+    return { b, vb, W, H, N, base, trunk, arm, leg, baseHole, hem, tx0, tx1, ny, crotch, eyes, px0, px1, py0, py1, shoeTop, footTop, footH, footAdded };
   }
 
   // headOnly: per i capelli contano solo i difetti della testa (i vestiti sono già controllati a parte)
@@ -250,7 +276,18 @@ function browserSide() {
       while (y > ys - 22 * S && !cls[y * W + x]) run.push(y-- * W + x);
       if (run.length && y > ys - 22 * S && cls[y * W + x] && cls[y * W + x] !== SHOE) gl.push(...run);
     }
-    if (!headOnly) { take('gapTrunk', gt); take('gapArm', ga); take('gapLeg', gl); }
+    // tacche e gradini dell'orlo ai piedi (una gamba che non entra dritta nella scarpa): pixel che la chiusura aggiunge
+    const hn = [];
+    if (!headOnly) {
+      const m = new Uint8Array(W * P.footH);
+      for (let i = 0; i < m.length; i++) m[i] = cls[P.footTop * W + i] ? 1 : 0;
+      const closed = closing(m, W, P.footH, Math.round(3 * S));
+      const gain = new Uint8Array(m.length);
+      for (let i = 0; i < m.length; i++) gain[i] = closed[i] && !m[i] && !P.footAdded[i] ? 1 : 0;
+      const thick = erode(gain, W, P.footH, 1);              // via i filetti di un pixel agli angoli fra orlo e scarpa
+      for (let i = 0; i < m.length; i++) if (thick[i]) hn.push(P.footTop * W + i);
+    }
+    if (!headOnly) { take('gapTrunk', gt); take('gapArm', ga); take('gapLeg', gl); take('hemNotch', hn); }
     // buchi chiusi nuovi: solo le fessure sottili (larghe fino a 2·THIN px); uno spazio largo fra braccio e fianco è normale
     const bgMask = cls.map((c) => (c ? 0 : 1));
     const bgc = components(bgMask, W, H, false), dist = distance(bgMask, W, H), thick = new Float32Array(bgc.n + 1), nh = [];

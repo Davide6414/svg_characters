@@ -107,6 +107,39 @@ def _extend_rows(mask, up, down):
     return out
 
 
+def _to_ground(cell, end_row, inset=0.0, win=10):
+    """Prolunga verso il suolo ogni gamba (o ogni gamba di pantalone) della regione, fino alla riga `end_row`: un rettangolo largo
+    quanto la gamba `win` px sopra l'orlo (meno `inset` px per lato). L'orlo del foglio non combacia con le scarpe della sagoma
+    (tacchi, ballerine, sandali): così la gamba entra dritta nella scarpa, che disegnata sopra la nasconde, e non restano
+    orli a gradini o gambe che galleggiano sopra la scarpa."""
+    out = cell.copy()
+    rows = np.nonzero(cell.any(1))[0]
+    last = rows.max()
+    if last + 1 >= end_row:
+        return cell
+    cols = np.nonzero(cell[max(0, last - 30 * K):last + 1].any(0))[0]
+    runs, start = [], cols[0]
+    for a, b in zip(cols[:-1], cols[1:]):
+        if b - a > 2 * K:
+            runs.append((start, a)); start = b
+    runs.append((start, cols[-1]))
+    for a, b in runs:
+        if b - a < 8 * K:
+            continue
+        run_rows = np.nonzero(cell[:, a:b + 1].any(1))[0]
+        top = max(0, run_rows.max() - win * K)
+        xs = np.nonzero(cell[top, a:b + 1])[0]
+        if not xs.size:
+            continue
+        x0, x1 = a + xs.min() + int(inset * K), a + xs.max() - int(inset * K)
+        if x1 > x0:
+            tol = int(3 * K)                                  # fuori dalla gamba (± 3 px) i gradini e le punte dell'orlo si tagliano
+            out[top:, a:max(a, x0 - tol)] = False
+            out[top:, x1 + 1 + tol:b + 1] = False
+            out[top:end_row, x0:x1 + 1] = True
+    return out
+
+
 def _clip_top(cell):
     """Toglie le righe in alto più strette del 60% della riga più larga."""
     rows = cell.sum(1)
@@ -242,6 +275,10 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
             shape[i] = cell                                       # la forma del capo, prima di scendere sotto le scarpe
             if i in cs.get('to_shoes', ()):                       # scende sotto le scarpe, così l'orlo non si vede
                 cell = cell | (dilate(cell, PAD * K) & shoe_cells)
+            if i in cs.get('to_ground', {}):                      # le gambe arrivano dritte fino alla scarpa della sagoma
+                tg = cs['to_ground'][i]
+                inset, up, win = (tuple(tg) + (14, 10)[len(tg) - 1:]) if isinstance(tg, tuple) else (tg, 14, 10)
+                cell = _to_ground(cell, int((bottom_y - y0) * K) - int(up * K), inset, win)
             details = cs.get('split', {}).get(i, ())
             # con dei dettagli sopra, la regione si disegna in due tempi: riempimento, dettagli, poi il tratto del bordo
             add(base, role, cell, med[i], layer, stroke=not details, part=cs.get('parts', {}).get(i))
