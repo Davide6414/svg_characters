@@ -2,7 +2,7 @@
 """Traccia le sagome di un foglio di riferimento (figure affiancate su sfondo chiaro).
 
 Uso:
-  python3 tools/trace_bodies.py reference/sagome-maschili.webp --out src/bodies/maschio \\
+  python3 tools/trace_bodies.py reference/sagome-maschili.webp --out src/human/bodies/maschio \\
       --names bambino,ragazzo,slanciato,adulto,robusto
 
 Per ogni figura (da sinistra a destra) scrive `<nome>.svg` e `<nome>.json` in --out. Il nome visualizzato
@@ -21,7 +21,7 @@ from lib.sheet import Sheet                # noqa: E402
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('sheet', help='immagine del foglio di riferimento')
-    ap.add_argument('--out', required=True, help='cartella di destinazione (es. src/bodies/maschio)')
+    ap.add_argument('--out', required=True, help='cartella di destinazione (es. src/human/bodies/maschio)')
     ap.add_argument('--names', required=True, help='nomi dei file, da sinistra a destra, separati da virgola')
     ap.add_argument('--ground', type=float, default=GROUND, help='y della linea del suolo (default %(default)s)')
     ap.add_argument('-v', '--verbose', action='store_true')

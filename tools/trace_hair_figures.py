@@ -2,8 +2,8 @@
 """Traccia le acconciature da un foglio di figure intere (ogni figura ha la testa con uno stile diverso).
 
 Uso:
-  python3 tools/trace_hair_figures.py reference/capelli-anziani.webp --out src/hair
-  python3 tools/trace_hair_figures.py reference/capelli-2.webp --out src/hair
+  python3 tools/trace_hair_figures.py reference/capelli-anziani.webp --out src/human/hair
+  python3 tools/trace_hair_figures.py reference/capelli-2.webp --out src/human/hair
 
 La tabella si sceglie dal nome del foglio (HAIRS[nome senza estensione]), una riga per figura da sinistra a destra.
 Scrive `<id>.svg` (riempimento, contorno solo dove il foglio ha un tratto, linee interne, nelle coordinate del
@@ -75,7 +75,7 @@ def hair_svg(h, r):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('sheet', help='foglio con le figure')
-    ap.add_argument('--out', required=True, help='cartella di destinazione (es. src/hair)')
+    ap.add_argument('--out', required=True, help='cartella di destinazione (es. src/human/hair)')
     ap.add_argument('-v', '--verbose', action='store_true')
     a = ap.parse_args()
     stem = os.path.splitext(os.path.basename(a.sheet))[0]

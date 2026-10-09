@@ -12,9 +12,9 @@ Sono deterministici: rigenerando da `reference/` si ottengono file identici a qu
 ## Sagome: `trace_bodies.py`
 
 ```
-python3 tools/trace_bodies.py reference/sagome-maschili.webp  --out src/bodies/maschio \
+python3 tools/trace_bodies.py reference/sagome-maschili.webp  --out src/human/bodies/maschio \
     --names bambino,ragazzo,slanciato,adulto,robusto
-python3 tools/trace_bodies.py reference/sagome-femminili.webp --out src/bodies/femmina \
+python3 tools/trace_bodies.py reference/sagome-femminili.webp --out src/human/bodies/femmina \
     --names bambina,ragazza,slanciata,adulta,robusta
 ```
 
@@ -42,14 +42,14 @@ Come lavora (moduli in `lib/`):
 4. Tutte le sagome vengono spostate in verticale perché le suole poggino su y = 900: stessa linea del suolo.
 5. `export.py` scrive i file.
 
-Dopo la tracciatura: aggiungere le sagome a `bodies` e `presets` in `src/manifest.json` e lanciare `node build.mjs`.
+Dopo la tracciatura: aggiungere le sagome a `bodies` e `presets` in `src/human/manifest.json` e lanciare `node build.mjs`.
 Se cambiano i punti di riferimento (`landmarks`) vanno rigenerate anche le sagome già esistenti.
 
 ## Capelli: `trace_hair.py`
 
 ```
-python3 tools/trace_hair.py reference/capelli.webp --out src/hair
-python3 tools/trace_hair.py reference/capelli-3.webp --out src/hair
+python3 tools/trace_hair.py reference/capelli.webp --out src/human/hair
+python3 tools/trace_hair.py reference/capelli-3.webp --out src/human/hair
 ```
 
 Per i fogli di **soli capelli su sfondo trasparente** (RGBA). La tabella `HAIRS[nome del foglio]` ha una riga per
@@ -71,8 +71,8 @@ Poi aggiungere l'id a `hair` nel manifest e lanciare `node build.mjs`.
 ## Capelli da figure intere: `trace_hair_figures.py`
 
 ```
-python3 tools/trace_hair_figures.py reference/capelli-2.webp --out src/hair
-python3 tools/trace_hair_figures.py reference/capelli-anziani.webp --out src/hair
+python3 tools/trace_hair_figures.py reference/capelli-2.webp --out src/human/hair
+python3 tools/trace_hair_figures.py reference/capelli-anziani.webp --out src/human/hair
 ```
 
 Per un foglio di figure intere, ognuna con un'acconciatura diversa (`lib/hair_figures.py`). I capelli vanno isolati dalla
@@ -106,7 +106,7 @@ sagome si applica lo stile (`ages` nel manifest): gli stili da anziani non vanno
 ## Barbe: `trace_beards.py`
 
 ```
-python3 tools/trace_beards.py reference/barbe.webp --out src/beards
+python3 tools/trace_beards.py reference/barbe.webp --out src/human/beards
 ```
 
 Per un foglio di figure intere con la stessa testa calva e una barba diversa (`lib/beard_figures.py`). Come per i capelli da
@@ -127,7 +127,7 @@ foglio]` ha una riga per figura: id, nome, `groups` e `ages` (a quali sagome val
 
 ## Vestiti: un capo, una sagoma
 
-Ogni capo sta **solo sulla sagoma su cui è disegnato**: i file sono in `src/clothes/<gruppo>/<sagoma>/{tops,bottoms}/`
+Ogni capo sta **solo sulla sagoma su cui è disegnato**: i file sono in `src/human/clothes/<gruppo>/<sagoma>/{tops,bottoms}/`
 e il manifest li elenca per sagoma (`clothes["maschio/adulto"].tops`…). Mischiare i capi fra corporature diverse dava
 sempre problemi di vestibilità, quindi non esiste più nessun adattamento fra sagome. Un capo per un'altra sagoma si
 traccia di nuovo su quella sagoma. Due strumenti, secondo il foglio.
@@ -135,7 +135,7 @@ traccia di nuovo su quella sagoma. Due strumenti, secondo il foglio.
 ## Due fogli sullo stesso corpo: `trace_clothes.py`
 
 ```
-python3 tools/trace_clothes.py --out src/clothes/maschio/adulto \
+python3 tools/trace_clothes.py --out src/human/clothes/maschio/adulto \
     --bottoms reference/vestiti-maschili-pantaloni.webp --tops reference/vestiti-maschili-maglie.webp
 ```
 
@@ -161,11 +161,11 @@ destra): id, nome e le correzioni `{indice regione: ruolo}`. Per vedere gli indi
 ## Outfit: `trace_outfits.py`
 
 ```
-python3 tools/trace_outfits.py reference/vestiti-femminili.webp   --bodies src/bodies/femmina --out src/clothes/femmina
-python3 tools/trace_outfits.py reference/vestiti-femminili-2.webp --bodies src/bodies/femmina --out src/clothes/femmina
-python3 tools/trace_outfits.py reference/vestiti-femminili-3.webp --bodies src/bodies/femmina --out src/clothes/femmina
-python3 tools/trace_outfits.py reference/vestiti-femminili-4.webp --bodies src/bodies/femmina --out src/clothes/femmina
-python3 tools/trace_outfits.py reference/vestiti-maschili-outfit.webp --bodies src/bodies/maschio --out src/clothes/maschio
+python3 tools/trace_outfits.py reference/vestiti-femminili.webp   --bodies src/human/bodies/femmina --out src/human/clothes/femmina
+python3 tools/trace_outfits.py reference/vestiti-femminili-2.webp --bodies src/human/bodies/femmina --out src/human/clothes/femmina
+python3 tools/trace_outfits.py reference/vestiti-femminili-3.webp --bodies src/human/bodies/femmina --out src/human/clothes/femmina
+python3 tools/trace_outfits.py reference/vestiti-femminili-4.webp --bodies src/human/bodies/femmina --out src/human/clothes/femmina
+python3 tools/trace_outfits.py reference/vestiti-maschili-outfit.webp --bodies src/human/bodies/maschio --out src/human/clothes/maschio
 ```
 
 Per un foglio in cui **ogni figura indossa maglia e pantaloni sul proprio corpo** (le cinque sagome di un gruppo, ognuna

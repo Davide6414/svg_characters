@@ -2,7 +2,7 @@
 """Traccia le barbe da un foglio di figure intere (ogni figura ha la testa calva con una barba diversa).
 
 Uso:
-  python3 tools/trace_beards.py reference/barbe.webp --out src/beards
+  python3 tools/trace_beards.py reference/barbe.webp --out src/human/beards
 
 La tabella si sceglie dal nome del foglio (BEARDS[nome senza estensione]), una riga per figura da sinistra a destra.
 Scrive `<id>.svg` (livello sotto il contorno della testa + sagoma, contorno e linee, nelle coordinate del riquadro dei
@@ -67,7 +67,7 @@ def beard_svg(b, r):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('sheet', help='foglio con le figure')
-    ap.add_argument('--out', required=True, help='cartella di destinazione (es. src/beards)')
+    ap.add_argument('--out', required=True, help='cartella di destinazione (es. src/human/beards)')
     ap.add_argument('-v', '--verbose', action='store_true')
     a = ap.parse_args()
     stem = os.path.splitext(os.path.basename(a.sheet))[0]
