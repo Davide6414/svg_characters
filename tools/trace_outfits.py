@@ -95,7 +95,7 @@ OUTFITS['vestiti-femminili-2'] = [
                   neck=True, under_down={7: (30, 0), 5: (20, 4), 6: (20, 4)}),                        # il top e i lembi scendono sotto i pantaloni
          bottom=dict(id='jeans-neri', name='Jeans neri risvoltati', regions={18: 'main', 14: 'main', 15: 'main', 16: 'main',
                                                                              19: 'trim', 20: 'trim', 21: 'skin', 22: 'skin'},
-                     to_shoes=(21, 22), behind={18: (5, 6, 7)}, under_up={18: 30})),
+                     to_shoes=(21, 22), behind={18: (5, 6, 7)}, extend_top={18: (16, 6)}, under_up={18: 12})),     # la vita arriva alla cintura (nel foglio la giacca copre i fianchi)
     dict(body='adulta',
          top=dict(id='maglione-v', name='Maglione a coste', regions={3: 'main'}, arms=(4, 6), neck=True, folds=(3,)),
          bottom=dict(id='pantaloni-oliva', name='Pantaloni oliva', regions={5: 'main', 7: 'skin'}, to_shoes=(5, 7),
