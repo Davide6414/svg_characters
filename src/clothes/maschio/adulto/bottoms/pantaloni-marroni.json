@@ -1,0 +1,24 @@
+{
+  "name": "Pantaloni marroni",
+  "colors": {
+    "main": "#67513c"
+  },
+  "landmarks": {
+    "pants-tl": [
+      887.5,
+      618.4
+    ],
+    "pants-tr": [
+      1060.5,
+      618.4
+    ],
+    "pants-bl": [
+      887.5,
+      857.3
+    ],
+    "pants-br": [
+      1060.5,
+      857.3
+    ]
+  }
+}

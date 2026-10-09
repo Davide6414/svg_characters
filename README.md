@@ -35,7 +35,7 @@ serve.mjs                   server statico opzionale:  node serve.mjs → http:/
 reference/                  fogli di riferimento da cui sono tracciate le sorgenti
   sagome-maschili · sagome-femminili · capelli · capelli-2 · capelli-3 · capelli-anziani · barbe ·
   vestiti-maschili-pantaloni · vestiti-maschili-maglie ·
-  vestiti-maschili-outfit · vestiti-maschili-2 · vestiti-femminili · vestiti-femminili-2 · vestiti-femminili-3 · vestiti-femminili-4 · archivio/
+  vestiti-maschili-outfit · vestiti-maschili-2 · vestiti-maschili-3 · vestiti-femminili · vestiti-femminili-2 · vestiti-femminili-3 · vestiti-femminili-4 · archivio/
 tools/                      strumenti Python per tracciare i fogli (vedi tools/README.md)
 ```
 
@@ -189,11 +189,11 @@ disegnati su di lei e solo lì (`src/clothes/<gruppo>/<sagoma>/`, elencati per s
 
 | Sagoma | Maglie (`top-<id>`) | Pantaloni (`bottom-<id>`) |
 | --- | --- | --- |
-| Bambino | `maglietta-riga` (bianca con una riga sul petto) · `maglietta-sole` (gialla con un sole) | `bermuda-cargo` (tasche laterali, con gambe e calze) · `pantaloncini-blu` (con risvolto, gambe e calze) |
-| Ragazzo | `felpa-rossa` (cappuccio, cordini, tasca, polsini) · `maglietta-righe-blu` (righe bianche e blu) | `jeans-grigi` (cucitura centrale) · `cargo-beige` (bermuda con tasca sulla coscia, gambe e calze) |
-| Slanciato | `camicia-risvoltata` (aperta, maniche arrotolate, taschino, maglietta sotto) · `maglietta-verde` | `pantaloni-kaki` · `cargo-grigio` (bermuda con due tasche, gambe e calze) |
-| Adulto | `felpa` (cappuccio, cordini, tasca a marsupio) · `giacca` (colletto, cerniera, tasche, coste) · `polo` (colletto, patta con bottoni) · `maglione` (girocollo, coste) · `camicia` (aperta sulla maglietta) · `polo-blu` (bottoni, infilata nei pantaloni) · `polo-bianca` (colletto e patta con bottoni) | `jeans` · `chino` · `jogger` (coste e cordino) · `cargo` (tasche laterali) · `larghi` (gamba larga, pieghe) · `pantaloni-cintura` (cintura e fibbia) · `bermuda-beige` (con le gambe) |
-| Robusto | `cardigan-grigio` (bottoni, coste, maglietta sotto) · `camicia-celeste` (aperta, a maniche corte, bottoni e taschino, maglietta bianca sotto) | `jeans-chiari` · `pantaloni-lino` (risvoltati sul polpaccio, con le gambe) |
+| Bambino | `maglietta-riga` (bianca con una riga sul petto) · `maglietta-sole` (gialla con un sole) · `maglione-senape` (girocollo) | `bermuda-cargo` (tasche laterali, con gambe e calze) · `pantaloncini-blu` (con risvolto, gambe e calze) · `pantaloni-verdi` (verde oliva, con le gambe) |
+| Ragazzo | `felpa-rossa` (cappuccio, cordini, tasca, polsini) · `maglietta-righe-blu` (righe bianche e blu) · `giubbotto-ruggine` (aperto sulla felpa col cappuccio e i cordini) | `jeans-grigi` (cucitura centrale) · `cargo-beige` (bermuda con tasca sulla coscia, gambe e calze) · `jeans-risvoltati` (con il risvolto chiaro) |
+| Slanciato | `camicia-risvoltata` (aperta, maniche arrotolate, taschino, maglietta sotto) · `maglietta-verde` · `felpa-verde` (cappuccio, cordini, tasca a marsupio, maglietta bianca sotto) | `pantaloni-kaki` · `cargo-grigio` (bermuda con due tasche, gambe e calze) · `cargo-neri` (lunghi, con quattro tasche) |
+| Adulto | `felpa` (cappuccio, cordini, tasca a marsupio) · `giacca` (colletto, cerniera, tasche, coste) · `polo` (colletto, patta con bottoni) · `maglione` (girocollo, coste) · `camicia` (aperta sulla maglietta) · `polo-blu` (bottoni, infilata nei pantaloni) · `polo-bianca` (colletto e patta con bottoni) · `maglione-panna` (girocollo) | `jeans` · `chino` · `jogger` (coste e cordino) · `cargo` (tasche laterali) · `larghi` (gamba larga, pieghe) · `pantaloni-cintura` (cintura e fibbia) · `bermuda-beige` (con le gambe) · `pantaloni-marroni` |
+| Robusto | `cardigan-grigio` (bottoni, coste, maglietta sotto) · `camicia-celeste` (aperta, a maniche corte, bottoni e taschino, maglietta bianca sotto) · `giacca-camicia` (blu, aperta su una maglietta ruggine, bottoni e taschino) | `jeans-chiari` · `pantaloni-lino` (risvoltati sul polpaccio, con le gambe) · `chino-beige` |
 | Bambina | `maglietta-fiore` (rosa con fiore) · `abitino` (colletto, fiore, pieghe) · `abito-sbuffo` (corpetto bianco con maniche a sbuffo) · `abito-rosa` (corpetto senza maniche) | `pantaloncini` (di jeans risvoltati, con gambe e calze) · `leggings` (con le caviglie) · `gonna-fiocco` (gonna bianca con cintura e fiocco dietro, con gambe) · `gonna-tulle` (gonna a ruota rosa con grande fiocco) |
 | Ragazza | `felpa-cappuccio` (cappuccio aperto, cordini, tasca a marsupio) · `maglia-righe` (righe e polsini) · `camicetta-colletto` (colletto alla coreana, maniche a sbuffo) · `abito-bordeaux` (corpetto con spalline) | `jeans-scuri` (tasche, cucitura) · `jeans-cargo` (tasche laterali) · `gonna-rosa` (a campana, con cintura e gambe) · `gonna-bordeaux` (a ruota con fiocco) |
 | Slanciata | `top-corto` (canotta nera: spalle, braccia e pancia scoperte) · `giacca-jeans` (aperta su un top nero, maniche risvoltate) · `blusa-quadrata` (scollo quadrato, maniche lunghe) · `abito-nero` (corpetto con spalline sottili e collana) | `jeans-a-zampa` (passanti, bottone, tasche) · `jeans-neri` (risvoltati, caviglie scoperte) · `pantaloni-marroni-cintura` (gamba larga, cintura con fibbia) · `gonna-lunga-nera` (lunga con spacco, la gamba nello spacco è pelle) |
@@ -217,8 +217,8 @@ Righe e fantasie sono dettagli: una maglia a righe ha le righe in `--shirt-accen
 Un capo ha solo i ruoli che gli servono (la polo non ha dettagli, la camicia non ha bordi). La pelle che un capo lascia
 scoperta (gambe sotto i pantaloncini, pancia, spalle) usa `--skin`, come il resto del corpo.
 
-**Capi da fogli di outfit.** I capi femminili e la seconda e la terza serie maschile (uno per sagoma) vengono da fogli
-(`vestiti-femminili`, `vestiti-femminili-2`, `vestiti-femminili-3`, `vestiti-femminili-4`, `vestiti-maschili-outfit`, `vestiti-maschili-2`) in cui ogni figura indossa maglia e pantaloni sul
+**Capi da fogli di outfit.** I capi femminili e la seconda, la terza e la quarta serie maschile (uno per sagoma) vengono da fogli
+(`vestiti-femminili`, `vestiti-femminili-2`, `vestiti-femminili-3`, `vestiti-femminili-4`, `vestiti-maschili-outfit`, `vestiti-maschili-2`, `vestiti-maschili-3`) in cui ogni figura indossa maglia e pantaloni sul
 proprio corpo: il capo si traccia su quella figura e resta su quella sagoma. I fogli mostrano anche le scarpe di ogni
 outfit: non sono capi ma colori, e li impostano i preset (`colors`). I dieci capi della prima serie maschile
 vengono invece da due fogli sullo stesso corpo e stanno su `maschio/adulto`. Cose particolari rispetto ai primi capi
@@ -229,6 +229,7 @@ maschili:
 - *Dettagli senza contorno* ricavati dal colore: fiori, righe, risvolti, calze, bottoni chiari.
 - *Scollo*: la pelle sotto il collo (V, cappuccio, scollo ampio) è parte del capo.
 - *Abiti e gonne* (terza e quarta serie femminile): un abito è diviso in due capi, il corpetto (una maglia, con le maniche) e la gonna (nei pantaloni, con cintura, fiocchi e le gambe scoperte sotto l'orlo, come i pantaloncini); la gonna sta dietro al braccio vicino e davanti ai pantaloni base, quindi vale con qualunque maglia della sagoma. Le gonne a campana sono più larghe della sagoma ma stanno nello stesso riquadro (322×742). Le scarpe del foglio (ballerine, mary jane, tacchi) non sono disegnate: restano le scarpe base della sagoma e dal foglio si prendono solo i colori, nei preset. Per questo le gambe (e i pantaloni) dei fogli con tacchi e ballerine non si fermano all'orlo del foglio: si prolungano dritte fino al suolo (`to_ground`) e le scarpe della sagoma, disegnate sopra, le nascondono; i pantaloni molto larghi (la tuta) si fermano invece alla cima della scarpa, con l'orlo in vista. Un abito intero senza la linea della vita (l'abito nero della slanciata) si divide con un taglio a una certa altezza: il corpetto è la maglia, la gonna lunga i pantaloni, e la cucitura in vita si vede solo come tratto sottile. Un capo senza maniche (o con spalline) disegna spalle e braccia da sé (`replaces: ["arms"]`, come il top corto): le braccia della sagoma si nascondono e con loro i riempimenti di fondo del busto e dei pantaloni vicino alle braccia, che altrimenti sporgerebbero dove le braccia del foglio sono in un'altra posizione. Il corpetto ha sempre una fascia sotto i pantaloni (`under_down`), lunga abbastanza per coprire la vita con qualunque altro pantalone della sagoma.
+- *Serie autunnale maschile* (`vestiti-maschili-3`): i maglioni a coste sono di un solo colore (separare le coste in un colore a parte dava solo macchie scure), le felpe e le giacche aperte portano la felpa o la maglietta sotto come livello `under`, e i pantaloni scendono sotto le scarpe. Le scarpe del foglio (sneaker, stivaletti) restano quelle della sagoma e se ne prendono i colori nei preset; i jeans risvoltati hanno il risvolto come `--pants-trim`, e un bordo alto a gradini (il lembo della giacca nasconde i fianchi) si chiude con `under_up={…: (30, True, 0)}`.
 
 ## Animazione idle
 
@@ -246,7 +247,7 @@ Con `prefers-reduced-motion` l'SVG resta fermo. Nel visualizzatore c'è l'interr
 
 ## Visualizzatore
 
-Ci sono trentuno personaggi di partenza (i preset del manifest: due o tre per sagoma, quattro per le femmine, ognuno con un abbinamento di capi della sua sagoma; la seconda, la terza e la quarta serie femminile portano i capelli nuovi; *Adulto · polo* e *Robusto · cardigan* hanno la barba), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **barba** (solo sagome maschili: la sezione compare solo per loro e solo con le barbe che valgono per la sagoma), **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono solo quelli della sagoma scelta: se cambi sagoma, maglia e pantaloni passano all'abito di partenza di quella sagoma (il primo dei suoi preset), e se la sagoma non ha capi restano la maglietta e i pantaloni base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
+Ci sono trentasei personaggi di partenza (i preset del manifest: tre o quattro per sagoma, ognuno con un abbinamento di capi della sua sagoma; la seconda, la terza e la quarta serie femminile portano i capelli nuovi; *Adulto · polo* e *Robusto · cardigan* hanno la barba), divisi per gruppo (*Tutti / Maschio / Femmina*). Per quello selezionato si possono cambiare **sagoma** (tutte e dieci), **stile dei capelli**, **barba** (solo sagome maschili: la sezione compare solo per loro e solo con le barbe che valgono per la sagoma), **maglia**, **pantaloni** e ogni colore. I colori che non hai toccato seguono la sagoma e i capi scelti; quelli che hai scelto restano. I capi disponibili sono solo quelli della sagoma scelta: se cambi sagoma, maglia e pantaloni passano all'abito di partenza di quella sagoma (il primo dei suoi preset), e se la sagoma non ha capi restano la maglietta e i pantaloni base. Un personaggio resta nel gruppo del suo preset anche se gli dai la sagoma dell'altro gruppo. Tasti `1`–`9`, `0` o `←` `→` per cambiare personaggio.
 
 **Colori.** I campi sono divisi per parte (corpo, maglia, pantaloni, scarpe, contorno e occhi) e mostrano solo i ruoli che il capo scelto ha. Sotto ogni campo ci sono dei colori rapidi: toni della pelle, colori di capelli naturali e di fantasia, una tavolozza di tessuti; per le scarpe una tavolozza unica per la tomaia e una per la suola. `↺` riporta un campo al suo colore di default; *Vestiti a caso* e *Pelle e capelli a caso* pescano dalle tavolozze (maglia e pantaloni ben distinti), *Colori di default* azzera tutto.
 
@@ -263,11 +264,11 @@ I colori di partenza sono i default scritti nel CSS di ogni SVG, più i `colors`
 ## Audit delle combinazioni
 
 ```
-NODE_PATH=$(npm root -g) node tools/audit.mjs      # serve playwright (npm i -g playwright), circa 3 minuti
+NODE_PATH=$(npm root -g) node tools/audit.mjs      # serve playwright (npm i -g playwright), circa 4 minuti
 ```
 
 Rende nel browser, per ogni sagoma, ogni maglia con ogni pantalone **della sua sagoma** (compresi la maglietta e i
-pantaloni base) e ogni stile di capelli con ogni maglia, più ogni barba sulla sagoma che la prevede: 1341 combinazioni, circa 3 minuti. Cerca i difetti
+pantaloni base) e ogni stile di capelli con ogni maglia, più ogni barba sulla sagoma che la prevede: 1489 combinazioni, circa 4 minuti. Cerca i difetti
 confrontando ogni combinazione con la sagoma base: vuoti nel busto, nelle braccia e alle caviglie, tacche e gradini dell'orlo ai piedi (una gamba che non entra dritta nella scarpa), fessure sottili
 chiuse dalla figura, pezzi staccati, parti tagliate dal riquadro, l'estensione dei pantaloni che si vede, livelli sotto
 che coprono il braccio o sporgono, vuoti nel fotogramma estremo del respiro, occhi coperti dai capelli (lo sfondo racchiuso fra le ciocche dei capelli lunghi, la testa

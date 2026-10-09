@@ -1,0 +1,24 @@
+{
+  "name": "Pantaloni verde oliva",
+  "colors": {
+    "main": "#5f5f46"
+  },
+  "landmarks": {
+    "pants-tl": [
+      88.0,
+      781.1
+    ],
+    "pants-tr": [
+      222.5,
+      781.1
+    ],
+    "pants-bl": [
+      88.0,
+      864.4
+    ],
+    "pants-br": [
+      222.5,
+      864.4
+    ]
+  }
+}

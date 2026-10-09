@@ -167,6 +167,7 @@ python3 tools/trace_outfits.py reference/vestiti-femminili-3.webp --bodies src/b
 python3 tools/trace_outfits.py reference/vestiti-femminili-4.webp --bodies src/bodies/femmina --out src/clothes/femmina
 python3 tools/trace_outfits.py reference/vestiti-maschili-outfit.webp --bodies src/bodies/maschio --out src/clothes/maschio
 python3 tools/trace_outfits.py reference/vestiti-maschili-2.webp --bodies src/bodies/maschio --out src/clothes/maschio
+python3 tools/trace_outfits.py reference/vestiti-maschili-3.webp --bodies src/bodies/maschio --out src/clothes/maschio
 ```
 
 Per un foglio in cui **ogni figura indossa maglia e pantaloni sul proprio corpo** (le cinque sagome di un gruppo, ognuna
@@ -195,7 +196,8 @@ docstring del file, gestiscono i casi che i fogli maschili non avevano (`lib/out
   braccia, quando le maniche sono più corte di quelle della sagoma di base: l'orlo della manica si aggancia all'inizio
   del braccio con dei punti di riferimento corretti (`landmarks` nel json del capo);
 - `under_up`, `behind`: i pantaloni salgono sotto la maglia e proseguono dietro le braccia, così con altre maglie della
-  stessa sagoma non restano buchi in vita; `under_down`: lo stesso per una maglia corta o infilata, che scende sotto i
+  stessa sagoma non restano buchi in vita (se il bordo alto dei pantaloni è a gradini, perché il foglio lo nasconde sotto
+  un lembo della giacca, `under_up={9: (30, True, 0)}`: la fascia è larga come i fianchi, con rientro ai lati 0); `under_down`: lo stesso per una maglia corta o infilata, che scende sotto i
   pantaloni (con un terzo valore, `(30, 1, 0.5)`, l'orlo è l'ultima riga larga almeno metà della più larga: serve quando la
   manica lunga è unita al busto); `neck_up`: la pelle del collo sale dietro la testa e chiude la fessura col bavero; `to_shoes`: scendono sotto le scarpe. I bordi alto e basso dei pantaloni si agganciano a quelli dei
   pantaloni della sagoma (`landmarks`) quando sono vicini (entro 20 px: una vita alta o una cintura restano dove sono);

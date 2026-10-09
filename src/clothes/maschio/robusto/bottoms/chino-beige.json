@@ -1,0 +1,24 @@
+{
+  "name": "Chino beige risvoltati",
+  "colors": {
+    "main": "#bba585"
+  },
+  "landmarks": {
+    "pants-tl": [
+      1193.5,
+      627.2
+    ],
+    "pants-tr": [
+      1356.5,
+      627.2
+    ],
+    "pants-bl": [
+      1193.5,
+      852.2
+    ],
+    "pants-br": [
+      1356.5,
+      852.2
+    ]
+  }
+}

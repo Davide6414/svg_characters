@@ -251,6 +251,33 @@ OUTFITS['vestiti-maschili-2'] = [
 ]
 
 
+OUTFITS['vestiti-maschili-3'] = [
+    dict(body='bambino',
+         top=dict(id='maglione-senape', name='Maglione senape a coste', regions={3: 'main'}, arms=(5, 4), neck=True, smooth={3: 3}),
+         bottom=dict(id='pantaloni-verdi', name='Pantaloni verde oliva', regions={7: 'main'}, to_shoes=(7,),
+                     behind={7: (5, 4)}, under_up={7: 30})),
+    dict(body='ragazzo',
+         top=dict(id='giubbotto-ruggine', name='Giubbotto con felpa col cappuccio', regions={6: 'main', 5: 'main', 3: 'under'},
+                  arms=(7, 8), neck=True, folds=(6, 5), under_down={3: (25, 0)}),
+         bottom=dict(id='jeans-risvoltati', name='Jeans risvoltati', regions={9: 'main', 10: 'trim'}, to_shoes=(9, 10),
+                     behind={9: (7, 8)}, under_up={9: (30, True, 0)})),
+    dict(body='slanciato',
+         top=dict(id='felpa-verde', name='Felpa verde con cappuccio', regions={3: 'main', 9: 'under', 4: 'under', 5: 'accent', 6: 'accent'},
+                  arms=(11, 10), neck=True, folds=(3,), under_down={9: (25, 0)}),
+         bottom=dict(id='cargo-neri', name='Pantaloni cargo neri', regions={13: 'main', 12: 'main', 15: 'trim', 17: 'trim', 14: 'trim', 16: 'trim'},
+                     join={13: (12,)}, to_shoes=(13, 12), behind={13: (11, 10)}, under_up={13: 30})),
+    dict(body='adulto',
+         top=dict(id='maglione-panna', name='Maglione panna a coste', regions={3: 'main'}, arms=(6, 4), neck=True),
+         bottom=dict(id='pantaloni-marroni', name='Pantaloni marroni', regions={5: 'main'}, to_shoes=(5,),
+                     behind={5: (6, 4)}, under_up={5: 30})),
+    dict(body='robusto',
+         top=dict(id='giacca-camicia', name='Giacca-camicia blu su maglietta ruggine', regions={3: 'main', 5: 'main', 4: 'main', 7: 'main', 9: 'main', 6: 'under'},
+                  arms=(12, 11), neck=True, folds=(3, 5), under_down={6: (25, 0)}),
+         bottom=dict(id='chino-beige', name='Chino beige risvoltati', regions={10: 'main'}, to_shoes=(10,),
+                     behind={10: (12, 11)}, under_up={10: 30})),
+]
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('sheet', help='foglio con gli outfit')

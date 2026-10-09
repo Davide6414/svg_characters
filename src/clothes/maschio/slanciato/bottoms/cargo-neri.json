@@ -1,0 +1,17 @@
+{
+  "name": "Pantaloni cargo neri",
+  "colors": {
+    "main": "#363636",
+    "trim": "#353534"
+  },
+  "landmarks": {
+    "pants-bl": [
+      622.5,
+      858.6
+    ],
+    "pants-br": [
+      767.0,
+      858.6
+    ]
+  }
+}

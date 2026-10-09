@@ -181,7 +181,7 @@ def find_folds(seg, g, pid, to_xy, contrast=20, minlen=9.0, sigma=6.0):
 
 
 # ---------------------------------------------------------------- estensioni sotto altri capi
-def band_rect(cell, rows, extra, notch, inset=10, taper=0.0):
+def band_rect(cell, rows, extra, notch, inset=10, taper=0.0, wide_top=False):
     """Rettangolo largo come la fascia `rows` della regione (meno `inset` px per lato), che si allunga di `extra` px
     oltre la fascia: in alto se extra > 0, in basso se extra < 0. Con `taper` si stringe man mano che si allontana."""
     cols = np.nonzero(cell[rows].any(0))[0]
@@ -199,7 +199,9 @@ def band_rect(cell, rows, extra, notch, inset=10, taper=0.0):
         t = int(far * taper)
         a, b = x0 + t, x1 - t
         if v < top_row:                               # sopra la regione: non più larga del suo bordo alto
-            row = top_cols
+            row = cols if wide_top else top_cols      # (con `wide_top`: larga come la fascia, il bordo alto è a gradini)
+        elif wide_top:
+            row = cols
         else:                                         # dentro: non più larga della regione dal bordo alto fin qui
             row = np.nonzero(cell[top_row:max(v + 1, top_row + 6 * K)].any(0))[0]
         if row.size:
@@ -209,13 +211,13 @@ def band_rect(cell, rows, extra, notch, inset=10, taper=0.0):
     return out
 
 
-def extend_top(cell, up, notch=35, inset=5, taper=0.3, band_only=False):
+def extend_top(cell, up, notch=35, inset=5, taper=0.3, band_only=False, wide_top=False):
     """Parte alta dei pantaloni: un rettangolo largo come i primi `notch` px dall'alto, `up` px sopra il bordo alto e
     `notch` px sotto (riempie i vani fra il bordo alto frastagliato, l'orlo di una maglia, e i pantaloni), che si stringe
     salendo (la vita è più stretta dei fianchi). Così, con una maglia più corta o con un orlo diverso, non resta un buco.
     Con `band_only` restituisce solo la fascia (per il livello sotto: ridisegnare tutta la regione doppierebbe il contorno)."""
     rows = np.nonzero(cell.any(1))[0]
-    band = band_rect(cell, slice(rows.min(), rows.min() + int(notch * K)), up, notch, inset=inset, taper=taper)
+    band = band_rect(cell, slice(rows.min(), rows.min() + int(notch * K)), up, notch, inset=inset, taper=taper, wide_top=wide_top)
     return band if band_only else cell | band
 
 
