@@ -20,12 +20,18 @@ Ogni capo ha:
   to_shoes   regioni che scendono sotto le scarpe (pantaloni, calze, gambe), così l'orlo non si vede
   layers     {indice: 'under'} regioni che stanno sotto i pantaloni (la pancia scoperta di un top corto)
   pad_under  {indice: dict(near=regioni vicine, up=, down=)} allunga in verticale quelle regioni sotto le regioni vicine
+  widen      {indice: (regioni vicine,)} allarga la regione in orizzontale sotto le regioni vicine (la pancia sotto le braccia)
   under_up   {indice: px} i pantaloni salgono di tanti px sotto la maglia (in un livello sotto), così con una maglia
              più corta o con un orlo diverso non resta un buco in vita
-  under_down {indice: px} lo stesso per una maglia corta o infilata: scende sotto i pantaloni
+  under_down {indice: px | (px, rientro)} lo stesso per una maglia corta o infilata: scende sotto i pantaloni (rientro ai
+             lati in px, 10 se non detto)
   join       {indice: (altre regioni,)} regioni da unire in una sola (le gambe dei leggings sotto un abito)
-  extend_top {indice: px} la regione sale di tanti px (i fianchi nascosti da un abito)
-  neck       True se lo scollo lascia vedere la pelle sotto il collo della sagoma (V, scollo ampio, cappuccio aperto)
+  extend_top {indice: px | (px, rientro)} la regione sale di tanti px, con i bordi alti pieni (i fianchi nascosti da un
+             abito, una vita da raddrizzare); il rientro tiene gli angoli dentro il profilo
+  clip_top   regioni da cui togliere le strisce strette in alto (un pezzo di pantalone che risale lungo un braccio)
+  to_waist   regioni che salgono fino alla vita dei pantaloni della sagoma (quando nel foglio la vita è nascosta)
+  neck       la pelle sotto il collo della sagoma fa parte della maglia (scollo a V, cappuccio aperto, o solo il bordo
+             del colletto): True per le maglie se non detto altrimenti
   parts      {indice: 'arms'} regioni che sostituiscono le braccia della sagoma (spalle e braccia scoperte)
   arms       (braccio sinistro, braccio destro): indici delle regioni dei bracci, per le maniche corte (vedi sotto)
   folds      regioni dove cercare anche le pieghe chiare (per i pantaloni: la regione principale, in automatico)
@@ -57,7 +63,7 @@ OUTFITS['vestiti-femminili'] = [
                      behind={7: (3, 4, 5, 6)}, under_up={7: 30})),
     dict(body='slanciata',
          top=dict(id='top-corto', name='Top corto', regions={3: 'main', 4: 'skin', 5: 'skin', 6: 'skin', 8: 'skin'},
-                  layers={8: 'under'}, pad_under={8: dict(near=(3, 9), up=14, down=40)}, parts={4: 'arms', 5: 'arms', 6: 'arms'}, neck=True),   # braccia e pancia scoperte
+                  layers={8: 'under'}, pad_under={8: dict(near=(3, 9), up=14, down=60)}, widen={8: (4, 6)}, parts={4: 'arms', 5: 'arms', 6: 'arms'}, neck=True),   # braccia e pancia scoperte
          bottom=dict(id='jeans-a-zampa', name='Jeans a zampa', regions={9: 'main'}, to_shoes=(9,))),
     dict(body='adulta',
          top=dict(id='maglietta-v', name='Maglietta scollo a V', regions={3: 'main'}, arms=(6, 7), neck=True),
@@ -65,8 +71,9 @@ OUTFITS['vestiti-femminili'] = [
                      behind={9: (3,)}, under_up={9: 30})),
     dict(body='robusta',
          top=dict(id='cardigan', name='Cardigan', regions={3: 'main', 4: 'main', 5: 'under', 6: 'main', 9: 'main'}, neck=True,
-                  folds=(3, 4)),
-         bottom=dict(id='pantaloni-marroni', name='Pantaloni marroni', regions={10: 'main'}, to_shoes=(10,), behind={10: (3, 4, 5, 7)}, under_up={10: 20})),
+                  folds=(3, 4), under_down={5: (25, 0)}),                                             # la maglietta sotto scende sotto i pantaloni
+         bottom=dict(id='pantaloni-marroni', name='Pantaloni marroni', regions={10: 'main'}, to_shoes=(10,), behind={10: (7, 8)},
+                     clip_top=(10,), to_waist=(10,), under_up={10: 12})),                          # via la striscia lungo il braccio; vita piatta
 ]
 
 
@@ -85,7 +92,7 @@ OUTFITS['vestiti-femminili-2'] = [
     dict(body='slanciata',
          top=dict(id='giacca-jeans', name='Giacca di jeans', regions={5: 'main', 6: 'main', 3: 'main', 4: 'main', 8: 'main',
                                                                       9: 'main', 10: 'main', 11: 'trim', 12: 'trim', 7: 'under'},
-                  neck=True, under_down={7: 30}),                                                                          # risvolti delle maniche, top sotto
+                  neck=True, under_down={7: (30, 0), 5: (20, 4), 6: (20, 4)}),                        # il top e i lembi scendono sotto i pantaloni
          bottom=dict(id='jeans-neri', name='Jeans neri risvoltati', regions={18: 'main', 14: 'main', 15: 'main', 16: 'main',
                                                                              19: 'trim', 20: 'trim', 21: 'skin', 22: 'skin'},
                      to_shoes=(21, 22), behind={18: (5, 6, 7)}, under_up={18: 30})),
@@ -95,9 +102,9 @@ OUTFITS['vestiti-femminili-2'] = [
                      behind={5: (3,)}, under_up={5: 30})),
     dict(body='robusta',
          top=dict(id='cardigan-fiori', name='Cardigan e maglia a fiori', regions={3: 'main', 4: 'main', 6: 'main', 9: 'main', 5: 'under'},
-                  split={5: [('accent', 'lilac')]}, neck=True, folds=(3, 4)),                         # fiori sulla maglia
+                  split={5: [('accent', 'lilac')]}, neck=True, folds=(3, 4), under_down={5: (25, 0)}),  # fiori sulla maglia
          bottom=dict(id='pantaloni-scuri', name='Pantaloni marrone scuro', regions={10: 'main'}, to_shoes=(10,),
-                     behind={10: (3, 4, 5, 7)}, under_up={10: 20})),
+                     behind={10: (7, 8)}, clip_top=(10,), to_waist=(10,), under_up={10: 12})),
 ]
 
 OUTFITS['vestiti-maschili-outfit'] = [
@@ -113,7 +120,8 @@ OUTFITS['vestiti-maschili-outfit'] = [
                      behind={11: (3,)}, under_up={11: 30})),
     dict(body='slanciato',
          top=dict(id='camicia-risvoltata', name='Camicia con maniche arrotolate',
-                  regions={3: 'main', 6: 'main', 4: 'main', 7: 'main', 8: 'main', 9: 'main', 5: 'under'}, neck=True),
+                  regions={3: 'main', 6: 'main', 4: 'main', 7: 'main', 8: 'main', 9: 'main', 5: 'under'}, neck=True,
+                  under_down={5: (25, 0)}),
          bottom=dict(id='pantaloni-kaki', name='Pantaloni kaki', regions={12: 'main'}, to_shoes=(12,),
                      behind={12: (3, 5, 6)}, under_up={12: 30})),
     dict(body='adulto',
@@ -124,7 +132,7 @@ OUTFITS['vestiti-maschili-outfit'] = [
                      to_shoes=(10,), under_up={10: 30})),                                              # cintura e fibbia
     dict(body='robusto',
          top=dict(id='cardigan-grigio', name='Cardigan grigio', regions={3: 'main', 4: 'main', 5: 'under'}, neck=True,
-                  folds=(3, 4)),
+                  folds=(3, 4), under_down={5: (25, 0)}),
          bottom=dict(id='jeans-chiari', name='Jeans chiari', regions={6: 'main'}, to_shoes=(6,),
                      behind={6: (3, 4, 5)}, under_up={6: 30})),
 ]

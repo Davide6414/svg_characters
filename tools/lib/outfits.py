@@ -14,12 +14,13 @@ nella regione della testa (sotto la linea del collo della sagoma). La pancia sco
 pantaloni (`layer: under`), così la sua posizione non dipende dai pantaloni scelti.
 """
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageFilter
 
 from .geom import catmull_d, dilate, erode, fill_small_holes, grow_labels, label_components, rdp, skeleton_lines, trace_paths
-from .parts import GROUND, PAD, find_folds, find_seams, region_info
+from .parts import BACK, GROUND, PAD, back_strip, extend_bottom, extend_top, find_folds, find_seams, hdilate, hull, region_info
 from .segment import K, segment
 
+SMALL_REGION = 60    # px²: le regioni più piccole non assegnate si uniscono alla regione del capo che le circonda
 SHOE_BAND = 45        # px sopra la cima delle suole: le regioni più in basso sono scarpe
 STROKE_INSET = 2.5    # px: i dettagli senza contorno stanno dentro la cella, senza coprire il tratto del bordo
 PIN_LIMIT = 20.0      # px: scarto massimo per agganciare i bordi dei pantaloni a quelli della sagoma
@@ -88,59 +89,11 @@ def _extend_rows(mask, up, down):
     return out
 
 
-def _hull(mask):
-    """Involucro convesso di una maschera (catena monotona sui bordi di ogni riga, poi riempimento del poligono)."""
-    pts = []
-    for y in np.nonzero(mask.any(1))[0]:
-        xs = np.nonzero(mask[y])[0]
-        pts += [(int(xs.min()), int(y)), (int(xs.max()), int(y))]
-    pts = sorted(set(pts))
-
-    def half(points):
-        out = []
-        for p in points:
-            while len(out) >= 2 and (out[-1][0] - out[-2][0]) * (p[1] - out[-2][1]) - (out[-1][1] - out[-2][1]) * (p[0] - out[-2][0]) <= 0:
-                out.pop()
-            out.append(p)
-        return out
-    hull = half(pts)[:-1] + half(pts[::-1])[:-1]
-    img = Image.new('L', (mask.shape[1], mask.shape[0]), 0)
-    ImageDraw.Draw(img).polygon(hull, fill=255)
-    return np.array(img) > 0
-
-
-def _band_rect(cell, rows, extra, notch, inset=10, taper=0.0):
-    """Rettangolo largo come la fascia `rows` della regione (meno `inset` px per lato), che si allunga di `extra` px
-    oltre la fascia: in alto se extra > 0, in basso se extra < 0. Con `taper` si stringe man mano che si allontana."""
-    cols = np.nonzero(cell[rows].any(0))[0]
-    out = np.zeros_like(cell)
-    x0, x1 = cols.min() + int(inset * K), cols.max() + 1 - int(inset * K)
-    edge = rows.start if extra > 0 else rows.stop
-    steps = range(int(abs(extra) * K) + int(notch * K))
-    for d in steps:
-        v = edge - int(abs(extra) * K) + d if extra > 0 else edge - int(notch * K) + d
-        if not 0 <= v < cell.shape[0]:
-            continue
-        far = max(0, (edge - v) if extra > 0 else (v - edge))      # distanza oltre il bordo
-        t = int(far * taper)
-        if x0 + t < x1 - t:
-            out[v, x0 + t:x1 - t] = True
-    return out
-
-
-def _extend_top(cell, up, notch=35, inset=10, taper=0.5):
-    """Parte alta dei pantaloni: un rettangolo largo come i primi `notch` px dall'alto, `up` px sopra il bordo alto e
-    `notch` px sotto (riempie i vani fra il bordo alto frastagliato, l'orlo di una maglia, e i pantaloni), che si stringe
-    salendo (la vita è più stretta dei fianchi). Così, con una maglia più corta o con un orlo diverso, non resta un buco."""
-    rows = np.nonzero(cell.any(1))[0]
-    return cell | _band_rect(cell, slice(rows.min(), rows.min() + int(notch * K)), up, notch, inset=inset, taper=taper)
-
-
-def _extend_bottom(cell, down, notch=25):
-    """Parte bassa di una maglia (in un livello sotto i pantaloni): un rettangolo largo come l'orlo, `down` px più in
-    basso. Con pantaloni che cominciano più in basso dell'orlo non resta un buco in vita."""
-    rows = np.nonzero(cell.any(1))[0]
-    return cell | _band_rect(cell, slice(rows.max() + 1 - int(notch * K), rows.max() + 1), -down, notch)
+def _clip_top(cell):
+    """Toglie le righe in alto più strette del 60% della riga più larga."""
+    rows = cell.sum(1)
+    start = np.nonzero(rows >= 0.6 * rows.max())[0].min()
+    return cell & (np.arange(cell.shape[0])[:, None] >= start)
 
 
 def trace_outfit(sheet, box, ref, spec, verbose=False):
@@ -177,6 +130,27 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
     shoe_cells = np.zeros_like(seg.dark)
     for i in shoes:
         shoe_cells |= cells[i]
+    # regioni minuscole che nessuno ha preso (l'interno dell'anello di un cordino, il V fra cappuccio e collo):
+    # vanno alla regione del capo con cui confinano di più, altrimenti resterebbero buchi
+    sole_line = (sole_top - SHOE_BAND - y0) * K
+    for i in range(1, seg.n_lab + 1):
+        if i in used or i in shoes or i == head or i in seg.border or seg.sizes[i] > SMALL_REGION * K * K:
+            continue
+        m = g == i
+        if not m.any() or np.nonzero(m)[0].mean() > sole_line:
+            continue
+        ring = dilate(m, 2 * K) & ~m
+        contact = {j: int((ring & cells[j]).sum()) for j in used}
+        best = max(contact, key=contact.get)
+        if contact[best] > 0.5 * ring.sum():
+            cells[best] = cells[best] | m
+    # braccia e mani della figura (pelle, non usate dai capi): servono per il livello dietro (vedi back_strip)
+    arms = np.zeros_like(seg.dark)
+    for i, r in info.items():
+        c = r['rgb']
+        if (i not in used and i != head and i not in shoes and not r['bg'] and c[0] > 215 and 150 < c[1] < 215
+                and 110 < c[2] < 190 and c[0] - c[2] > 45):
+            arms |= g == i
     med = {}
     for i in used:
         core = erode(seg.lab == i, 2 * K)
@@ -191,7 +165,7 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
         shape, joined_seams = {}, []
 
         def trace(mask):
-            return trace_paths(fill_small_holes(mask, 30 * K * K), to_xy, opttol=1.6 * K / 2, alphamax=1.0, turd=20, smooth=1.0)
+            return trace_paths(fill_small_holes(mask, 60 * K * K), to_xy, opttol=1.6 * K / 2, alphamax=1.0, turd=20, smooth=1.0)
 
         def add(target, role, mask, color, layer, stroke, part=None):
             paths = trace(mask)
@@ -207,19 +181,35 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
                     joined_seams.append(dict(d=catmull_d(rdp(pts, 1.1 * K), to_xy), label=i, kind='seam', length=len(pts) / K, thick=5.0))
                 cell = cell | cells[j]
             layer = cs.get('layers', {}).get(i, 'main')
+            plain = cell                                          # la regione prima delle estensioni (per le fasce sotto)
             if i in cs.get('pad_under', {}):                      # pelle del livello sotto: si estende in verticale sotto i capi vicini
                 pad = cs['pad_under'][i]
                 near = np.zeros_like(seg.dark)
                 for j in pad['near']:
                     near |= cells[j]
                 cell = cell | (_extend_rows(cell, pad['up'], pad['down']) & near)
+            if i in cs.get('widen', {}):                          # si allarga sotto le regioni vicine (la pancia sotto le braccia)
+                near = np.zeros_like(seg.dark)
+                for j in cs['widen'][i]:
+                    near |= cells[j]
+                cell = cell | (hdilate(cell, BACK * K) & dilate(near, 2 * K))
             if i in cs.get('behind', {}):                         # prosegue dietro le braccia (un pugno sui pantaloni)
                 arms = np.zeros_like(seg.dark)
                 for j in cs['behind'][i]:
                     arms |= g == j
-                cell = cell | (_hull(cell) & arms)
+                cell = cell | (hull(cell) & arms)
+            if i in cs.get('clip_top', ()):                       # via le strisce strette sopra la vita (un pezzo che risale
+                cell, plain = _clip_top(cell), _clip_top(plain)   # lungo un braccio, fra la maglia e la mano)
+            if i in cs.get('to_waist', ()):                       # sale fino alla vita dei pantaloni della sagoma (nel foglio
+                waist = ((ref['landmarks']['pants-tl'][1] - rt) / s + head_t + dy - y0) * K    # la vita è nascosta)
+                rows = np.nonzero(cell.any(1))[0]
+                cell = extend_top(cell, max(0.0, (rows.min() - waist) / K), inset=8, taper=0.15)
+                plain = plain | cell
             if i in cs.get('extend_top', {}):                     # sale fino alla vita (i fianchi nascosti da un abito)
-                cell = _extend_top(cell, cs['extend_top'][i], inset=0, taper=0.15)
+                up = cs['extend_top'][i]                          # px, oppure (px, rientro ai lati)
+                up, inset = up if isinstance(up, tuple) else (up, 0)
+                cell = extend_top(cell, up, inset=inset, taper=0.15)
+                plain = plain | cell                              # la fascia in vita parte dalla vita ricostruita
             shape[i] = cell                                       # la forma del capo, prima di scendere sotto le scarpe
             if i in cs.get('to_shoes', ()):                       # scende sotto le scarpe, così l'orlo non si vede
                 cell = cell | (dilate(cell, PAD * K) & shoe_cells)
@@ -227,9 +217,11 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
             # con dei dettagli sopra, la regione si disegna in due tempi: riempimento, dettagli, poi il tratto del bordo
             add(base, role, cell, med[i], layer, stroke=not details, part=cs.get('parts', {}).get(i))
             if i in cs.get('under_up', {}):                       # i pantaloni salgono sotto la maglia: nessun buco con altre maglie
-                add(base, role, _extend_top(cell, cs['under_up'][i]), med[i], 'under', stroke=True)
+                add(base, role, extend_top(plain, cs['under_up'][i], band_only=True), med[i], 'under', stroke=True)
             if i in cs.get('under_down', {}):                     # la maglia scende sotto i pantaloni: nessun buco con altri pantaloni
-                add(base, role, _extend_bottom(cell, cs['under_down'][i]), med[i], 'under', stroke=True)
+                down = cs['under_down'][i]                        # px, oppure (px, rientro ai lati)
+                px, inset = down if isinstance(down, tuple) else (down, 10)
+                add(base, role, extend_bottom(plain, px, inset=inset, band_only=True), med[i], 'under', stroke=True)
             if details:
                 add(strokes, 'open', cell, med[i], layer, stroke=True)
             if verbose:
@@ -251,13 +243,29 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
                     add(overlays, drole, m, color, layer, stroke=False)
                     if verbose:
                         print(f'    dettaglio {drole:7s} {rule:8s} area {m.sum() / (K * K):6.0f} {_hex(color)}')
-        if cs.get('neck'):                                        # pelle dello scollo: parte bassa della regione della testa
+        if cs.get('neck', kind == 'top'):                         # pelle dello scollo: parte bassa della regione della testa
             cut = (ref['landmarks']['neck-l'][1] - rt) / s + head_t + dy - NECK_OVERLAP     # y del foglio
             m = _smooth_mask(erode(cells[head], STROKE_INSET * K) & (v_idx >= (cut - y0) * K), 0.8, 20)
             if m.any():
                 add(overlays, 'skin', m, (252, 190, 154), 'main', stroke=False)
                 if verbose:
                     print(f'    scollo area {m.sum() / (K * K):.0f}')
+
+        # livello dietro: il capo continua sotto le braccia (non per un capo che disegna le braccia da sé: le sue braccia
+        # si spostano col capo e la striscia sporgerebbe)
+        if kind == 'top' and cs.get('back', True) and not cs.get('parts'):      # (i pantaloni: basta il riempimento della sagoma)
+            gar = np.zeros_like(seg.dark)
+            for i, r in cs['regions'].items():
+                if r != 'skin':
+                    gar |= shape[i]
+            arm_mask = arms
+            if gar.any() and arm_mask.any():
+                gv = np.nonzero(gar.any(1))[0]
+                rows = (np.nonzero(arm_mask.any(1))[0].min(), gv.max()) if kind == 'top' else (gv.min(), gv.min() + 60 * K)
+                strip = back_strip(gar, arm_mask, rows)
+                main_i = max((i for i, r in cs['regions'].items() if r == 'main'), key=lambda i: info[i]['area'])
+                if strip.sum() > 20 * K * K:
+                    add(base, 'main', strip, med[main_i], 'back', stroke=True)
 
         # linee interne: fessure scure (cuciture, tasche, cordini) e pieghe chiare (solo dove richiesto; per i
         # pantaloni, la regione principale)

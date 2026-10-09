@@ -19,7 +19,7 @@ python3 tools/trace_bodies.py reference/sagome-femminili.webp --out src/bodies/f
 ```
 
 Per ogni figura (da sinistra a destra) scrive `<nome>.svg` (solo geometria, vedi il README principale) e
-`<nome>.json` (nome visualizzato, punti di riferimento della testa, 22 punti di riferimento del corpo per adattare i
+`<nome>.json` (nome visualizzato, punti di riferimento della testa, 34 punti di riferimento del corpo per adattare i
 vestiti, colori di pantaloni e scarpe).
 
 Cosa si aspetta il foglio: figure affiancate su sfondo chiaro, nella stessa posa e con lo stesso disegno (testa con
@@ -34,8 +34,11 @@ Come lavora (moduli in `lib/`):
    scarpa risultano un'unica regione (manca la linea fra le due) le separa per colore o con un taglio geometrico.
 3. `parts.py` dà un ruolo a ogni regione (testa, maglia, braccia, pantaloni, suola, tomaia, linguetta, punta,
    lacci), fa crescere le regioni dentro il contorno fino a metà del tratto (Voronoi) e traccia ogni cella con
-   potrace. I pantaloni scendono sotto le scarpe. Le fessure interne (orecchio, cuciture, pieghe) diventano linee
-   aperte. Misura anche i punti di riferimento (`landmarks`).
+   potrace. I pantaloni scendono sotto le scarpe e salgono sotto la maglia (`pants-under`, una fascia in un livello
+   sotto). Le fessure interne (orecchio, cuciture, pieghe) diventano linee aperte. Misura anche i punti di riferimento
+   (`landmarks`): riquadri di busto, braccia e pantaloni, collo, pugni, bordi del busto contro le braccia, fianchi,
+   scarpe e ginocchia. Sono misure del corpo, non dei vestiti base: le larghezze delle gambe, per esempio, non ci
+   sono (i pantaloni base svasati o dritti sono uno stile), le scarpe sì.
 4. Tutte le sagome vengono spostate in verticale perché le suole poggino su y = 900: stessa linea del suolo.
 5. `export.py` scrive i file.
 
@@ -139,7 +142,14 @@ docstring del file, gestiscono i casi che i fogli maschili non avevano (`lib/out
   restano buchi in vita; `under_down`: lo stesso per una maglia corta o infilata, che scende sotto i pantaloni;
   `to_shoes`: scendono sotto le scarpe. I bordi alto e basso dei pantaloni si agganciano a quelli dei pantaloni della
   sagoma (`landmarks`) quando sono vicini (entro 20 px: una vita alta o una cintura restano dove sono);
-- `folds`: dove cercare anche le pieghe chiare (per i pantaloni, la regione principale, in automatico).
+- `folds`: dove cercare anche le pieghe chiare (per i pantaloni, la regione principale, in automatico);
+- `widen`, `clip_top`, `to_waist`: allargare una regione sotto le vicine (la pancia sotto le braccia), togliere le strisce
+  strette in alto (un pezzo di pantalone che risale lungo il braccio), far salire i pantaloni fino alla vita della
+  sagoma quando nel foglio la vita è coperta;
+- in automatico ogni maglia ha anche il **livello dietro** (`backlay`): una striscia oltre i suoi fianchi, solo dove
+  sulla figura c'è un braccio (`parts.back_strip`). Su un corpo diverso riempie la fessura sottile fra braccio e maglia.
+  Lo stesso fa `trace_clothes.py`; per i pantaloni basta il riempimento di fondo della sagoma (`trace_bodies.py`: il
+  bordo del busto e dei fianchi fra le braccia, richiamato in ogni capo col suo colore, e la pelle allo scollo).
 
 Dopo la tracciatura: i capi in `clothes.<gruppo>` del manifest; i colori delle scarpe di ogni outfit si ricavano dal
 foglio e si scrivono nel preset (`colors`).
@@ -152,4 +162,5 @@ foglio e si scrivono nel preset (`colors`).
   rilevato.
 - I vestiti si adattano ai corpi con una deformazione guidata da pochi punti: segue le proporzioni generali, non i
   dettagli. Su un corpo molto diverso da quello di riferimento (per esempio un bambino con testa grande) il
-  risultato è plausibile ma non identico a un disegno fatto apposta.
+  risultato è plausibile ma non identico a un disegno fatto apposta. `node tools/audit.mjs` (README principale) trova i
+  casi in cui l'adattamento lascia vuoti o sovrapposizioni.

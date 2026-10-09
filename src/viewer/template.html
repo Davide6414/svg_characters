@@ -545,21 +545,22 @@
       .replace(/calc\(([\d.]+) \* ([\d.]+)\)/g, (_, a, b) => String(+(a * b).toFixed(2)))
       .replace(/calc\((-?[\d.]+)s \+ ([\d.]+)s\)/g, (_, a, b) => `${+(+a + +b).toFixed(2)}s`);
     root.querySelector('title').textContent = `Personaggio – ${v.body.name}`;
-    const hidden = { head: ['head'], hair: ['hair'], torso: ['torso'], arms: ['arm-left', 'arm-right'], pants: ['pants'], shoes: ['shoes'] };
+    const hidden = { head: ['head'], hair: ['hair'], torso: ['torso', 'torso-fill', 'neck-fill'], arms: ['arm-left', 'arm-right'], pants: ['pants', 'pants-under', 'pants-fill'], shoes: ['shoes'] };
     for (const p of PARTS) {
       if (state.parts[p.key]) continue;
       for (const id of hidden[p.key]) root.querySelector(`#${id}`)?.remove();
     }
     // di capelli, maglie e pantaloni resta solo ciò che è scelto (Illustrator e Figma non rispettano display:none)
     for (const h of HAIR) if (h.id !== v.hair) root.querySelector(`#hair-${h.id}`)?.remove();
-    for (const t of ALL_TOPS) if (t.id !== v.top) root.querySelectorAll(`#top-${t.id}, #top-${t.id}-under`).forEach(n => n.remove());
-    for (const b of ALL_BOTTOMS) if (b.id !== v.bottom) root.querySelectorAll(`#bottom-${b.id}, #bottom-${b.id}-under`).forEach(n => n.remove());
+    const parts = (kind, id) => `#${kind}-${id}, #${kind}-${id}-under, #${kind}-${id}-back`;      // il capo e i suoi livelli
+    for (const t of ALL_TOPS) if (t.id !== v.top) root.querySelectorAll(parts('top', t.id)).forEach(n => n.remove());
+    for (const b of ALL_BOTTOMS) if (b.id !== v.bottom) root.querySelectorAll(parts('bottom', b.id)).forEach(n => n.remove());
     if (!state.parts.arms) root.querySelectorAll('.g-arms').forEach(n => n.remove());
     if (replacedParts(v).has('arms')) for (const id of ['arm-left', 'arm-right']) root.querySelector(`#${id}`)?.remove();
-    if (v.top !== 'base') root.querySelector('#torso')?.remove();       // la maglietta base sta sotto un altro capo: non serve
-    if (v.bottom !== 'base') root.querySelector('#pants')?.remove();
-    if (!state.parts.torso) root.querySelectorAll(`#top-${v.top}, #top-${v.top}-under`).forEach(n => n.remove());
-    if (!state.parts.pants) root.querySelectorAll(`#bottom-${v.bottom}, #bottom-${v.bottom}-under`).forEach(n => n.remove());
+    if (v.top !== 'base') root.querySelectorAll('#torso, #torso-fill').forEach(n => n.remove());   // la maglietta base sta sotto un altro capo: non serve
+    if (v.bottom !== 'base') root.querySelectorAll('#pants, #pants-under, #pants-fill').forEach(n => n.remove());
+    if (!state.parts.torso) root.querySelectorAll(parts('top', v.top)).forEach(n => n.remove());
+    if (!state.parts.pants) root.querySelectorAll(parts('bottom', v.bottom)).forEach(n => n.remove());
     return XML_HEAD + new XMLSerializer().serializeToString(root);
   }
   const fileStem = () => `personaggio-${variants[state.selected].body.id.replace('/', '-')}`;

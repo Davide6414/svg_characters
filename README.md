@@ -67,8 +67,11 @@ vengono scalati in x (da orecchio a fronte) e in y (da cima a linea degli occhi)
 (`src/clothes/<gruppo>/reference.json`, come per i maschi: un solo corpo con capi diversi) oppure la sagoma indicata dal
 capo stesso (`on` nel suo `.json`, come per le femmine: un foglio dove ogni figura indossa un outfit sul proprio corpo).
 Un capo può correggere alcuni punti di partenza (`landmarks` nel suo `.json`, per esempio l'orlo di una manica corta o
-il bordo alto dei pantaloni). Ogni sagoma ha nel suo `.json` 22 punti di riferimento (collo, angoli del riquadro di busto, braccia e pantaloni, e
-il pugno di ciascun braccio, che tiene le cuffie allineate al polso). `lib/fit.mjs` costruisce la deformazione morbida che porta i punti del corpo di riferimento su quelli
+il bordo alto dei pantaloni). Ogni sagoma ha nel suo `.json` 34 punti di riferimento: collo; angoli del riquadro di
+busto, braccia e pantaloni; il pugno di ciascun braccio (tiene le cuffie allineate al polso); i bordi del busto contro le
+braccia al petto e in vita e i fianchi (una maglia arriva fino alle braccia anche su un corpo più largo, senza spicchi
+vuoti); la cima e la suola di ogni scarpa e l'altezza del ginocchio sopra ciascuna (orli, pantaloncini e calze restano
+al loro posto anche passando da un bambino a un adulto). `lib/fit.mjs` costruisce la deformazione morbida che porta i punti del corpo di riferimento su quelli
 della sagoma e la applica al capo: maniche, cuffie, orli e tasche seguono quindi le proporzioni di ciascun corpo.
 In entrambi i casi le coordinate vengono riscritte, quindi lo spessore del contorno resta uguale ovunque.
 
@@ -79,11 +82,17 @@ sono unici fra i gruppi (un capo nuovo con lo stesso id di uno esistente fa fall
 ## Struttura dell'SVG di una sagoma
 
 Parti separate in gruppi con `id`, dal fondo al primo piano (uguali in tutte le sagome):
-`arm-right` → parti sotto i pantaloni (`bottom-<id>-under`, `top-<id>-under`) → `pants` (e i `bottom-<id>`) → `shoes` (`shoe-left`, `shoe-right`) → `arm-left` → `head` (con `hair` dentro) → `torso` (e i `top-<id>`).
+`neck-fill` e i livelli dietro (`pants-fill`, `torso-fill`, `bottom-<id>-back`, `top-<id>-back`) → `arm-right` → parti sotto i pantaloni (`pants-under`, `bottom-<id>-under`, `top-<id>-under`) → `pants` (e i `bottom-<id>`) → `shoes` (`shoe-left`, `shoe-right`) → `arm-left` → `head` (con `hair` dentro, sotto gli occhi) → `torso` (e i `top-<id>`).
 
 - Ogni parte è una regione chiusa col suo contorno, e le regioni vicine si toccano a metà del tratto scuro del foglio, quindi non ci sono buchi né sovrapposizioni fra le linee.
 - Dentro le regioni ci sono le linee aperte: orecchio, cuciture delle maniche e del busto, cucitura interna e pieghe all'orlo dei pantaloni. Nei bambini c'è anche la tasca (un dettaglio dei pantaloni).
-- I pantaloni scendono un poco sotto le scarpe, così l'orlo non si vede.
+- I pantaloni scendono un poco sotto le scarpe, così l'orlo non si vede, e salgono sotto la maglia con una fascia
+  (`pants-under`, e lo stesso per ogni capo): con una maglia più corta di quella base non resta un buco in vita.
+- **Riempimenti di fondo**, dietro a tutto, perché nessuna combinazione lasci fessure: il bordo del busto e dei fianchi
+  vicino alle braccia (`<defs>`: `fill-top-…`, `fill-bottom-…`), richiamato con `<use>` dentro ogni maglia e pantalone
+  (`top-<id>-back`, `bottom-<id>-back`) col colore principale di quel capo; ogni maglia vi aggiunge la sua parte sotto le
+  braccia. E una fascia di pelle sotto il collo (`neck-fill`), che si vede solo con una maglia più scollata della base.
+  Sulla sagoma base sono tutti coperti da braccia e busto.
 - Scarpe, come regioni riempite: suola, tomaia (`c-upper-l` / `c-upper-r`), linguetta a sinistra, punta e zona lacci (`c-toe`, `c-lace`) a destra. Alcune sagome non hanno la punta come regione a parte: `--shoe-toe` non ha effetto su di loro (il visualizzatore non mostra quel campo).
 - Il sorgente in `src/bodies/` contiene solo la geometria e il segnaposto `<!-- @hair -->` dentro `head`; colori, capelli e vestiti li aggiunge la build.
 
@@ -93,7 +102,8 @@ Le coordinate sono quelle dei fogli di riferimento, uguali per tutte le sagome: 
 
 ## Capelli
 
-Il gruppo `hair` sta **dentro** `head`, sopra gli occhi, così i capelli seguono il movimento idle della testa. Ogni stile è un gruppo `hair-<id>` con la sagoma (riempimento + contorno) e qualche linea interna per ciocche e separazioni. Ne è visibile uno solo: per default quello del preset di quella sagoma.
+Il gruppo `hair` sta **dentro** `head`, così i capelli seguono il movimento idle della testa, ed è disegnato prima degli
+occhi: una frangia lunga passa dietro gli occhi e non li copre. Ogni stile è un gruppo `hair-<id>` con la sagoma (riempimento + contorno) e qualche linea interna per ciocche e separazioni. Ne è visibile uno solo: per default quello del preset di quella sagoma.
 
 | Stile (`id`) | Nome | Colore di default |
 | --- | --- | --- |
@@ -185,7 +195,8 @@ particolari rispetto ai primi capi maschili:
 
 Definita direttamente in ogni SVG (CSS `@keyframes`, solo `transform`), quindi parte anche aprendo il file da solo nel browser:
 
-- **respiro**: busto e braccia si allungano di ~1% ancorati alla base, la testa si alza di 2 px con 0.14 s di ritardo (cicli di 1.9 s, andata e ritorno);
+- **respiro**: busto e braccia si allungano di ~1% ancorati alla base, la testa si alza di 2 px con 0.14 s di ritardo (cicli di 1.9 s, andata e ritorno); le maglie (con le loro parti sotto e dietro) respirano col busto attorno allo stesso punto, la base del busto
+  (`.c-origin-<gruppo>-<sagoma>`, coordinate assolute): così i livelli non si separano;
 - **battito di ciglia**: gli occhi si schiacciano brevemente ogni 4.6 s.
 
 Con `prefers-reduced-motion` l'SVG resta fermo. Nel visualizzatore c'è l'interruttore *Animazione*; il PNG esportato è sempre un fotogramma fermo.
@@ -207,4 +218,18 @@ I colori di partenza sono i default scritti nel CSS di ogni SVG, più i `colors`
 - **Sagoma**: tracciarla con `tools/trace_bodies.py` (o scrivere a mano `src/bodies/<gruppo>/<nome>.svg` + `.json` con la stessa struttura, compresi i punti `head` e `landmarks`), poi aggiungerla a `bodies` e a `presets` in `src/manifest.json`. Un gruppo nuovo (per esempio *Anziani*) è una cartella in più, più una voce in `groups`.
 - **Stile di capelli**: `tools/trace_hair.py` o a mano in `src/hair/<id>.svg` + `.json`, poi l'id in `hair` nel manifest.
 - **Vestiti**: due strade, secondo il foglio. Con due fogli di figure sullo stesso corpo (pantaloni e maglie, come per i maschi): `tools/trace_clothes.py`; il corpo di riferimento è la prima figura del foglio dei pantaloni. Con un foglio in cui ogni figura indossa un outfit sul proprio corpo (come per le femmine): `tools/trace_outfits.py`, con le regioni di ogni figura assegnate a mano nella sua tabella `OUTFITS`. Poi i capi in `clothes.<gruppo>` nel manifest e, se si vuole, in un preset (`top`, `bottom`, `colors`).
-- Poi `node build.mjs`.
+- Poi `node build.mjs`, e se si vuole l'audit (sotto).
+
+## Audit delle combinazioni
+
+```
+NODE_PATH=$(npm root -g) node tools/audit.mjs      # serve playwright (npm i -g playwright), circa 10 minuti
+```
+
+Rende nel browser ogni sagoma con ogni maglia e pantaloni (e ogni stile di capelli con ogni maglia), circa 3000
+combinazioni, e cerca i difetti confrontando ogni combinazione con la sagoma base: vuoti nel busto, nelle braccia e alle
+caviglie, fessure sottili chiuse dalla figura, pezzi staccati, parti tagliate dal riquadro, l'estensione dei pantaloni
+che si vede, livelli sotto che coprono il braccio o sporgono, vuoti nel fotogramma estremo del respiro, occhi coperti
+dai capelli; controlla anche che l'SVG esportato dal visualizzatore sia uguale a quello mostrato e che i file siano
+validi (XML, id unici, ogni parte con un colore). Scrive `audit/report.html` (per ogni difetto le combinazioni peggiori,
+col difetto colorato) e `audit/report.json`. Per rifare solo una parte: `--only=femmina/robusta`, `--skip=hair,export`.

@@ -14,6 +14,7 @@ from .segment import K, segment
 
 GROUND = 900.0     # y della linea del suolo (le suole poggiano qui in tutte le sagome)
 PAD = 14           # px: i pantaloni scendono sotto le scarpe, così l'orlo non si vede
+WAIST_UP = 30      # px: i pantaloni salgono sotto la maglia (livello sotto), così un'altra maglia non lascia buchi in vita
 SEAM_RADIUS = 4.2  # px: una fessura interna ha una sola regione entro questo raggio
 SHOE_CLASSES = ('sole', 'tongue', 'upper-l', 'upper-r', 'toe', 'lace')
 
@@ -176,6 +177,118 @@ def find_folds(seg, g, pid, to_xy, contrast=20, minlen=9.0, sigma=6.0):
             for l in skeleton_lines(mask, minlen * K)]
 
 
+# ---------------------------------------------------------------- estensioni sotto altri capi
+def band_rect(cell, rows, extra, notch, inset=10, taper=0.0):
+    """Rettangolo largo come la fascia `rows` della regione (meno `inset` px per lato), che si allunga di `extra` px
+    oltre la fascia: in alto se extra > 0, in basso se extra < 0. Con `taper` si stringe man mano che si allontana."""
+    cols = np.nonzero(cell[rows].any(0))[0]
+    out = np.zeros_like(cell)
+    top_row = np.nonzero(cell.any(1))[0].min()
+    top_cols = np.nonzero(cell[top_row:top_row + 6 * K].any(0))[0]     # il bordo alto (non la sua sola prima riga)
+    x0, x1 = cols.min() + int(inset * K), cols.max() + 1 - int(inset * K)
+    edge = rows.start if extra > 0 else rows.stop
+    steps = range(int(abs(extra) * K) + int(notch * K))
+    for d in steps:
+        v = edge - int(abs(extra) * K) + d if extra > 0 else edge - int(notch * K) + d
+        if not 0 <= v < cell.shape[0]:
+            continue
+        far = max(0, (edge - v) if extra > 0 else (v - edge))      # distanza oltre il bordo
+        t = int(far * taper)
+        a, b = x0 + t, x1 - t
+        if v < top_row:                               # sopra la regione: non più larga del suo bordo alto
+            row = top_cols
+        else:                                         # dentro: non più larga della regione dal bordo alto fin qui
+            row = np.nonzero(cell[top_row:max(v + 1, top_row + 6 * K)].any(0))[0]
+        if row.size:
+            a, b = max(a, row.min()), min(b, row.max() + 1)
+        if a < b:
+            out[v, a:b] = True
+    return out
+
+
+def extend_top(cell, up, notch=35, inset=5, taper=0.3, band_only=False):
+    """Parte alta dei pantaloni: un rettangolo largo come i primi `notch` px dall'alto, `up` px sopra il bordo alto e
+    `notch` px sotto (riempie i vani fra il bordo alto frastagliato, l'orlo di una maglia, e i pantaloni), che si stringe
+    salendo (la vita è più stretta dei fianchi). Così, con una maglia più corta o con un orlo diverso, non resta un buco.
+    Con `band_only` restituisce solo la fascia (per il livello sotto: ridisegnare tutta la regione doppierebbe il contorno)."""
+    rows = np.nonzero(cell.any(1))[0]
+    band = band_rect(cell, slice(rows.min(), rows.min() + int(notch * K)), up, notch, inset=inset, taper=taper)
+    return band if band_only else cell | band
+
+
+def extend_bottom(cell, down, notch=25, inset=10, band_only=False):
+    """Parte bassa di una maglia (in un livello sotto i pantaloni): un rettangolo largo come l'orlo, `down` px più in
+    basso. Con pantaloni che cominciano più in basso dell'orlo non resta un buco in vita."""
+    rows = np.nonzero(cell.any(1))[0]
+    band = band_rect(cell, slice(rows.max() + 1 - int(notch * K), rows.max() + 1), -down, notch, inset=inset)
+    return band if band_only else cell | band
+
+
+def hull(mask):
+    """Involucro convesso di una maschera (catena monotona sui bordi di ogni riga, poi riempimento del poligono)."""
+    from PIL import ImageDraw
+    pts = []
+    for y in np.nonzero(mask.any(1))[0]:
+        xs = np.nonzero(mask[y])[0]
+        pts += [(int(xs.min()), int(y)), (int(xs.max()), int(y))]
+    pts = sorted(set(pts))
+
+    def half(points):
+        out = []
+        for p in points:
+            while len(out) >= 2 and (out[-1][0] - out[-2][0]) * (p[1] - out[-2][1]) - (out[-1][1] - out[-2][1]) * (p[0] - out[-2][0]) <= 0:
+                out.pop()
+            out.append(p)
+        return out
+    poly = half(pts)[:-1] + half(pts[::-1])[:-1]
+    img = Image.new('L', (mask.shape[1], mask.shape[0]), 0)
+    ImageDraw.Draw(img).polygon(poly, fill=255)
+    return np.array(img) > 0
+
+
+def hdilate(mask, r):
+    """Allarga una maschera solo in orizzontale, di `r` px del bitmap per lato."""
+    out = mask.copy()
+    for k in range(1, int(r) + 1):
+        out[:, k:] |= mask[:, :-k]
+        out[:, :-k] |= mask[:, k:]
+    return out
+
+
+BACK = 10          # px: il livello dietro allarga un capo fin sotto le braccia (vedi back_strip)
+FILL_NEAR = 14     # px: i riempimenti di fondo stanno vicino alle braccia
+FILL_RIM = 9       # px: e coprono questa fascia dentro il bordo del busto
+FILL_RIM_HIPS = 16  # px: e dei fianchi (i pantaloni corti o stretti sono più stretti dei pantaloni base)
+FILL_NECK = 30     # px: la fascia di pelle allo scollo scende tanto sotto il collo
+FILL_NECK_SIDE = 12  # px: e si allarga tanto oltre il collo (non arriva alle spalle)
+
+
+def between_arms(arms, center):
+    """Per ogni riga, le colonne fra il bordo interno del braccio a sinistra di `center` e quello del braccio a destra
+    (con 2 px di margine); vuoto dove manca uno dei due."""
+    out = np.zeros_like(arms)
+    c = int(center)
+    for row in range(arms.shape[0]):
+        xs = np.nonzero(arms[row])[0]
+        la, ra = xs[xs < c], xs[xs >= c]
+        if la.size and ra.size:
+            out[row, max(0, la.max() - 2 * K):ra.min() + 2 * K + 1] = True
+    return out
+
+
+def back_strip(garment, arms, rows=None):
+    """Livello dietro di un capo: una striscia larga fino a BACK px oltre i suoi fianchi, solo dove sulla figura c'è un
+    braccio (che la nasconde). Su un altro corpo, dove fra braccio e capo resterebbe una fessura sottile, la striscia la
+    riempie; uno spazio largo fra braccio e fianco resta com'è. `rows` = (prima, ultima) riga in cui vale."""
+    # solo fra le braccia: fuori (oltre il braccio lontano, o dalla manica in fuori) su un altro corpo sporgerebbe
+    center = np.nonzero(garment)[1].mean()
+    strip = hdilate(garment, BACK * K) & ~garment & dilate(arms, 2 * K) & between_arms(arms, center)
+    if rows is not None:
+        v = np.arange(strip.shape[0])[:, None]
+        strip &= (v >= rows[0]) & (v <= rows[1])
+    return strip
+
+
 # ---------------------------------------------------------------- misure
 def _hex(c):
     return '#%02x%02x%02x' % tuple(int(round(v)) for v in c)
@@ -232,6 +345,49 @@ def landmarks(cells, cls, to_xy):
         cols = np.nonzero(mask[v])[0]
         return {f'{prefix}-fl': to_xy(cols.min(), v), f'{prefix}-fr': to_xy(cols.max() + 1, v)}
 
+    def edges(mask, v, left_arm, right_arm):
+        """Bordi del busto alla riga v: dove comincia il braccio davanti (a sinistra) e quello dietro (a destra),
+        o il bordo della maglia se lì il braccio non c'è."""
+        cols = np.nonzero(mask[v])[0]
+        lo, hi = cols.min(), cols.max() + 1
+        la, ra = np.nonzero(left_arm[v])[0], np.nonzero(right_arm[v])[0]
+        if la.size and abs(la.max() + 1 - lo) <= 4 * K:
+            lo = la.max() + 1
+        if ra.size and abs(ra.min() - hi) <= 4 * K:
+            hi = ra.min()
+        return lo, hi
+
+    # Larghezza del busto contro le braccia (al petto, sotto le maniche, e in vita) e dei fianchi: senza questi punti i
+    # vestiti seguono solo i riquadri, e su un corpo più largo resta uno spicchio vuoto fra braccio e fianco.
+    T, AL, AR, PA = (cells[by_role[r]] for r in ('torso', 'arm-left', 'arm-right', 'pants'))
+    tv = np.nonzero(T.any(1))[0]
+    arm_top = max(np.nonzero(AL.any(1))[0].min(), np.nonzero(AR.any(1))[0].min())
+    for name, v in (('chest', arm_top + 8 * K), ('waist', tv.max() - 6 * K)):
+        lo, hi = edges(T, v, AL, AR)
+        out[f'{name}-l'], out[f'{name}-r'] = to_xy(lo, v), to_xy(hi, v)
+    pv = max(np.nonzero(PA.any(1))[0].min(), tv.max()) + 10 * K        # sotto l'orlo della maglia: i pantaloni si vedono interi
+    cols = np.nonzero(PA[pv])[0]
+    out['hip-l'], out['hip-r'] = to_xy(cols.min(), pv), to_xy(cols.max() + 1, pv)
+
+    # Gambe: dove sono i piedi (la cima di ogni scarpa) e, sopra ciascuno, l'altezza del ginocchio (a metà fra la vita e
+    # le scarpe). Tengono al loro posto orli, pantaloncini e calze: senza, un capo corto disegnato su un bambino diventa
+    # enorme su un adulto. Le larghezze no: quelle dei pantaloni base sono uno stile (svasati, dritti), non il corpo.
+    shoe_l = np.zeros_like(PA); shoe_r = np.zeros_like(PA)
+    soles = sorted((i for i, c in cls.items() if c == 'sole'), key=lambda i: np.nonzero(cells[i])[1].mean())
+    for i, c in cls.items():
+        if c in ('upper-l', 'tongue') or i == soles[0]:
+            shoe_l |= cells[i]
+        elif c in ('upper-r', 'toe', 'lace') or i == soles[-1]:
+            shoe_r |= cells[i]
+    pants_top = np.nonzero(PA.any(1))[0].min()
+    for side, m in (('l', shoe_l), ('r', shoe_r)):
+        ys, xs = np.nonzero(m)
+        top, bottom = ys.min(), ys.max() + 1
+        cx = xs[ys < top + 8 * K].mean()
+        out[f'foot-{side}'] = to_xy(cx, top)                        # la cima della scarpa (la caviglia)
+        out[f'sole-{side}'] = to_xy(xs.mean(), bottom)              # sotto la scarpa, a terra
+        out[f'knee-{side}'] = to_xy(cx, (pants_top + top) / 2)
+
     out.update(box('torso', cells[by_role['torso']]))
     out.update(box('armL', cells[by_role['arm-left']]))
     out.update(fist('armL', cells[by_role['arm-left']]))
@@ -258,12 +414,20 @@ def trace_body(sheet, box, ground=GROUND, verbose=False):
 
     marks = landmarks(cells, cls, to_xy)
 
+    # i pantaloni salgono sotto la maglia (livello sotto: si vede solo dove una maglia più corta lascerebbe un buco)
+    pid = next(i for i, c in cls.items() if c == 'pants')
+    # e proseguono sotto la mano davanti (nel foglio la copre, e con un braccio diverso resterebbe un incavo)
+    front = next(i for i, c in cls.items() if c == 'arm-left')
+    cells[pid] = cells[pid] | (hull(cells[pid]) & cells[front])
+    under = extend_top(cells[pid], WAIST_UP, band_only=True)
+
+    pants_cell = cells[pid].copy()
+
     # i pantaloni scendono sotto le scarpe
     shoe_cells = np.zeros_like(seg.dark)
     for i, c in cls.items():
         if c in SHOE_CLASSES:
             shoe_cells |= cells[i]
-    pid = next(i for i, c in cls.items() if c == 'pants')
     cells[pid] = cells[pid] | (dilate(cells[pid], PAD * K) & shoe_cells)
 
     parts = {}
@@ -278,6 +442,47 @@ def trace_body(sheet, box, ground=GROUND, verbose=False):
             med=[float(v) for v in med], area=float(info[i]['area']), cx=float(info[i]['cx']), cy=float(info[i]['cy'] - dy)))
         if verbose:
             print(f'  regione {i:2d} {c:13s} area {info[i]["area"]:6.0f}')
+
+    parts['pants-under'] = [dict(id=-1, d=trace_paths(fill_small_holes(under, 30 * K * K), to_xy, opttol=1.6 * K / 2, alphamax=1.0, turd=20, smooth=1.0),
+                                 med=parts['pants'][0]['med'], area=float(under.sum() / (K * K)), cx=0.0, cy=0.0)]
+    # Riempimenti di fondo, dietro a tutto: qualunque capo si scelga, fra braccio e busto (o fianchi) non resta una
+    # fessura. Sono il bordo del busto e dei pantaloni vicino alle braccia (dentro e sotto il braccio), nel colore del
+    # capo scelto, e una fascia di pelle allo scollo (si vede solo dove la maglia scelta è più scollata della base).
+    arms = np.zeros_like(seg.dark)
+    for i, c in cls.items():
+        if c in ('arm-left', 'arm-right'):
+            arms |= cells[i]
+    tid = next(i for i, c in cls.items() if c == 'torso')
+    torso = cells[tid]
+    near = dilate(arms, FILL_NEAR * K)
+    arm_top = np.nonzero(arms.any(1))[0].min()
+    v = np.arange(torso.shape[0])[:, None]
+    # dentro il bordo vicino alle braccia (fra le due braccia: non nelle maniche della maglietta base, che sono più larghe
+    # di quelle di altri capi), e fuori solo dove il braccio lo copre (sulla sagoma base non si vede)
+    AL = cells[next(i for i, c in cls.items() if c == 'arm-left')]
+    AR = cells[next(i for i, c in cls.items() if c == 'arm-right')]
+    between = np.zeros_like(torso)
+    for row in range(torso.shape[0]):
+        la, ra = np.nonzero(AL[row])[0], np.nonzero(AR[row])[0]
+        if la.size and ra.size:
+            between[row, max(0, la.max() - 2 * K):ra.min() + 2 * K + 1] = True
+    rim = lambda m, inside=None, depth=FILL_RIM: ((m & ~erode(m, depth * K) & near & (inside if inside is not None else True))
+                                                  | (hdilate(m, BACK * K) & ~m & dilate(arms, 1.5 * K)))
+    tv = np.nonzero(torso.any(1))[0]
+    pv = np.nonzero(pants_cell.any(1))[0]
+    head_cell = cells[next(i for i, c in cls.items() if c == 'head')]
+    neck_v = np.nonzero(head_cell.any(1))[0].max()
+    nc = np.nonzero(head_cell[neck_v - 8 * K])[0]                 # le colonne del collo, con un margine
+    neck_cols = np.zeros_like(torso)
+    neck_cols[:, max(0, nc.min() - FILL_NECK_SIDE * K):nc.max() + 1 + FILL_NECK_SIDE * K] = True
+    fills = {
+        'fill-top': rim(torso, between) & (v >= arm_top),
+        'fill-bottom': rim(pants_cell, between, FILL_RIM_HIPS) & (v >= pv.min()) & (v <= pv.min() + 60 * K),
+        'fill-neck': torso & ~head_cell & (v <= neck_v + FILL_NECK * K) & neck_cols,
+    }
+    for name, m in fills.items():
+        parts[name] = [dict(id=-1, d=trace_paths(fill_small_holes(m, 30 * K * K), to_xy, opttol=1.6 * K / 2, alphamax=1.0, turd=20, smooth=1.0),
+                            med=[0, 0, 0], area=float(m.sum() / (K * K)), cx=0.0, cy=0.0)] if m.any() else []
 
     body_labels = {i for i, c in cls.items() if c in ('head', 'torso', 'pants', 'arm-left', 'arm-right')}
     seams = find_seams(seg, g, body_labels, to_xy) + find_folds(seg, g, pid, to_xy)

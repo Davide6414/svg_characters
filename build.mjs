@@ -41,13 +41,17 @@ const bodies = await Promise.all(manifest.bodies.map(async (path) => {
   const svg = await read(`src/bodies/${path}.svg`);
   if (!svg.includes('<!-- @hair -->')) throw new Error(`src/bodies/${path}.svg: manca il segnaposto <!-- @hair -->`);
   const inner = svg.slice(svg.indexOf('</title>') + '</title>'.length, svg.lastIndexOf('</svg>'));
-  return { id: path, group, file, ...(await readJson(`src/bodies/${path}.json`)), inner };
+  // i riempimenti di fondo hanno un id per sagoma (il visualizzatore mette tutte le sagome nella stessa pagina)
+  const fills = {};
+  const named = inner.replace(/<path id="fill-(top|bottom)"/g, (m, k) => { fills[k] = `fill-${k}-${group}-${file}`; return `<path id="${fills[k]}"`; });
+  return { id: path, group, file, ...(await readJson(`src/bodies/${path}.json`)), inner: named, fills };
 }));
 
 // ---- vestiti -----------------------------------------------------------------
 // Un capo ('top' = sopra il busto, 'bottom' = pantaloni) è disegnato su un corpo di riferimento: quello del gruppo
 // (src/clothes/<gruppo>/reference.json) oppure la sagoma indicata dal capo (`on`, per esempio "femmina/ragazza").
-// `<g id="garment">` è il capo; `<g id="underlay">`, se c'è, sta sotto i pantaloni (pelle scoperta da una maglia corta).
+// `<g id="garment">` è il capo; `<g id="underlay">`, se c'è, sta sotto i pantaloni (pelle scoperta da una maglia corta,
+// fasce che salgono o scendono sotto un altro capo); `<g id="backlay">` dietro a tutto (il capo sotto le braccia).
 const KINDS = { tops: 'top', bottoms: 'bottom' };
 const bodyById = Object.fromEntries(bodies.map((b) => [b.id, b]));
 const groupContent = (svg, id) => svg.match(new RegExp(`<g id="${id}">\\n([\\s\\S]*?)\\n  </g>`))?.[1];
@@ -64,7 +68,7 @@ for (const [group, lists] of Object.entries(manifest.clothes ?? {})) {
       const meta = await readJson(`${path}.json`);
       const ref = meta.on ? { landmarks: { ...bodyById[meta.on].landmarks, ...meta.landmarks } } : groupRef;
       if (!ref) throw new Error(`${path}: serve src/clothes/${group}/reference.json oppure "on" nel json`);
-      clothes[group].items.push({ id, kind, group, ref, ...meta, content, under: groupContent(svg, 'underlay') ?? '' });
+      clothes[group].items.push({ id, kind, group, ref, ...meta, content, under: groupContent(svg, 'underlay') ?? '', back: groupContent(svg, 'backlay') ?? '' });
     }
   }
 }
@@ -86,7 +90,7 @@ function clothesFor(body) {
     return fits.get(ref);
   };
   const map = (xml, f) => mapCircles(mapPaths(xml, f), f);
-  return wardrobe(body.group).map((g) => { const f = fit(g.ref); return { ...g, content: map(g.content, f), under: map(g.under, f) }; });
+  return wardrobe(body.group).map((g) => { const f = fit(g.ref); return { ...g, content: map(g.content, f), under: map(g.under, f), back: map(g.back, f) }; });
 }
 for (const b of bodies) b.clothes = clothesFor(b);
 
@@ -108,7 +112,7 @@ for (const b of bodies) b.hair = hairFor(b);
 
 // ---- riquadro comune: stessa scala e linea del suolo, spazio per i capelli ------------
 const ext = (b) => {
-  const pts = [...coords(b.inner), ...b.hair.flatMap((h) => coords(h.group)), ...b.clothes.flatMap((g) => coords(g.content + g.under))];
+  const pts = [...coords(b.inner), ...b.hair.flatMap((h) => coords(h.group)), ...b.clothes.flatMap((g) => coords(g.content + g.under + g.back))];
   const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
   return [Math.min(...xs) - 3.5, Math.min(...ys) - 3.5, Math.max(...xs) + 3.5, Math.max(...ys) + 3.5];
 };
@@ -124,13 +128,23 @@ const ROLE_VAR = { top: { main: '--shirt', trim: '--shirt-trim', accent: '--shir
                    bottom: { main: '--pants', trim: '--pants-trim', accent: '--pants-accent', under: '--pants-under' } };
 function clothesCss(body, defaults) {
   const fills = body.clothes.flatMap((g) => Object.entries(g.colors).map(([role, color]) =>
-    `${g.under ? `#${g.kind}-${g.id}-under .c-${role}, ` : ''}#${g.kind}-${g.id} .c-${role} { fill: var(${ROLE_VAR[g.kind][role]}, ${color}) }`));
-  const show = [['top', 'torso'], ['bottom', 'pants']].flatMap(([kind, base]) => [
-    `#${base} { display: var(--show-${kind}-base, ${defaults[kind] === 'base' ? 'inline' : 'none'}) }`,
+    // il gruppo del capo per ultimo: il visualizzatore legge il colore di default da "#top-<id> .c-<ruolo> {"
+    `${[...(g.under ? ['-under'] : []), '-back', ''].map((x) => `#${g.kind}-${g.id}${x} .c-${role}`).join(', ')} { fill: var(${ROLE_VAR[g.kind][role]}, ${color}) }`));
+  const show = [['top', '#torso, #torso-fill'], ['bottom', '#pants, #pants-under, #pants-fill']].flatMap(([kind, base]) => [
+    `${base} { display: var(--show-${kind}-base, ${defaults[kind] === 'base' ? 'inline' : 'none'}) }`,
     ...body.clothes.filter((g) => g.kind === kind).map((g) =>
-      `#${kind}-${g.id}${g.under ? `, #${kind}-${g.id}-under` : ''} { display: var(--show-${kind}-${g.id}, ${defaults[kind] === g.id ? 'inline' : 'none'}) }`)]);
+      `#${kind}-${g.id}${g.under ? `, #${kind}-${g.id}-under` : ''}, #${kind}-${g.id}-back { display: var(--show-${kind}-${g.id}, ${defaults[kind] === g.id ? 'inline' : 'none'}) }`)]);
   return { fills: fills.join('\n'), show: show.join('\n') };
 }
+
+// Il respiro allunga il busto attorno alla sua base. Tutto ciò che sta sul busto (maglietta, maglie, le loro parti sotto e
+// dietro, la pelle dello scollo) usa la stessa origine, in coordinate assolute: con l'origine di ogni gruppo (la base del
+// suo ingombro) livelli diversi si muoverebbero in modo diverso e fra loro si aprirebbero fessure.
+const originClass = (body) => `c-origin-${body.group}-${body.file}`;
+const originCss = (body) => {
+  const L = body.landmarks, x = (L['torso-bl'][0] + L['torso-br'][0]) / 2, y = L['torso-bl'][1];
+  return `.c-idle-torso.${originClass(body)} { transform-box: view-box; transform-origin: ${fmt(x)}px ${fmt(y)}px }`;
+};
 
 function css(body, defaultHair, defaults, preset) {
   const vars = { ...manifest.palette, ...body.colors, ...preset?.colors };
@@ -143,6 +157,7 @@ function css(body, defaultHair, defaults, preset) {
     if (k === 'body-arms-default') return body.clothes.some((g) => defaults[g.kind] === g.id && g.replaces?.includes('arms')) ? 'none' : 'inline';
     if (k === 'clothes-fills') return cl.fills;
     if (k === 'clothes-show') return cl.show;
+    if (k === 'idle-origin') return originCss(body);
     if (!(k in vars)) throw new Error(`style.css: segnaposto {{${k}}} senza valore per ${body.id}`);
     return vars[k];
   });
@@ -154,14 +169,30 @@ function compose(body) {
   const defaultHair = preset?.hair ?? body.hair[0].id;
   if (!body.hair.some((h) => h.id === defaultHair)) throw new Error(`preset di ${body.id}: lo stile ${defaultHair} non vale per questa sagoma`);
   const defaults = { top: preset?.top ?? 'base', bottom: preset?.bottom ?? 'base' };
-  const group = (kind) => body.clothes.filter((g) => g.kind === kind).map((g) => `  <!-- ${g.name} -->\n  <g id="${kind}-${g.id}">\n${g.content}\n  </g>`).join('\n');
-  const underlay = [...body.clothes.filter((g) => g.kind === 'bottom'), ...body.clothes.filter((g) => g.kind === 'top')].filter((g) => g.under).map((g) => `  <!-- ${g.name}: parti sotto i pantaloni -->\n  <g id="${g.kind}-${g.id}-under">\n${g.under}\n  </g>`).join('\n');
+  // le maglie respirano col busto (stessa animazione della maglietta base), i pantaloni stanno fermi
+  // le maglie (e le loro parti sotto e dietro) respirano col busto, attorno allo stesso punto: la base del busto
+  const breathe = (kind) => (kind === 'top' ? ` class="c-idle-torso ${originClass(body)}"` : '');
+  const group = (kind) => body.clothes.filter((g) => g.kind === kind).map((g) => `  <!-- ${g.name} -->\n  <g id="${kind}-${g.id}"${breathe(kind)}>\n${g.content}\n  </g>`).join('\n');
+  const ordered = [...body.clothes.filter((g) => g.kind === 'bottom'), ...body.clothes.filter((g) => g.kind === 'top')];
+  const underlay = ordered.filter((g) => g.under).map((g) => `  <!-- ${g.name}: parti sotto i pantaloni -->\n  <g id="${g.kind}-${g.id}-under"${breathe(g.kind)}>\n${g.under}\n  </g>`).join('\n');
+  // dietro alle braccia: i riempimenti di fondo della sagoma (definiti una volta, richiamati col colore di ogni capo) e le
+  // parti del capo sotto le braccia
+  const fillRef = { top: body.fills.top, bottom: body.fills.bottom };
+  const use = (kind, cls) => (fillRef[kind] ? `    <use href="#${fillRef[kind]}" class="${cls}"/>\n` : '');
+  const backlay = [
+    `  <g id="pants-fill">\n${use('bottom', 'c-pants')}  </g>`, `  <g id="torso-fill"${breathe('top')}>\n${use('top', 'c-shirt')}  </g>`,
+    ...ordered.map((g) => `  <!-- ${g.name}: sotto le braccia -->\n  <g id="${g.kind}-${g.id}-back"${breathe(g.kind)}>\n${use(g.kind, 'c-main')}${g.back}\n  </g>`),
+  ].join('\n');
   const x0 = Math.round((body.ext[0] + body.ext[2]) / 2 - W / 2);
-  const hairXml = '\n    <!-- Capelli: nel gruppo della testa, così seguono il respiro. Stile mostrato di default: ' + defaultHair + ' -->\n' +
+  const hairXml = '\n    <!-- Capelli: nel gruppo della testa (così seguono il respiro), sotto gli occhi. Stile mostrato di default: ' + defaultHair + ' -->\n' +
     '    <g id="hair">\n' + body.hair.map((h) => `      <!-- ${h.name} -->\n` + h.group.split('\n').map((l) => '    ' + l).join('\n')).join('\n') + '\n    </g>';
-  // le parti sotto i pantaloni vanno prima dei pantaloni, i pantaloni prima delle scarpe, le maglie dopo il busto
-  let inner = body.inner.replace('    <!-- @hair -->', hairXml.replace(/^\n/, '\n'));
-  if (underlay) inner = inner.replace('  <g id="pants">', underlay + '\n  <g id="pants">');
+  // i pantaloni vanno prima delle scarpe, le maglie dopo il busto
+  let inner = body.inner.replace('    <!-- @hair -->', hairXml.replace(/^\n/, '\n'))
+    .replace('<g id="torso" class="c-idle-torso">', `<g id="torso"${breathe('top')}>`)
+    .replace('<g id="neck-fill">', `<g id="neck-fill"${breathe('top')}>`);
+  // dietro al braccio lontano: prima i riempimenti e le parti dietro, poi le parti sotto (fasce in vita, pancia scoperta)
+  inner = inner.replace('  <g id="pants-under">', backlay + '\n  <g id="pants-under">');
+  if (underlay) inner = inner.replace('  <g id="arm-right"', underlay + '\n  <g id="arm-right"');
   if (group('bottom')) inner = inner.replace('  <g id="shoes">', group('bottom') + '\n  <g id="shoes">');
   if (group('top')) inner = inner.replace(/\s*$/, '\n') + group('top') + '\n';
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} ${Y0} ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="t">

@@ -8,6 +8,7 @@
 .c-skin     { fill: var(--skin, {{skin}}) }
 .c-shirt    { fill: var(--shirt, {{shirt}}) }
 .c-pants    { fill: var(--pants, {{pants}}) }
+#neck-fill { display: var(--show-torso, inline) }
 .c-upper-l  { fill: var(--shoe-upper-l, {{shoe-upper-l}}) }
 .c-upper-r  { fill: var(--shoe-upper-r, {{shoe-upper-r}}) }
 .c-toe      { fill: var(--shoe-toe, {{shoe-toe}}) }
@@ -45,6 +46,7 @@
   animation-delay: var(--idle-delay, 0s);
 }
 .c-idle-torso { transform-origin: 50% 100%; animation-name: idle-breathe }
+{{idle-origin}}
 .c-idle-arm   { transform-origin: 50% 100%; animation-name: idle-arms }
 .c-idle-head  { transform-origin: 50% 100%; animation-name: idle-head; animation-delay: calc(var(--idle-delay, 0s) + 0.14s) }
 .c-blink      { transform-origin: 50% 50%; animation-name: idle-blink; animation-duration: 4.6s; animation-direction: normal; animation-timing-function: linear }

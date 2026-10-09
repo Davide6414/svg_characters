@@ -9,3 +9,6 @@ Thumbs.db
 # Python (strumenti di tracciatura)
 __pycache__/
 *.pyc
+
+# Rapporto dell'audit (node tools/audit.mjs)
+audit/

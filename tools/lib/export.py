@@ -40,7 +40,15 @@ def body_svg(body, title):
     x0, y0, x1, y1 = _extent(body)
     L = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{fmt(x0 - 4)} {fmt(y0 - 4)} {fmt(x1 - x0 + 8)} {fmt(y1 - y0 + 8)}">',
          f'  <title>{title}</title>',
-         '  <g id="arm-right" class="c-idle-arm">']
+         '  <defs>']                                                   # riempimenti di fondo (vedi parts.trace_body):
+    for name in ('fill-top', 'fill-bottom'):                           # la build li richiama in ogni capo, col suo colore
+        for p in P.get(name, []):
+            L.append(f'    <path id="{name}" d="{_d(p["d"])}"/>')
+    L += ['  </defs>', '  <g id="neck-fill">']
+    L += ['    ' + _path('c-skin', p['d']) for p in P.get('fill-neck', [])]
+    L += ['  </g>', '  <g id="pants-under">']                 # i pantaloni sotto la maglia (vedi WAIST_UP in parts.py),
+    L += ['    ' + _path('c-pants c-stroke', p['d']) for p in P['pants-under']]   # dietro al braccio lontano
+    L += ['  </g>', '  <g id="arm-right" class="c-idle-arm">']
     L += ['    ' + _path('c-skin c-stroke', p['d']) for p in P['arm-right']]
     L += ['  </g>', '  <g id="pants">']
     for p in P['pants']:
@@ -60,9 +68,10 @@ def body_svg(body, title):
     L += ['  </g>', '  <g id="head" class="c-idle-head">']
     L += ['    ' + _path('c-skin c-stroke', p['d']) for p in P['head']]
     L += seam_paths('head', 4)
+    L += ['    <!-- @hair -->']                     # i capelli sotto gli occhi: una frangia lunga non li copre mai
     for e in body['eyes']:
         L.append(f'    <ellipse class="c-eye c-blink" cx="{fmt(e["cx"])}" cy="{fmt(e["cy"])}" rx="{fmt(e["rx"])}" ry="{fmt(e["ry"])}"/>')
-    L += ['    <!-- @hair -->', '  </g>', '  <g id="torso" class="c-idle-torso">']
+    L += ['  </g>', '  <g id="torso" class="c-idle-torso">']
     L += ['    ' + _path('c-shirt c-stroke', p['d']) for p in P['torso']]
     L += seam_paths('torso', 4)
     L += ['  </g>', '</svg>']

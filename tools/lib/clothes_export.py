@@ -34,14 +34,16 @@ def _rows(garment, layer):
 
 
 def garment_svg(garment, title):
-    """`<g id="garment">` è il capo; `<g id="underlay">` (se c'è) sta sotto i pantaloni (pelle scoperta dalla maglia)."""
+    """`<g id="garment">` è il capo; `<g id="underlay">` (se c'è) sta sotto i pantaloni (pelle scoperta dalla maglia,
+    fasce che salgono o scendono sotto un altro capo); `<g id="backlay">` dietro a tutto (il capo sotto le braccia)."""
     xs, ys = [], []
     for r in garment['regions']:
         for m in PAIR.finditer(''.join(r['d'])):
             xs.append(float(m.group(1))); ys.append(float(m.group(2)))
     vb = f'{fmt(min(xs) - 4)} {fmt(min(ys) - 4)} {fmt(max(xs) - min(xs) + 8)} {fmt(max(ys) - min(ys) + 8)}'
     groups = '\n'.join(f'  <g id="{gid}">\n' + '\n'.join(rows) + '\n  </g>'
-                       for gid, rows in (('garment', _rows(garment, 'main')), ('underlay', _rows(garment, 'under'))) if rows)
+                       for gid, rows in (('garment', _rows(garment, 'main')), ('underlay', _rows(garment, 'under')),
+                                         ('backlay', _rows(garment, 'back'))) if rows)
     return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vb}">\n  <title>{title}</title>\n{groups}\n</svg>\n'
 
 

@@ -15,7 +15,7 @@ Ruoli dei colori di un capo (variabili CSS --shirt / --pants e le loro varianti)
 import numpy as np
 
 from .geom import dilate, erode, fill_small_holes, grow_labels, trace_paths
-from .parts import GROUND, PAD, find_folds, find_seams, landmarks, region_info
+from .parts import GROUND, PAD, WAIST_UP, back_strip, extend_top, find_folds, find_seams, landmarks, region_info
 from .segment import K, segment
 
 SHOE_BAND = 45        # px sopra la cima delle suole: le regioni più in basso sono scarpe
@@ -116,12 +116,35 @@ def trace_garment(sheet, box, kind, ref=None, overrides=None, verbose=False):
         med[i] = np.median(seg.rgb[core_mask], axis=0) if core_mask.any() else info[i]['rgb']
     roles = assign_roles(info, med, garment, core, overrides)
 
+    # i pantaloni salgono sotto la maglia (livello sotto), così un'altra maglia più corta non lascia buchi in vita
+    under = extend_top(cells[core], WAIST_UP, band_only=True) if kind == 'bottom' else None
+
+    # livello dietro: il capo continua sotto le braccia (vedi back_strip)
+    arms = np.zeros_like(seg.dark)
+    for i, r in info.items():
+        if not r['bg'] and i != head and i not in garment and i not in shoes and _skin(r):
+            arms |= g == i
+    gar = np.zeros_like(seg.dark)
+    for i in garment:
+        gar |= cells[i]
+    back = None
+    if arms.any() and kind == 'top':                  # i pantaloni: basta il riempimento della sagoma
+        gv = np.nonzero(gar.any(1))[0]
+        rows = (np.nonzero(arms.any(1))[0].min(), gv.max()) if kind == 'top' else (gv.min(), gv.min() + 60 * K)
+        back = back_strip(gar, arms, rows)
+        if back.sum() <= 20 * K * K:
+            back = None
+
     # i pantaloni scendono sotto le scarpe, così l'orlo non si vede
     if kind == 'bottom':
         shoe_cells = np.zeros_like(seg.dark)
         for i in shoes:
             shoe_cells |= cells[i]
-        cells[core] = cells[core] | (dilate(cells[core], PAD * K) & shoe_cells)
+        # anche le regioni che toccano le scarpe (risvolti, coste alle caviglie)
+        near_shoes = dilate(shoe_cells, 2 * K)
+        for i in garment:
+            if i == core or (cells[i] & near_shoes).any():
+                cells[i] = cells[i] | (dilate(cells[i], PAD * K) & shoe_cells)
 
     regions = []
     for i in sorted(garment, key=lambda i: -info[i]['area']):
@@ -130,6 +153,13 @@ def trace_garment(sheet, box, kind, ref=None, overrides=None, verbose=False):
                             d=trace_paths(cell, to_xy, opttol=1.6 * K / 2, alphamax=1.0, turd=20, smooth=1.0)))
         if verbose:
             print(f'  regione {i:2d} {roles[i]:7s} area {info[i]["area"]:6.0f} {_hex(med[i])}')
+
+    if back is not None:
+        regions.append(dict(id=-2, role=roles[core], layer='back', area=float(back.sum() / (K * K)), med=[float(v) for v in med[core]],
+                            d=trace_paths(back, to_xy, opttol=1.6 * K / 2, alphamax=1.0, turd=20, smooth=1.0)))
+    if under is not None:
+        regions.append(dict(id=-1, role=roles[core], layer='under', area=float(under.sum() / (K * K)), med=[float(v) for v in med[core]],
+                            d=trace_paths(fill_small_holes(under, 30 * K * K), to_xy, opttol=1.6 * K / 2, alphamax=1.0, turd=20, smooth=1.0)))
 
     labels = set(garment)
     seams = find_seams(seg, g, labels, to_xy)
