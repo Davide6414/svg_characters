@@ -118,14 +118,17 @@ def _minmax_in_disk(g, r):
     return mn, mx
 
 
-def find_seams(seg, g, allowed, to_xy, minlen=9.0):
+def find_seams(seg, g, allowed, to_xy, minlen=9.0, exclude=None):
     """Fessure scure dentro una stessa regione (orecchio, cuciture delle maniche, cucitura dei pantaloni…):
-    pixel scuri che hanno una sola regione intorno. `allowed` = etichette delle regioni da considerare.
+    pixel scuri che hanno una sola regione intorno. `allowed` = etichette delle regioni da considerare; `exclude` = maschera
+    di pixel da non considerare (il confine fra due regioni fuse in una sola).
     Restituisce le linee (con l'etichetta della regione), già estese fino al contorno."""
     dark = seg.dark
     h, w = dark.shape
     mn, mx = _minmax_in_disk(g, SEAM_RADIUS * K)
     cand = dark & (mn == mx)
+    if exclude is not None:
+        cand &= ~exclude
     bnd = np.zeros_like(dark)
     p = np.pad(g, 1)
     for dy, dx in N8:

@@ -206,6 +206,10 @@ docstring del file, gestiscono i casi che i fogli maschili non avevano (`lib/out
   marrone di un abito rosa, `dark=80` lo chiude in una regione) e `cuts=[(regione, y)]`: divide una regione con un taglio
   orizzontale all'altezza `y` del foglio (un abito senza la linea della vita: la parte sotto prende l'indice successivo all'ultimo,
   lo stampa `-v`);
+- `no_seams`, `min_seam`, `smooth`: ripulire un abito scuro dai ghirigori. `no_seams` toglie le linee interne di certe regioni (una gamba
+  o un braccio di pelle, i pannelli fusi con `absorb`); `min_seam` alza la lunghezza minima delle linee (px del foglio) per
+  perdere i trattini corti dei bordi doppi; `smooth={indice: px}` apre la regione (erosione e dilatazione) e toglie i
+  bernoccoli di un cinturino fuso in una caviglia. Con `folds=()` si spengono anche le pieghe chiare dei pantaloni;
 - `folds`: dove cercare anche le pieghe chiare (per i pantaloni, la regione principale, in automatico);
 - `widen`, `clip_top`, `to_waist`: allargare una regione sotto le vicine (la pancia sotto le braccia), togliere le strisce
   strette in alto (un pezzo di pantalone che risale lungo il braccio), far salire i pantaloni fino alla vita della

@@ -207,6 +207,9 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
             for j in cs.get('absorb', {}).get(i, ()):            # regioni assorbite: una sola regione, senza cucitura
                 cell = cell | cells[j]
             layer = cs.get('layers', {}).get(i, 'main')
+            if i in cs.get('smooth', {}):                         # toglie i bernoccoli (un cinturino, una fibbia fusi nella regione)
+                r = cs['smooth'][i] * K
+                cell = dilate(erode(cell, r), r) & cell
             plain = cell                                          # la regione prima delle estensioni (per le fasce sotto)
             if i in cs.get('pad_under', {}):                      # pelle del livello sotto: si estende in verticale sotto i capi vicini
                 pad = cs['pad_under'][i]
@@ -301,7 +304,12 @@ def trace_outfit(sheet, box, ref, spec, verbose=False):
 
         # linee interne: fessure scure (cuciture, tasche, cordini) e pieghe chiare (solo dove richiesto; per i
         # pantaloni, la regione principale)
-        seams = find_seams(seg, g, labels, to_xy) + joined_seams
+        merged = np.zeros_like(seg.dark)                       # il confine fra regioni fuse con `absorb`: nessuna cucitura
+        for i, js in cs.get('absorb', {}).items():
+            for j in js:
+                merged |= dilate(seg.dark & dilate(cells[i], 2 * K) & dilate(cells[j], 2 * K), 2 * K)
+        seams = [sm for sm in find_seams(seg, g, labels, to_xy, minlen=cs.get('min_seam', 9.0), exclude=merged if merged.any() else None)
+                 if sm['label'] not in cs.get('no_seams', ())] + joined_seams
         fold_regions = cs.get('folds', (max((i for i, r in cs['regions'].items() if r != 'skin'), key=lambda i: info[i]['area']),)
                               if kind == 'bottom' else ())
         for i in fold_regions:

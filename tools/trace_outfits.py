@@ -42,6 +42,9 @@ Ogni capo ha:
              riempie la fessura fra il collo della sagoma e il bavero o lo scollo del foglio
   parts      {indice: 'arms'} regioni che sostituiscono le braccia della sagoma (spalle e braccia scoperte)
   arms       (braccio sinistro, braccio destro): indici delle regioni dei bracci, per le maniche corte (vedi sotto)
+  min_seam   px: lunghezza minima delle linee interne (9 di solito; più alta se i bordi doppi del foglio lasciano trattini corti)
+  smooth     {indice: px} apre la regione (erosione e dilatazione) per toglierle i bernoccoli: un cinturino fuso in una caviglia
+  no_seams   regioni da cui non si estraggono le linee interne (una gamba di pelle accanto a un bordo doppio: sarebbero ghirigori)
   folds      regioni dove cercare anche le pieghe chiare (per i pantaloni: la regione principale, in automatico)
 
 Ogni riga della tabella (figura) può avere anche, oltre a `top` e `bottom`:
@@ -168,9 +171,10 @@ OUTFITS['vestiti-femminili-4'] = [
                      absorb={20: (24,), 22: (23,)}, to_shoes=(20, 22), behind={18: (6, 8)}, under_up={18: 20})),
     dict(body='slanciata', cuts=[(9, 497)],
          top=dict(id='abito-nero', name='Abito nero con spalline (corpetto)', regions={9: 'main', 5: 'skin', 6: 'skin', 15: 'skin', 7: 'skin'},
-                  parts={6: 'arms', 15: 'arms'}, neck=True, absorb={9: (16,)}, under_down={9: (40, 1, 0.5)}),
-         bottom=dict(id='gonna-lunga-nera', name='Gonna lunga con spacco', regions={67: 'main', 21: 'main', 24: 'main', 18: 'skin'},
-                     absorb={67: (24, 25, 26), 21: (33,), 18: (29, 32)}, to_shoes=(18,), behind={67: (6, 15)}, under_up={67: 30})),
+                  parts={6: 'arms', 15: 'arms'}, neck=True, absorb={9: (16,)}, min_seam=30, no_seams=(5, 6, 7, 15), under_down={9: (40, 1, 0.5)}),
+         bottom=dict(id='gonna-lunga-nera', name='Gonna lunga con spacco', regions={67: 'main', 21: 'main', 18: 'skin'},
+                     absorb={67: (24, 25, 26), 21: (33,), 18: (29, 30, 31, 32, 27, 34)}, no_seams=(18, 24, 25, 26), smooth={18: 5, 67: 3, 21: 4}, min_seam=50, folds=(),
+                     to_shoes=(18,), behind={67: (6, 15)}, under_up={67: 30})),
     dict(body='adulta',
          top=dict(id='camicetta-bluse', name='Camicetta a portafoglio', regions={4: 'main'}, arms=(22, 21), neck=True, folds=(4,),
                   absorb={4: (5,)}, under_down={4: (60, 6, 0, 492)}),
