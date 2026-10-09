@@ -286,8 +286,11 @@ la tabella dice dove tagliarla. Ogni figura ha `parts`:
 
 - `kind='cut'` (dietro la testa): `poly`, un poligono in px del foglio che racchiude la protuberanza e lascia fuori il cranio (il taglio
   passa lungo la base: dove la protuberanza attacca alla testa, un poco fuori dal cranio). La parte è la silhouette dentro il poligono.
-  Continua di `EXT` px dentro il cranio (ma non fino al suo bordo), dove la testa di ogni sagoma la copre; il tratto è solo sul bordo
-  esterno. Le linee interne (nervature, spirali) restano; quelle lungo il taglio (il contorno del cranio) no. Per un cranio tondo si
+  Il suo contorno esterno continua dentro la testa, dove quella di ogni sagoma lo copre: i bordi che arrivano al cranio si prolungano
+  lungo la loro tangente (`TAIL` px, finché restano a `REACH` px dal cranio della figura; un estremo la cui tangente corre lungo la
+  testa, fuori, non si prolunga) e il riempimento è la sagoma così chiusa. Così si chiude sul contorno di ogni sagoma, anche se la
+  sua testa è un poco più stretta o più lontana (le pinne sulla testa inclinata). Il tratto è solo sul bordo esterno. Le linee
+  interne (nervature, spirali) restano; quelle lungo il taglio (il contorno del cranio) no. Per un cranio tondo si
   può dare `not_circle=(cx, cy, r)`: la silhouette fuori da quel cerchio (la cresta a spine);
 - `kind='region'` (davanti alla testa): `seed`, un punto dentro una regione chiusa dal tratto del foglio (un corno che passa davanti al
   cranio); riempimento e contorno interi. `bridge` della figura chiude un'interruzione del tratto (il corno di destra delle corna a spirale).

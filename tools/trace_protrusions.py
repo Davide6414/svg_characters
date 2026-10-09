@@ -39,15 +39,15 @@ FIGURES = [
          parts=[dict(kind='cut', poly=POLY((760, 535), (918, 535), (918, 690), (862, 780), (760, 780))),
                 dict(kind='cut', poly=POLY((1143, 535), (1260, 535), (1260, 795), (1158, 795), (1143, 722)))]),
     dict(id='cresta-a-foglia', name='Cresta a foglia', sheet=FIGURE, box=(400, 0, 680, 555), fit=dict(dx=6),
-         parts=[dict(kind='cut', poly=POLY((400, -10), (570, -10), (570, 70), (537, 76), (500, 82), (467, 102), (450, 127), (447, 150), (400, 150)))]),
+         parts=[dict(kind='cut', poly=POLY((400, -10), (570, -10), (570, 70), (537, 76), (500, 82), (467, 102), (450, 127), (447, 160), (400, 160)))]),
     dict(id='pinne', name='Pinne laterali', sheet=FIGURE, box=(770, 40, 1100, 543),
          parts=[dict(kind='cut', poly=POLY((770, 60), (857, 60), (857, 112), (845, 164), (860, 216), (860, 260), (770, 260))),
                 dict(kind='cut', poly=POLY((1100, 60), (1023, 60), (1023, 112), (1035, 164), (1020, 216), (1020, 260), (1100, 260)))]),
     dict(id='cresta-al-vento', name='Cresta al vento', sheet=FIGURE, box=(340, 555, 680, 1086), fit=dict(dx=14),
-         parts=[dict(kind='cut', poly=POLY((330, 560), (515, 560), (515, 606), (490, 630), (476, 665), (470, 700), (468, 712), (330, 712))),
+         parts=[dict(kind='cut', poly=POLY((330, 560), (515, 560), (515, 606), (490, 630), (476, 665), (470, 700), (466, 722), (330, 722))),
                 dict(kind='cut', poly=POLY((500, 555), (600, 555), (600, 605), (580, 606), (550, 606), (520, 607), (500, 607)))]),
     dict(id='spine', name='Cresta a spine', sheet=FIGURE, box=(790, 545, 1100, 1086),
-         parts=[dict(kind='cut', poly=POLY((790, 545), (1100, 545), (1100, 722), (790, 722)), not_circle=(945, 694, 90))]),
+         parts=[dict(kind='cut', poly=POLY((790, 545), (1100, 545), (1100, 745), (790, 745)), not_circle=(945, 694, 90))]),
 ]
 
 

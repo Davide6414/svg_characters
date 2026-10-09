@@ -8,9 +8,11 @@ misure: la cima e il centro del cranio restano gli ancoraggi.
 Nel foglio la protuberanza è fusa con la testa (stesso colore, spesso nessuna linea fra le due), quindi si isola con un
 **taglio**: un poligono, in px del foglio, che racchiude la protuberanza e lascia fuori il cranio. Due tipi di parte:
 
-- `cut` (dietro la testa): la parte della silhouette dentro il poligono. Continua per EXT px dentro il cranio, dove la testa di ogni
-  sagoma la copre, così resta attaccata qualunque sia la testa; il tratto sta solo sul bordo esterno (il contorno della testa è
-  quello della sagoma). Le linee interne (nervature, spirali) restano sopra il riempimento.
+- `cut` (dietro la testa): la parte della silhouette dentro il poligono. Il suo contorno esterno continua dentro la testa, dove quella
+  di ogni sagoma lo copre: i due bordi che arrivano al cranio (di una pinna, di un corno) si prolungano lungo la loro tangente (fino a
+  TAIL px, finché restano vicino al cranio della figura: `extend_chain`) e il riempimento è la sagoma così chiusa, quindi si chiude
+  sul contorno di ogni sagoma anche se la sua testa è un poco più stretta o più lontana. Il tratto sta solo sul bordo esterno (il
+  contorno della testa è quello della sagoma). Le linee interne (nervature, spirali) restano sopra il riempimento.
 - `region` (davanti alla testa): una regione chiusa dal tratto del foglio (un corno che passa davanti al cranio), scelta con un punto
   dentro (`seed`); riempimento e contorno interi, sopra la testa. `bridge` chiude le interruzioni del tratto.
 """
@@ -24,7 +26,9 @@ from .parts import find_seams
 from .alien import SKULL_DEPTH
 from .segment import K, segment
 
-EXT = 8           # px: la parte dietro la testa continua tanto dentro il cranio
+EXT = 8           # px: la parte dietro la testa continua tanto dentro il cranio (quando il bordo ha più tratti)
+TAIL = 40         # px: il contorno di una protuberanza dietro la testa continua tanto verso la testa, lungo la sua tangente
+REACH = 16        # px: ...ma solo finché sta a questa distanza dal cranio della figura (la testa di una sagoma può essere un poco più stretta)
 PAIR = re.compile(r'(-?\d+\.?\d*),(-?\d+\.?\d*)')
 
 
@@ -50,6 +54,41 @@ def circle_mask(cx, cy, r, shape, box):
     img = Image.new('L', (shape[1], shape[0]), 0)
     ImageDraw.Draw(img).ellipse([((cx - r) - x0) * K, ((cy - r) - y0) * K, ((cx + r) - x0) * K, ((cy + r) - y0) * K], fill=255)
     return np.asarray(img) > 127
+
+
+def extend_chain(line, allowed, inside, length=TAIL, back=6.0):
+    """Prolunga i due estremi di una polilinea (il contorno che arriva alla testa) lungo la loro tangente, finché restano vicino al
+    cranio (`allowed`): i due bordi di una pinna o di un corno entrano nella testa, dove quella di ogni sagoma li copre, e si chiudono
+    sempre sul suo contorno, anche se è un poco più stretta di quella della figura. Un estremo la cui tangente non entra nel cranio
+    (`inside`) resta com'è: il prolungamento correrebbe lungo la testa, fuori."""
+    pts = [np.array(p, float) for p in line]
+
+    def tangent(seq):
+        a = seq[-1]
+        q = seq[0]
+        for q in reversed(seq[:-1]):
+            if np.hypot(*(a - q)) >= back * K:
+                break
+        v = a - q
+        n = np.hypot(*v)
+        return v / n if n else None
+
+    out = list(pts)
+    for end in (0, -1):
+        t = tangent(pts if end == -1 else pts[::-1])
+        if t is None:
+            continue
+        ext = []
+        for step in range(1, int(length * K) + 1):
+            q = pts[end] + t * step
+            x, y = int(round(q[0])), int(round(q[1]))
+            if not (0 <= y < allowed.shape[0] and 0 <= x < allowed.shape[1]) or not allowed[y, x]:
+                break
+            ext.append(q)
+        if not any(inside[int(round(q[1])), int(round(q[0]))] for q in ext):
+            ext = []
+        out = out + ext if end == -1 else ext[::-1] + out
+    return out
 
 
 def close_bottom(sheet, box):
@@ -122,9 +161,32 @@ def trace_protrusion(sheet, spec, frame):
     boundary = S & ~erode(S, 1.5)                                # il bordo della silhouette (a mezzo tratto, verso lo sfondo)
     back, front, used = [], [], set()
     for part, m in zip([p for p in spec['parts'] if p['kind'] == 'cut'], cuts):
-        ext = m | (dilate(m, EXT * K) & erode(S, 7 * K))          # dentro il cranio, ma non fino al suo bordo (sporgerebbe da una testa più stretta)
+        chains = skeleton_lines(boundary & dilate(m, 2 * K), 9 * K)
+        if len(chains) == 1:
+            # un solo contorno: i suoi due estremi entrano nel cranio lungo la tangente e il riempimento è la sagoma così chiusa (con un
+            # tratto dritto dentro la testa): niente fessure né riempimento senza contorno, qualunque sia la testa su cui finisce
+            near_head = dilate(head, REACH * K)
+            chain = extend_chain(chains[0], near_head, erode(head, 3 * K))
+            img = Image.new('L', (shape[1], shape[0]), 0)
+            ImageDraw.Draw(img).polygon([(float(x), float(y)) for x, y in chain], fill=255)
+            ext = m | ((np.asarray(img) > 127) & near_head)
+            outline = [catmull_d(rdp(chain, 1.1 * K), to_xy)]
+        else:
+            # più contorni (la silhouette si spezza dove si incrociano i rami): dentro il cranio, ma non fino al suo bordo; i contorni
+            # che entrano nel cranio si prolungano come sopra, col riempimento in più solo vicino ai prolungamenti
+            ext = m | (dilate(m, EXT * K) & erode(S, 7 * K))
+            near_head, inside_head = dilate(head, REACH * K), erode(head, 3 * K)
+            outline = []
+            for line in chains:
+                chain = extend_chain(line, near_head, inside_head)
+                if len(chain) > len(line):
+                    img = Image.new('L', (shape[1], shape[0]), 0)
+                    ImageDraw.Draw(img).polygon([(float(x), float(y)) for x, y in chain], fill=255)
+                    tails = Image.new('L', (shape[1], shape[0]), 0)
+                    ImageDraw.Draw(tails).line([(float(x), float(y)) for x, y in chain], fill=255, width=2)
+                    ext |= (np.asarray(img) > 127) & near_head & dilate(np.asarray(tails) > 127, 25 * K)
+                outline.append(catmull_d(rdp(chain, 1.1 * K), to_xy))
         fill = trace_paths(fill_small_holes(ext, 30 * K * K), to_xy, opttol=1.6 * K / 2, alphamax=1.0, turd=20, smooth=1.0)
-        outline = [catmull_d(rdp(line, 1.1 * K), to_xy) for line in skeleton_lines(boundary & dilate(m, 2 * K), 9 * K)]
         inner = poly_mask(part['poly'], shape, box) & S
         if 'not_circle' in part:
             inner &= ~circle_mask(*part['not_circle'], shape, box)
