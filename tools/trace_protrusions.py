@@ -20,6 +20,7 @@ from lib.sheet import Sheet                       # noqa: E402
 
 TESTE = 'reference/protuberanze-teste.webp'      # quattro teste con il busto (il busto non ha contorno in basso)
 FIGURE = 'reference/protuberanze-figure.webp'    # quattro figure intere
+ANTENNE = 'reference/protuberanze-antenne.webp'  # quattro figure intere con le antenne
 POLY = lambda *pts: list(pts)
 
 # id, nome, foglio, riquadro della figura, `bust` (la figura è un busto), parti (poligoni di taglio o punti dentro una regione).
@@ -48,6 +49,17 @@ FIGURES = [
                 dict(kind='cut', poly=POLY((500, 555), (600, 555), (600, 605), (580, 606), (550, 606), (520, 607), (500, 607)))]),
     dict(id='spine', name='Cresta a spine', sheet=FIGURE, box=(790, 545, 1100, 1086),
          parts=[dict(kind='cut', poly=POLY((790, 545), (1100, 545), (1100, 745), (790, 745)), not_circle=(945, 694, 90))]),
+    dict(id='antenne-a-pallina', name='Antenne a pallina', sheet=ANTENNE, box=(52, 127, 383, 1016),
+         parts=[dict(kind='cut', poly=POLY((90, 70), (210, 70), (210, 214), (172, 224), (150, 236), (90, 236))),
+                dict(kind='cut', poly=POLY((265, 70), (390, 70), (390, 228), (302, 234), (280, 222), (265, 222)))]),
+    dict(id='antenne-lunghe', name='Antenne lunghe', sheet=ANTENNE, box=(395, 60, 723, 1017),
+         parts=[dict(kind='cut', poly=POLY((420, 60), (545, 60), (545, 222), (538, 223), (515, 227), (420, 227))),
+                dict(kind='cut', poly=POLY((590, 60), (740, 60), (740, 226), (622, 226), (600, 224), (590, 224)))]),
+    dict(id='antenna-a-perline', name='Antenna a perline', sheet=ANTENNE, box=(725, 67, 1050, 1018),
+         parts=[dict(kind='cut', poly=POLY((840, 60), (940, 60), (940, 224), (913, 226), (863, 224), (840, 224)))]),
+    dict(id='antenne-a-pagaia', name='Antenne a pagaia', sheet=ANTENNE, box=(1065, 128, 1414, 1018),
+         parts=[dict(kind='cut', poly=POLY((1060, 110), (1205, 110), (1205, 228), (1178, 243), (1160, 250), (1060, 250))),
+                dict(kind='cut', poly=POLY((1270, 110), (1415, 110), (1415, 250), (1317, 250), (1305, 243), (1292, 234), (1270, 226)))]),
 ]
 
 

@@ -98,6 +98,26 @@
       "body": "femmina/curva",
       "name": "Curva · spine",
       "prot": "spine"
+    },
+    {
+      "body": "maschio/ragazzo",
+      "name": "Ragazzo · antenne a pallina",
+      "prot": "antenne-a-pallina"
+    },
+    {
+      "body": "maschio/adulto",
+      "name": "Adulto · antenne lunghe",
+      "prot": "antenne-lunghe"
+    },
+    {
+      "body": "femmina/ragazza",
+      "name": "Ragazza · antenne a pagaia",
+      "prot": "antenne-a-pagaia"
+    },
+    {
+      "body": "femmina/adulta",
+      "name": "Adulta · antenna a perline",
+      "prot": "antenna-a-perline"
     }
   ],
   "protrusions": [
@@ -108,6 +128,10 @@
     "cresta-a-foglia",
     "pinne",
     "cresta-al-vento",
-    "spine"
+    "spine",
+    "antenne-a-pallina",
+    "antenne-lunghe",
+    "antenna-a-perline",
+    "antenne-a-pagaia"
   ]
 }

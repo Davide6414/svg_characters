@@ -275,9 +275,9 @@ Dopo la tracciatura: le sagome in `bodies` e un preset per ognuna in `src/alien/
 python3 tools/trace_protrusions.py --frame src/alien/bodies/maschio/adulto.json --out src/alien/protrusions
 ```
 
-Per i fogli di **teste e figure aliene con una protuberanza** (corna, palchi, pinne, creste): `reference/protuberanze-teste.webp` (quattro
-teste con il busto, che non ha il contorno in basso: lo strumento lo chiude con un segmento) e `reference/protuberanze-figure.webp`
-(quattro figure intere). Scrive `<id>.svg` + `<id>.json` per ogni figura della tabella `FIGURES` in cima al file. `--frame` è la sagoma
+Per i fogli di **teste e figure aliene con una protuberanza** (corna, palchi, pinne, creste, antenne): `reference/protuberanze-teste.webp`
+(quattro teste con il busto, che non ha il contorno in basso: lo strumento lo chiude con un segmento), `reference/protuberanze-figure.webp`
+e `reference/protuberanze-antenne.webp` (quattro figure intere ciascuno). Scrive `<id>.svg` + `<id>.json` per ogni figura della tabella `FIGURES` in cima al file. `--frame` è la sagoma
 che dà la testa di riferimento (di solito `maschio/adulto`): le coordinate delle protuberanze stanno nel suo riquadro (centro e mezza
 larghezza del cranio, cima) e la build le adatta alla testa di ogni sagoma (`lib/protrusion.py`).
 

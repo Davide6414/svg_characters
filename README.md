@@ -4,7 +4,7 @@ Personaggi in SVG pensati per essere **combinati**, in due sezioni separate:
 
 - **Umani**: dieci sagome (cinque maschili e cinque femminili, da bambino a adulto) × venti stili di capelli × cinque barbe
   (per gli uomini) × maglie e pantaloni × colori a piacere;
-- **Alieni**: otto sagome aliene (quattro maschili e quattro femminili: bambino, ragazzo, adulto e una sagoma curva) con la loro maglia e i loro pantaloncini, otto protuberanze (corna, palchi, pinne, creste) e colori a piacere (vedi *Alieni*).
+- **Alieni**: otto sagome aliene (quattro maschili e quattro femminili: bambino, ragazzo, adulto e una sagoma curva) con la loro maglia e i loro pantaloncini, dodici protuberanze (corna, palchi, pinne, creste, antenne) e colori a piacere (vedi *Alieni*).
 
 Un visualizzatore HTML (`index.html`, con una scheda per sezione) permette di provare gli incroci.
 
@@ -55,7 +55,7 @@ reference/                  fogli di riferimento da cui sono tracciate le sorgen
   vestiti-maschili-pantaloni · vestiti-maschili-maglie ·
   vestiti-maschili-outfit · vestiti-femminili · vestiti-femminili-2 · vestiti-femminili-3 · vestiti-femminili-4 · archivio/
   alieno-modello (l'alieno nudo da cui parte lo stile) · sagome-aliene-maschili · sagome-aliene-femminili ·
-  protuberanze-teste · protuberanze-figure
+  protuberanze-teste · protuberanze-figure · protuberanze-antenne
 tools/                      strumenti Python per tracciare i fogli (vedi tools/README.md)
 ```
 
@@ -274,7 +274,7 @@ Con `prefers-reduced-motion` l'SVG resta fermo. Nel visualizzatore c'è l'interr
 Gli alieni sono una sezione a parte: risorse in `src/alien/`, composizione in `build/alien.mjs`, file in `characters/alieno/`. Con gli
 umani hanno in comune solo la scala (stessa linea del suolo `y = 900`, la figura più alta come un adulto) e le utilità della pagina.
 Non hanno capelli, barbe o capi da scegliere: ogni sagoma ha la sua maglia e i suoi pantaloncini (colori a piacere) e, a scelta, una
-**protuberanza** (corna, palchi, pinne, creste: vedi sotto).
+**protuberanza** (corna, palchi, pinne, creste, antenne: vedi sotto).
 
 | Gruppo | Sagome | Dal foglio |
 | --- | --- | --- |
@@ -318,6 +318,10 @@ altri stanno **davanti** (`alien-prot-<id>`, sopra il contorno e sotto gli occhi
 | `pinne` | Pinne laterali | `protuberanze-figure` |
 | `cresta-al-vento` | Cresta al vento | `protuberanze-figure` |
 | `spine` | Cresta a spine (con le orecchie a punta) | `protuberanze-figure` |
+| `antenne-a-pallina` | Antenne a pallina | `protuberanze-antenne` |
+| `antenne-lunghe` | Antenne lunghe e curve | `protuberanze-antenne` |
+| `antenna-a-perline` | Antenna centrale a perline | `protuberanze-antenne` |
+| `antenne-a-pagaia` | Quattro antenne a pagaia | `protuberanze-antenne` |
 
 Valgono per tutte le sagome; una alla volta (nessuna di default, o quella del preset: `prot` nel manifest). Il colore è quello della pelle
 finché non se ne sceglie un altro (`--prot`).
