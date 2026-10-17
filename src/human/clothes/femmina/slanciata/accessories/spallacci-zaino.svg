@@ -1,11 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="640 395 115 100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="640 395 120 120">
   <title>Spallacci dello zaino</title>
-  <!-- Codex (try 1) drew them; the trace (raw/spallacci-zaino/trace_1.svg, --ink-part) ran into the torso's
-       outline on the far side: redrawn by hand on the same places. The near strap from the top of the left
-       shoulder down the chest to the armpit, the far one along the right side of the torso; dark enough
-       to need no outline (with the game's thick line an outlined strap was all outline). -->
+  <!-- Codex (try 1) drew them; the trace (trace_1.svg, --ink-part) ran into the torso's outline on the far
+       side: redrawn by hand on the same places. Each strap from the top of the shoulder down the chest to the
+       armpit, where it bends to the side and runs into the torso's outline (around to the back, where the bag
+       is); dark enough to need no outline (with the game's thick line an outlined strap was all outline). -->
   <g id="garment">
-    <path class="c-main" d="M652,401.5C655.5,400.5 659.5,400.5 663,401.5C665.5,426 667.5,456 668.5,487C668.6,490 666.6,491.8 664,491.8C661.6,491.8 659.8,490.4 659.7,488C658.6,460 656.5,430 652,401.5Z"/>
-    <path class="c-main" d="M718,401.5C721,401.2 724,402.2 726,404.2C733,425 739,452 742.5,478C743,481.5 741,484 738.6,483.7C736.9,483.5 736,482 735.8,480C732.6,455 726,428 718,401.5Z"/>
+    <path class="c-main" d="M652,401.5C655.5,400.5 659.5,400.5 663,401.5C665.5,426 667.5,456 668.3,484C668.6,494 666,502 661.5,508C659.8,509.5 657,508 657.6,505C660.5,499 661,492 659.8,484C658.6,458 656.5,430 652,401.5Z"/>
+    <path class="c-main" d="M718,401.5C721,401.2 724,402.2 726,404.2C733,425 739,452 742,474C743.5,479 746.5,483 751,486C753.5,487.5 754,491 751.5,492.5C745.5,494.5 738,488 735.8,480C732.6,455 726,428 718,401.5Z"/>
   </g>
 </svg>

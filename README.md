@@ -170,11 +170,12 @@ se il cranio è un poco più alto o più basso di quello del foglio. Ogni livell
 | `lisci-frangia` | Lisci con frangia dritta (lunghi, scendono sulle spalle) | `#3b2d28` |
 | `lunghi-mossi` | Lunghi mossi con la riga di lato | `#623a26` |
 | `coda-laterale` | Coda laterale bassa (cade a sinistra, con un laccio) | `#885d44` |
-| `ricci-voluminosi` | Ricci voluminosi (una massa di ricci alta, ciuffi sulla fronte, l'orecchio scoperto) · solo `maschio/slanciato` | `#3b2618` |
-| `caschetto-mosso` | Caschetto mosso alle spalle, senza frangia · solo `femmina/slanciata` | `#9a6b45` |
+| `ricci-voluminosi` | Ricci voluminosi (una massa di ricci alta, un ricciolo sulla tempia e uno sulla fronte, l'orecchio scoperto) · tutte le sagome tranne `femmina/slanciata` e `femmina/adulta` | `#3b2618` |
+| `caschetto-mosso` | Caschetto mosso alle spalle, senza frangia | `#9a6b45` |
 
-Gli ultimi due vengono dalla "via Codex" (vedi *Componenti disegnati da Codex*) e valgono solo per la sagoma su cui sono
-disegnati (`bodies` nel `.json`).
+Gli ultimi due vengono dalla "via Codex" (vedi *Componenti disegnati da Codex*). I `ricci-voluminosi` sono così alti che
+sulle due teste più alte (`femmina/slanciata`, `femmina/adulta`) uscirebbero dal riquadro comune: non valgono per
+quelle sagome (`bodies` nel `.json`).
 
 **Capelli lunghi.** Gli ultimi cinque stili (`capelli-3`) scendono ai lati del viso fino alle spalle. Stanno nel gruppo
 della testa come gli altri, quindi braccia e maglia (disegnate dopo la testa) li coprono dove si sovrappongono: i capelli
@@ -220,15 +221,16 @@ Le sopracciglia sono un'opzione del viso come la barba: `src/human/brows/<id>.sv
 percorsi con classe `c-brows c-brows-<id>`, riempiti e senza contorno) + `<id>.json` (`name`, `color`, e se servono
 `groups`, `ages`, `bodies`), elencate in `brows` nel manifest. Sono disegnate nel riquadro dei capelli (`hairFrame`,
 occhi a y = 357, la loro cima a ~337) e adattate a ogni testa come i capelli; stanno nella testa **dopo i capelli e
-prima degli occhi** (una frangia non le copre e seguono il movimento della testa), nel gruppo `brows`.
+prima degli occhi** (una frangia non le copre e seguono il movimento della testa), nel gruppo `brows`. Valgono per
+tutte le sagome (come le barbe si adattano a ogni testa).
 
 - Nessuna di default: si sceglie con `--show-brows-<id>: inline`; `--show-brows: none` le nasconde tutte.
 - Il colore è `--brows`; se manca, quello dei capelli (`--hair`), poi il `color` del `.json`.
 
 | Sopracciglia (`id`) | Nome | Colore di default |
 | --- | --- | --- |
-| `marcate` | Sopracciglia marcate (spesse, un poco inclinate) · solo `maschio/slanciato` | `#2a1810` |
-| `sottili` | Sopracciglia sottili ad arco · solo `femmina/slanciata` | `#7a5236` |
+| `marcate` | Sopracciglia marcate (due archi spessi come il contorno del gioco, più sottili all'esterno) | `#2a1810` |
+| `sottili` | Sopracciglia sottili ad arco | `#7a5236` |
 
 ## Accessori
 
@@ -258,7 +260,8 @@ sagome base e i disegni di Codex restano nel repository del gioco (`social/compo
 
 Due chiavi nei `.json` servono a questi componenti:
 
-- `"bodies": ["<gruppo>/<sagoma>"]` (capelli e sopracciglia): lo stile vale solo per quelle sagome;
+- `"bodies": ["<gruppo>/<sagoma>"]` (capelli e sopracciglia): lo stile vale solo per quelle sagome (per esempio
+  dove non starebbe nel riquadro);
 - `"frame": false` (tutti): il componente **non allarga il riquadro comune** (322×742): chi usa i personaggi già
   disegnati (il gioco, con le sue centinaia di figure) li ritrova identici al pixel. Il componente deve starci dentro,
   altrimenti la build si ferma e dice quale sagoma esce.

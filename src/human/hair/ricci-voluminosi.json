@@ -2,7 +2,14 @@
   "name": "Ricci voluminosi",
   "color": "#3b2618",
   "bodies": [
-    "maschio/slanciato"
+    "maschio/bambino",
+    "maschio/ragazzo",
+    "maschio/slanciato",
+    "maschio/adulto",
+    "maschio/robusto",
+    "femmina/bambina",
+    "femmina/ragazza",
+    "femmina/robusta"
   ],
   "frame": false
 }
