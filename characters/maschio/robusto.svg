@@ -84,9 +84,17 @@
     #beard-pizzetto, #beard-pizzetto-skin { display: var(--show-beard-pizzetto, inline) }
     #beard-barba-lunga, #beard-barba-lunga-skin { display: var(--show-beard-barba-lunga, none) }
 
+    /* Sopracciglia: nessuna di default; --show-brows-NOME (inline | none), --show-brows: none le nasconde tutte.
+       Colore --brows (se manca, quello dei capelli). */
+
+    #brows { display: var(--show-brows, inline) }
+
+
     /* Vestiti: uno per tipo alla volta (default: cardigan-grigio + jeans-chiari). Il visualizzatore sceglie con
        --show-top-NOME / --show-bottom-NOME (inline | none); "base" è la maglietta e i pantaloni della sagoma.
-       Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under. */
+       Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under.
+       Accessori: nessuno di default, anche più di uno con --show-acc-NOME (inline | none); colori --acc-NOME
+       (e -trim, -accent, -accent2), se mancano --acc (e --acc-trim…). */
     #top-cardigan-grigio-under .c-main, #top-cardigan-grigio-back .c-main, #top-cardigan-grigio .c-main { fill: var(--shirt, #959290) }
     #top-cardigan-grigio-under .c-under, #top-cardigan-grigio-back .c-under, #top-cardigan-grigio .c-under { fill: var(--shirt-under, #f9f4ee) }
     #top-camicia-celeste-under .c-main, #top-camicia-celeste-back .c-main, #top-camicia-celeste .c-main { fill: var(--shirt, #a1b9db) }

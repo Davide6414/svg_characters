@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="670 410 50 52">
+  <title>Collana</title>
+  <!-- Codex (try 1) drew it; the cord was too thin for the trace (one or two pixels): redrawn by hand on the
+       same places, a cord from under the neckline in a V over the chest and a silver drop -->
+  <g id="garment">
+    <path class="c-main" d="M679.4,419.4L681.8,418.4C687,425 693.5,433 700.4,440.8L698.4,442.4C691.8,434.6 685,426.4 679.4,419.4Z"/>
+    <path class="c-main" d="M710,423.4L712.4,424.6C708.4,430.4 704.2,436.4 700.4,442.4L698.4,441C702.2,435.2 706,429.2 710,423.4Z"/>
+    <path class="c-accent" d="M699.4,441.6C701.6,444.8 704,447.8 704,450.6C704,453.6 701.8,455.4 699.4,455.4C697,455.4 694.8,453.6 694.8,450.6C694.8,447.8 697.2,444.8 699.4,441.6Z"/>
+  </g>
+</svg>

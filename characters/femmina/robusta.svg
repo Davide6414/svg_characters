@@ -71,9 +71,17 @@
     #beard, #beard-skin { display: var(--show-beard, inline) }
 
 
+    /* Sopracciglia: nessuna di default; --show-brows-NOME (inline | none), --show-brows: none le nasconde tutte.
+       Colore --brows (se manca, quello dei capelli). */
+
+    #brows { display: var(--show-brows, inline) }
+
+
     /* Vestiti: uno per tipo alla volta (default: cardigan + pantaloni-marroni). Il visualizzatore sceglie con
        --show-top-NOME / --show-bottom-NOME (inline | none); "base" è la maglietta e i pantaloni della sagoma.
-       Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under. */
+       Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under.
+       Accessori: nessuno di default, anche più di uno con --show-acc-NOME (inline | none); colori --acc-NOME
+       (e -trim, -accent, -accent2), se mancano --acc (e --acc-trim…). */
     #top-cardigan-under .c-main, #top-cardigan-back .c-main, #top-cardigan .c-main { fill: var(--shirt, #a67a84) }
     #top-cardigan-under .c-under, #top-cardigan-back .c-under, #top-cardigan .c-under { fill: var(--shirt-under, #f9efe5) }
     #top-cardigan-fiori-under .c-main, #top-cardigan-fiori-back .c-main, #top-cardigan-fiori .c-main { fill: var(--shirt, #a47681) }

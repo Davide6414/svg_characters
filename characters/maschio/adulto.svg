@@ -84,9 +84,17 @@
     #beard-pizzetto, #beard-pizzetto-skin { display: var(--show-beard-pizzetto, none) }
     #beard-barba-lunga, #beard-barba-lunga-skin { display: var(--show-beard-barba-lunga, none) }
 
+    /* Sopracciglia: nessuna di default; --show-brows-NOME (inline | none), --show-brows: none le nasconde tutte.
+       Colore --brows (se manca, quello dei capelli). */
+
+    #brows { display: var(--show-brows, inline) }
+
+
     /* Vestiti: uno per tipo alla volta (default: maglione + cargo). Il visualizzatore sceglie con
        --show-top-NOME / --show-bottom-NOME (inline | none); "base" è la maglietta e i pantaloni della sagoma.
-       Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under. */
+       Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under.
+       Accessori: nessuno di default, anche più di uno con --show-acc-NOME (inline | none); colori --acc-NOME
+       (e -trim, -accent, -accent2), se mancano --acc (e --acc-trim…). */
     #top-felpa-back .c-main, #top-felpa .c-main { fill: var(--shirt, #ccc6c3) }
     #top-felpa-back .c-trim, #top-felpa .c-trim { fill: var(--shirt-trim, #bdb7b2) }
     #top-felpa-back .c-accent, #top-felpa .c-accent { fill: var(--shirt-accent, #b8b3b0) }

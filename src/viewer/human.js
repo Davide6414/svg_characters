@@ -47,16 +47,16 @@ const PARTS = [
   { key: 'shoes', label: 'Scarpe' },
 ];
 
-const HAIR = DATA.hair, BEARD = DATA.beards;
+const HAIR = DATA.hair, BEARD = DATA.beards, BROWS = DATA.brows ?? [];
 document.getElementById('hair-count').textContent = HAIR.length;
 document.getElementById('beard-count').textContent = BEARD.length;
 
 // Sagome: ogni SVG composto ha già tutti gli stili di capelli, adattati alla sua testa.
-const bodies = DATA.bodies.map(({ id, group, name, svg, hair, beards }) => {
+const bodies = DATA.bodies.map(({ id, group, name, svg, hair, beards, brows }) => {
   const source = new DOMParser().parseFromString(svg, 'image/svg+xml').documentElement;
   const viewBox = source.getAttribute('viewBox');
   const [, , w, h] = viewBox.split(/\s+/).map(Number);
-  return { id, group, name, svg, hair, beards, source, viewBox, w, h, css: source.querySelector('style').textContent,
+  return { id, group, name, svg, hair, beards, brows: brows ?? [], source, viewBox, w, h, css: source.querySelector('style').textContent,
            symbol: `character-${id.replace('/', '-')}` };
 });
 const bodyById = Object.fromEntries(bodies.map(b => [b.id, b]));
@@ -83,7 +83,8 @@ const defaultColors = (v) => Object.fromEntries(COLOR_FIELDS.map(f => [f.key, cs
 // gruppo del preset: resta lì (nei filtri e nelle righe) anche se poi gli dai la sagoma di un altro gruppo.
 const makeVariant = (preset) => {
   const body = bodyById[preset.body];
-  const v = { body, hair: preset.hair, beard: preset.beard ?? 'none', top: preset.top ?? 'base', bottom: preset.bottom ?? 'base', home: body.group, preset };
+  const v = { body, hair: preset.hair, beard: preset.beard ?? 'none', top: preset.top ?? 'base', bottom: preset.bottom ?? 'base', home: body.group, preset,
+             brows: preset.brows ?? 'none', acc: [...(preset.accessories ?? [])] };
   v.colors = defaultColors(v);
   // colori del preset (per esempio pelle, capelli e scarpe di un outfit), con i nomi delle variabili CSS
   for (const [name, value] of Object.entries(preset.colors ?? {})) if (FIELD_BY_VAR[name]) v.colors[FIELD_BY_VAR[name].key] = value.toLowerCase();
@@ -98,6 +99,8 @@ const outfitOf = (v) => DATA.clothes[v.body.id] ?? { tops: [], bottoms: [] };
 const replacedParts = (v) => new Set([['tops', v.top], ['bottoms', v.bottom]].flatMap(([list, id]) => outfitOf(v)[list].find(c => c.id === id)?.replaces ?? []));
 const uniq = (items) => [...new Map(items.map(i => [i.id, i])).values()];
 const ALL_TOPS = uniq(Object.values(DATA.clothes).flatMap(c => c.tops)), ALL_BOTTOMS = uniq(Object.values(DATA.clothes).flatMap(c => c.bottoms));
+// gli accessori (spallacci, collane…): anche più di uno, nessuno di default
+const ALL_ACC = uniq(Object.values(DATA.clothes).flatMap(c => c.accessories ?? []));
 
 // Cambiando sagoma o stile, i colori che non hai modificato (uguali al default di prima) seguono il nuovo default.
 const follow = (v, before, after) => {
@@ -140,6 +143,8 @@ const cssVars = (v, index = 0, animated = state.idle) => {
   for (const p of PARTS) vars[`--show-${p.key}`] = state.parts[p.key] ? 'inline' : 'none';   // torso e pants: vedi sotto
   for (const h of HAIR) vars[`--show-hair-${h.id}`] = v.hair === h.id ? 'inline' : 'none';
   for (const b of BEARD) vars[`--show-beard-${b.id}`] = v.beard === b.id ? 'inline' : 'none';
+  for (const b of BROWS) vars[`--show-brows-${b.id}`] = v.brows === b.id ? 'inline' : 'none';
+  for (const a of ALL_ACC) vars[`--show-acc-${a.id}`] = v.acc.includes(a.id) ? 'inline' : 'none';
   // maglia e pantaloni: la scelta (o la sagoma base) si vede solo se la parte è attiva
   for (const id of ['base', ...ALL_TOPS.map(t => t.id)]) vars[`--show-top-${id}`] = state.parts.torso && v.top === id ? 'inline' : 'none';
   for (const id of ['base', ...ALL_BOTTOMS.map(t => t.id)]) vars[`--show-bottom-${id}`] = state.parts.pants && v.bottom === id ? 'inline' : 'none';
@@ -264,6 +269,21 @@ function renderBeards() {
     `<label><input type="radio" name="beard-style" value="${b.id}" ${b.id === v.beard ? 'checked' : ''}>${b.name}</label>`).join('');
 }
 
+// sopracciglia: nessuna di default, solo le sagome che le hanno (seguono il colore dei capelli)
+function renderBrows() {
+  const v = variants[state.selected], list = BROWS.filter(b => (v.body.brows ?? []).includes(b.id));
+  $('brows-section').hidden = !list.length;
+  $('brows-styles').innerHTML = [{ id: 'none', name: 'Nessuna' }, ...list].map(b =>
+    `<label><input type="radio" name="brows-style" value="${b.id}" ${b.id === v.brows ? 'checked' : ''}>${b.name}</label>`).join('');
+}
+
+function renderAcc() {
+  const v = variants[state.selected], list = outfitOf(v).accessories ?? [];
+  $('acc-section').hidden = !list.length;
+  $('acc-list').innerHTML = list.map(a =>
+    `<label><input type="checkbox" name="acc" value="${a.id}" ${v.acc.includes(a.id) ? 'checked' : ''}>${a.name}</label>`).join('');
+}
+
 function renderOutfit() {
   const v = variants[state.selected], c = outfitOf(v);
   const list = (kind, items, base, current) => `${[{ id: 'base', name: base }, ...items].map(i =>
@@ -286,7 +306,9 @@ function select(i) {
   renderBodies();
   renderHairStyles();
   renderBeards();
+  renderBrows();
   renderOutfit();
+  renderAcc();
   renderColorRows();
   renderStage();
 }
@@ -317,6 +339,9 @@ function buildExportSvg(animated = state.idle) {
   root.querySelectorAll('#hair-back, #hair-skin').forEach(n => { if (!n.children.length) n.remove(); });   // livelli vuoti: lo stile scelto non li usa
   for (const b of BEARD) if (b.id !== v.beard) root.querySelectorAll(`#beard-${b.id}, #beard-${b.id}-skin`).forEach(n => n.remove());
   root.querySelectorAll('#beard, #beard-skin').forEach(n => { if (!n.children.length) n.remove(); });
+  for (const b of BROWS) if (b.id !== v.brows) root.querySelector(`#brows-${b.id}`)?.remove();
+  root.querySelectorAll('#brows').forEach(n => { if (!n.children.length) n.remove(); });
+  for (const a of ALL_ACC) if (!v.acc.includes(a.id)) root.querySelectorAll(`#acc-${a.id}, #acc-${a.id}-back`).forEach(n => n.remove());
   const parts = (kind, id) => `#${kind}-${id}, #${kind}-${id}-under, #${kind}-${id}-back`;      // il capo e i suoi livelli
   for (const t of ALL_TOPS) if (t.id !== v.top) root.querySelectorAll(parts('top', t.id)).forEach(n => n.remove());
   for (const b of ALL_BOTTOMS) if (b.id !== v.bottom) root.querySelectorAll(parts('bottom', b.id)).forEach(n => n.remove());
@@ -435,6 +460,8 @@ const change = (mutate) => {
   // un capo che la nuova sagoma non ha (i capi sono per sagoma) lascia il posto all'abito di partenza di quella sagoma
   const c = outfitOf(v), home = DATA.presets.find(p => p.body === v.body.id);
   if (v.beard !== 'none' && !v.body.beards.includes(v.beard)) v.beard = 'none';             // la barba solo dove la sagoma la prevede
+  if (v.brows !== 'none' && !(v.body.brows ?? []).includes(v.brows)) v.brows = 'none';
+  v.acc = v.acc.filter(id => (c.accessories ?? []).some(a => a.id === id));                 // gli accessori sono per sagoma
   if (!v.body.hair.includes(v.hair)) v.hair = v.body.hair.includes(v.preset.hair) ? v.preset.hair : v.body.hair[0];
   if (v.top !== 'base' && !c.tops.some(t => t.id === v.top)) v.top = home?.top ?? 'base';
   if (v.bottom !== 'base' && !c.bottoms.some(b => b.id === v.bottom)) v.bottom = home?.bottom ?? 'base';
@@ -446,7 +473,9 @@ $('body-list').addEventListener('change', (e) => {
   change(v => { v.body = bodyById[e.target.value]; });
   renderHairStyles();
   renderBeards();
+  renderBrows();
   renderOutfit();
+  renderAcc();
   renderColorRows();
   renderStage();
 });
@@ -462,6 +491,18 @@ $('beard-styles').addEventListener('change', (e) => {
   if (e.target.name !== 'beard-style') return;
   change(v => { v.beard = e.target.value; });
   renderColorRows();
+  refresh();
+});
+
+$('brows-styles').addEventListener('change', (e) => {
+  if (e.target.name !== 'brows-style') return;
+  change(v => { v.brows = e.target.value; });
+  refresh();
+});
+
+$('acc-list').addEventListener('change', (e) => {
+  if (e.target.name !== 'acc') return;
+  change(v => { v.acc = [...$('acc-list').querySelectorAll('input:checked')].map(i => i.value); });
   refresh();
 });
 

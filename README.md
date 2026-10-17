@@ -170,6 +170,11 @@ se il cranio è un poco più alto o più basso di quello del foglio. Ogni livell
 | `lisci-frangia` | Lisci con frangia dritta (lunghi, scendono sulle spalle) | `#3b2d28` |
 | `lunghi-mossi` | Lunghi mossi con la riga di lato | `#623a26` |
 | `coda-laterale` | Coda laterale bassa (cade a sinistra, con un laccio) | `#885d44` |
+| `ricci-voluminosi` | Ricci voluminosi (una massa di ricci alta, ciuffi sulla fronte, l'orecchio scoperto) · solo `maschio/slanciato` | `#3b2618` |
+| `caschetto-mosso` | Caschetto mosso alle spalle, senza frangia · solo `femmina/slanciata` | `#9a6b45` |
+
+Gli ultimi due vengono dalla "via Codex" (vedi *Componenti disegnati da Codex*) e valgono solo per la sagoma su cui sono
+disegnati (`bodies` nel `.json`).
 
 **Capelli lunghi.** Gli ultimi cinque stili (`capelli-3`) scendono ai lati del viso fino alle spalle. Stanno nel gruppo
 della testa come gli altri, quindi braccia e maglia (disegnate dopo la testa) li coprono dove si sovrappongono: i capelli
@@ -209,6 +214,61 @@ classe `c-skinlayer`) è la stessa sagoma allargata di qualche px verso l'estern
 di pelle fra la barba e il mento. Le parti che scendono oltre il mento restano davanti, sopra il contorno. La barba
 incolta è fatta di puntini (un solo percorso, con gli estremi tondi) nello stesso livello.
 
+## Sopracciglia
+
+Le sopracciglia sono un'opzione del viso come la barba: `src/human/brows/<id>.svg` (un gruppo `<g id="brows-<id>">`,
+percorsi con classe `c-brows c-brows-<id>`, riempiti e senza contorno) + `<id>.json` (`name`, `color`, e se servono
+`groups`, `ages`, `bodies`), elencate in `brows` nel manifest. Sono disegnate nel riquadro dei capelli (`hairFrame`,
+occhi a y = 357, la loro cima a ~337) e adattate a ogni testa come i capelli; stanno nella testa **dopo i capelli e
+prima degli occhi** (una frangia non le copre e seguono il movimento della testa), nel gruppo `brows`.
+
+- Nessuna di default: si sceglie con `--show-brows-<id>: inline`; `--show-brows: none` le nasconde tutte.
+- Il colore è `--brows`; se manca, quello dei capelli (`--hair`), poi il `color` del `.json`.
+
+| Sopracciglia (`id`) | Nome | Colore di default |
+| --- | --- | --- |
+| `marcate` | Sopracciglia marcate (spesse, un poco inclinate) · solo `maschio/slanciato` | `#2a1810` |
+| `sottili` | Sopracciglia sottili ad arco · solo `femmina/slanciata` | `#7a5236` |
+
+## Accessori
+
+Gli accessori (spallacci di uno zaino, collane…) sono capi come le maglie e i pantaloni: stanno su una sagoma
+(`src/human/clothes/<gruppo>/<sagoma>/accessories/<id>.svg` + `.json`, elencati in
+`clothes["<gruppo>/<sagoma>"].accessories`), con lo stesso formato (`<g id="garment">`, se serve `<g id="backlay">`
+per una parte dietro la schiena) e gli stessi ruoli di colore. Differenze:
+
+- se ne possono mostrare **più insieme** e nessuno di default: `--show-acc-<id>: inline`;
+- stanno **davanti a tutto**, dopo le maglie (sulla maglia e sul collo), e respirano col busto;
+- colori: `--acc-<id>` (e `--acc-<id>-trim`, `-accent`, `-accent2`) per il singolo accessorio, altrimenti `--acc`
+  (`--acc-trim`…) per tutti, altrimenti il colore del `.json`.
+
+| Sagoma | Accessori (`acc-<id>`) |
+| --- | --- |
+| Slanciata | `spallacci-zaino` (spallacci neri su tutte e due le spalle) · `collana` (cordino scuro a V con un pendente argento, `accent`) |
+
+## Componenti disegnati da Codex
+
+Alcuni componenti (i capelli `ricci-voluminosi` e `caschetto-mosso`, le sopracciglia, la `polo-navy` dello slanciato,
+la `maglietta-gatto` e i pantaloni `palazzo` della slanciata, gli accessori) vengono da una via a parte, quella dello
+*Social Studio* di One More Floor (`social/tools/codex_component.py` nel repository del gioco): la sagoma base viene
+disegnata a 2× su bianco, Codex (ImageGen) ci disegna sopra **solo** il pezzo che manca, nello stesso stile, poi il
+disegno viene allineato sulla sagoma (occhi e suole), le regioni cambiate si ritagliano lungo il contorno, si
+tracciano con potrace e diventano un componente di questo repository (sistemato a mano dove serve). I brief, le
+sagome base e i disegni di Codex restano nel repository del gioco (`social/components/`).
+
+Due chiavi nei `.json` servono a questi componenti:
+
+- `"bodies": ["<gruppo>/<sagoma>"]` (capelli e sopracciglia): lo stile vale solo per quelle sagome;
+- `"frame": false` (tutti): il componente **non allarga il riquadro comune** (322×742): chi usa i personaggi già
+  disegnati (il gioco, con le sue centinaia di figure) li ritrova identici al pixel. Il componente deve starci dentro,
+  altrimenti la build si ferma e dice quale sagoma esce.
+
+Una fantasia si fa con un `<pattern>` dentro il capo, usato come colore principale (`"colors": {"main":
+"url(#<id del pattern>)"}`), con i colori del disegno in variabili CSS: i pantaloni `palazzo` hanno
+`--pants-print-bg`, `--pants-print-1` (petali), `--pants-print-2` (medaglioni), `--pants-print-3` (cuori). Il
+contenuto del pattern usa coordinate sulle gambe (un `viewBox` sul pattern): la build conta tutti i punti dei
+percorsi per il riquadro.
+
 ## Vestiti
 
 La maglietta (`torso`) e i pantaloni (`pants`) della sagoma sono la versione **base**. In più ogni sagoma ha i suoi capi,
@@ -218,12 +278,12 @@ disegnati su di lei e solo lì (`src/human/clothes/<gruppo>/<sagoma>/`, elencati
 | --- | --- | --- |
 | Bambino | `maglietta-riga` (bianca con una riga sul petto) · `maglietta-sole` (gialla con un sole) · `maglione-senape` (girocollo) · `smoking-papillon` (giacca nera, camicia con bottoni e papillon rosso) | `bermuda-cargo` (tasche laterali, con gambe e calze) · `pantaloncini-blu` (con risvolto, gambe e calze) · `pantaloni-verdi` (verde oliva, con le gambe) · `pantaloni-smoking` (neri, con cintura) |
 | Ragazzo | `felpa-rossa` (cappuccio, cordini, tasca, polsini) · `maglietta-righe-blu` (righe bianche e blu) · `giubbotto-ruggine` (aperto sulla felpa col cappuccio e i cordini) · `gilet-camicia` (gilet blu, camicia a maniche arrotolate, papillon) | `jeans-grigi` (cucitura centrale) · `cargo-beige` (bermuda con tasca sulla coscia, gambe e calze) · `jeans-risvoltati` (con il risvolto chiaro) · `pantaloni-antracite` |
-| Slanciato | `camicia-risvoltata` (aperta, maniche arrotolate, taschino, maglietta sotto) · `maglietta-verde` · `felpa-verde` (cappuccio, cordini, tasca a marsupio, maglietta bianca sotto) · `giacca-blu` (completo blu, camicia e cravatta nera) | `pantaloni-kaki` · `cargo-grigio` (bermuda con due tasche, gambe e calze) · `cargo-neri` (lunghi, con quattro tasche) · `pantaloni-blu-cintura` |
+| Slanciato | `camicia-risvoltata` (aperta, maniche arrotolate, taschino, maglietta sotto) · `maglietta-verde` · `felpa-verde` (cappuccio, cordini, tasca a marsupio, maglietta bianca sotto) · `giacca-blu` (completo blu, camicia e cravatta nera) · `polo-navy` (polo blu a maniche corte, colletto e patta con due bottoni) | `pantaloni-kaki` · `cargo-grigio` (bermuda con due tasche, gambe e calze) · `cargo-neri` (lunghi, con quattro tasche) · `pantaloni-blu-cintura` |
 | Adulto | `felpa` (cappuccio, cordini, tasca a marsupio) · `giacca` (colletto, cerniera, tasche, coste) · `polo` (colletto, patta con bottoni) · `maglione` (girocollo, coste) · `camicia` (aperta sulla maglietta) · `polo-blu` (bottoni, infilata nei pantaloni) · `polo-bianca` (colletto e patta con bottoni) · `maglione-panna` (girocollo) · `completo-nero` (giacca, gilet, cravatta rossa e fazzoletto) | `jeans` · `chino` · `jogger` (coste e cordino) · `cargo` (tasche laterali) · `larghi` (gamba larga, pieghe) · `pantaloni-cintura` (cintura e fibbia) · `bermuda-beige` (con le gambe) · `pantaloni-marroni` · `pantaloni-eleganti` |
 | Robusto | `cardigan-grigio` (bottoni, coste, maglietta sotto) · `camicia-celeste` (aperta, a maniche corte, bottoni e taschino, maglietta bianca sotto) · `giacca-camicia` (blu, aperta su una maglietta ruggine, bottoni e taschino) · `blazer-dolcevita` (blazer beige su un dolcevita scuro, con fazzoletto) | `jeans-chiari` · `pantaloni-lino` (risvoltati sul polpaccio, con le gambe) · `chino-beige` · `pantaloni-moro` (con cintura e fibbia dorata) |
 | Bambina | `maglietta-fiore` (rosa con fiore) · `abitino` (colletto, fiore, pieghe) · `abito-sbuffo` (corpetto bianco con maniche a sbuffo) · `abito-rosa` (corpetto senza maniche) | `pantaloncini` (di jeans risvoltati, con gambe e calze) · `leggings` (con le caviglie) · `gonna-fiocco` (gonna bianca con cintura e fiocco dietro, con gambe) · `gonna-tulle` (gonna a ruota rosa con grande fiocco) |
 | Ragazza | `felpa-cappuccio` (cappuccio aperto, cordini, tasca a marsupio) · `maglia-righe` (righe e polsini) · `camicetta-colletto` (colletto alla coreana, maniche a sbuffo) · `abito-bordeaux` (corpetto con spalline) | `jeans-scuri` (tasche, cucitura) · `jeans-cargo` (tasche laterali) · `gonna-rosa` (a campana, con cintura e gambe) · `gonna-bordeaux` (a ruota con fiocco) |
-| Slanciata | `top-corto` (canotta nera: spalle, braccia e pancia scoperte) · `giacca-jeans` (aperta su un top nero, maniche risvoltate) · `blusa-quadrata` (scollo quadrato, maniche lunghe) · `abito-nero` (corpetto con spalline sottili e collana) | `jeans-a-zampa` (passanti, bottone, tasche) · `jeans-neri` (risvoltati, caviglie scoperte) · `pantaloni-marroni-cintura` (gamba larga, cintura con fibbia) · `gonna-lunga-nera` (lunga con spacco, la gamba nello spacco è pelle) |
+| Slanciata | `top-corto` (canotta nera: spalle, braccia e pancia scoperte) · `giacca-jeans` (aperta su un top nero, maniche risvoltate) · `blusa-quadrata` (scollo quadrato, maniche lunghe) · `abito-nero` (corpetto con spalline sottili e collana) · `maglietta-gatto` (la maglietta bianca con la stampa di un gatto nero e dei girasoli, colori fissi) | `jeans-a-zampa` (passanti, bottone, tasche) · `jeans-neri` (risvoltati, caviglie scoperte) · `pantaloni-marroni-cintura` (gamba larga, cintura con fibbia) · `gonna-lunga-nera` (lunga con spacco, la gamba nello spacco è pelle) · `palazzo` (pantaloni palazzo larghissimi con una fantasia a medaglioni, vedi *Componenti disegnati da Codex*) |
 | Adulta | `maglietta-v` (verde oliva, scollo a V) · `maglione-v` (a coste, maniche a tre quarti) · `blazer-beige` (maniche arrotolate, risvolti, maglietta bianca sotto) · `camicetta-bluse` (a portafoglio, maniche a sbuffo con polsini) | `pantaloni-neri` (gamba larga) · `pantaloni-oliva` · `pantaloni-neri-cintura` (con cintura) · `gonna-verde` (al polpaccio, con fiocco) |
 | Robusta | `cardigan` (maniche arrotolate, bottoni, maglietta sotto) · `cardigan-fiori` (tasca, coste, su una maglia a fiori) · `abito-portafoglio` (corpetto incrociato con maniche svolazzanti) · `tuta-blu` (corpetto della tuta, senza maniche) | `pantaloni-marroni` · `pantaloni-scuri` · `gonna-portafoglio` (gonna al polpaccio con cintura e fiocco, con gambe) · `tuta-pantaloni` (gamba larga, cintura con fibbia dorata) |
 
@@ -271,7 +331,7 @@ Con `prefers-reduced-motion` l'SVG resta fermo. Nel visualizzatore c'è l'interr
 
 ## Variabili CSS
 
-`--outline`, `--line-w`, `--skin`, `--hair`, `--shirt` (+ `-trim`, `-accent`, `-accent2`, `-under`), `--pants` (+ `-trim`, `-accent`, `-under`), `--shoe-upper-l`, `--shoe-upper-r`, `--shoe-toe`, `--shoe-tongue`, `--shoe-lace`, `--shoe-sole`, `--eye`, più `--idle-n` (`0` spegne l'animazione), `--idle-delay` (sfasa più istanze), `--show-hair` / `--show-hair-<id>`, `--beard` e `--show-beard` / `--show-beard-<id>`, `--show-top-<id>` e `--show-bottom-<id>` (`inline` | `none`), `--show-arms` e `--show-body-arms`.
+`--outline`, `--line-w`, `--skin`, `--hair`, `--shirt` (+ `-trim`, `-accent`, `-accent2`, `-under`), `--pants` (+ `-trim`, `-accent`, `-under`), `--shoe-upper-l`, `--shoe-upper-r`, `--shoe-toe`, `--shoe-tongue`, `--shoe-lace`, `--shoe-sole`, `--eye`, più `--idle-n` (`0` spegne l'animazione), `--idle-delay` (sfasa più istanze), `--show-hair` / `--show-hair-<id>`, `--beard` e `--show-beard` / `--show-beard-<id>`, `--brows` e `--show-brows` / `--show-brows-<id>`, `--show-top-<id>` e `--show-bottom-<id>` (`inline` | `none`), `--show-acc-<id>` con `--acc` / `--acc-<id>` (+ `-trim`, `-accent`, `-accent2`), `--pants-print-bg` e `--pants-print-1..3` (la fantasia dei `palazzo`), `--show-arms` e `--show-body-arms`.
 
 ## Alieni
 
@@ -434,6 +494,9 @@ I colori di partenza sono i default scritti nel CSS di ogni SVG, più i `colors`
 - **Stile di capelli**: `tools/trace_hair.py` o a mano in `src/human/hair/<id>.svg` + `.json`, poi l'id in `hair` nel manifest.
 - **Barba**: `tools/trace_beards.py` (tabella `BEARDS` con gruppi ed età) in `src/human/beards/<id>.svg` + `.json`, poi l'id in `beards` nel manifest; un preset può averne una (`beard`, e `beard` in `colors`).
 - **Vestiti**: ogni capo sta su una sola sagoma, quindi si traccia su quella. Con un foglio in cui ogni figura indossa un outfit sul proprio corpo (come per le femmine): `tools/trace_outfits.py`, con le regioni di ogni figura assegnate a mano nella sua tabella `OUTFITS` (la riga dice la sagoma). Con due fogli di figure sullo stesso corpo (pantaloni e maglie, come per la prima serie maschile): `tools/trace_clothes.py --out src/human/clothes/<gruppo>/<sagoma>`; il corpo di riferimento è la prima figura del foglio dei pantaloni e i capi vengono deformati dalla build su quella sagoma (deve essere simile). Poi i capi nel manifest, in `clothes["<gruppo>/<sagoma>"]` (`tops` e `bottoms`), e se si vuole in un preset (`top`, `bottom`, `colors`).
+- **Sopracciglia**: a mano (o con la via Codex, sotto) in `src/human/brows/<id>.svg` + `.json`, poi l'id in `brows` nel manifest.
+- **Accessori**: come i vestiti, in `src/human/clothes/<gruppo>/<sagoma>/accessories/`, poi l'id in `clothes["<gruppo>/<sagoma>"].accessories`.
+- **Con Codex**: `python social/tools/codex_component.py new|base|brief|run|trace|finish|register` nel repository del gioco (vedi *Componenti disegnati da Codex*).
 - **Alieni**: `tools/trace_alien.py` su un foglio di figure affiancate, poi `bodies` e `presets` in `src/alien/manifest.json`; i vestiti con `tools/trace_alien_outfits.py` da un foglio dei vestiti allineato a quello delle sagome (vedi *Alieni*).
 - Poi `node build.mjs`, e se si vuole l'audit (sotto).
 

@@ -41,6 +41,16 @@ export async function buildHuman() {
     return { id, ...(await readJson(`${SRC}beards/${id}.json`)), group: rows.filter((l) => !isSkin(l)).join('\n'), skin: rows.filter(isSkin).join('\n') };
   }));
 
+  // Le sopracciglia sono come le barbe: disegnate nel riquadro dei capelli, adattate a ogni testa, nella testa sopra i
+  // capelli e prima degli occhi (seguono il movimento della testa). Nessuna di default; il colore è --brows, se manca
+  // quello dei capelli. Valgono per i gruppi e le età scritti nel loro .json.
+  const brows = await Promise.all((manifest.brows ?? []).map(async (id) => {
+    const svg = await read(`${SRC}brows/${id}.svg`);
+    const group = svg.match(/<g id="brows-[\s\S]*<\/g>/)?.[0];
+    if (!group) throw new Error(`${SRC}brows/${id}.svg: gruppo <g id="brows-…"> non trovato`);
+    return { id, ...(await readJson(`${SRC}brows/${id}.json`)), group };
+  }));
+
   const bodies = await Promise.all(manifest.bodies.map(async (path) => {
     const [group, file] = path.split('/');
     const svg = await read(`${SRC}bodies/${path}.svg`);
@@ -61,7 +71,9 @@ export async function buildHuman() {
   // corta) e dichiarare le parti del corpo che disegna da sé (`replaces`).
   // `<g id="garment">` è il capo; `<g id="underlay">`, se c'è, sta sotto i pantaloni (pelle scoperta da una maglia corta,
   // fasce che salgono o scendono sotto un altro capo); `<g id="backlay">` dietro a tutto (il capo sotto le braccia).
-  const KINDS = { tops: 'top', bottoms: 'bottom' };
+  // Gli accessori (`accessories`: spallacci, collane…) sono capi come gli altri, ma se ne possono mostrare più insieme
+  // (nessuno di default) e stanno davanti a tutto, dopo le maglie; respirano col busto.
+  const KINDS = { tops: 'top', bottoms: 'bottom', accessories: 'acc' };
   const bodyById = Object.fromEntries(bodies.map((b) => [b.id, b]));
   const groupContent = (svg, id) => svg.match(new RegExp(`<g id="${id}">\\n([\\s\\S]*?)\\n  </g>`))?.[1];
   const clothes = {};
@@ -121,7 +133,9 @@ export async function buildHuman() {
     const { L, R, T, eyeY } = body.head;
     const sx = (R - L) / (F.R - F.L), sy = (eyeY - T) / (F.eyeY - F.T);
     const f = (x, y) => [L + sx * (x - F.L), T + sy * (y - F.T)];
-    return hair.filter((h) => !h.ages || h.ages.includes(ageOf(body.id))).map((h) => ({ ...h, group: mapPaths(h.group, f), back: mapPaths(h.back, f), skin: mapPaths(h.skin, f) }));
+    // (`bodies` nel .json: lo stile vale solo per quelle sagome)
+    return hair.filter((h) => (!h.ages || h.ages.includes(ageOf(body.id))) && (!h.bodies || h.bodies.includes(body.id)))
+      .map((h) => ({ ...h, group: mapPaths(h.group, f), back: mapPaths(h.back, f), skin: mapPaths(h.skin, f) }));
   }
   for (const b of bodies) b.hair = hairFor(b);
   // le barbe seguono la testa come i capelli (stessa deformazione) e stanno solo sulle sagome che il loro .json indica
@@ -133,10 +147,23 @@ export async function buildHuman() {
       .map((bd) => ({ ...bd, group: mapPaths(bd.group, f), skin: mapPaths(bd.skin, f) }));
   }
   for (const b of bodies) b.beards = beardsFor(b);
+  // le sopracciglia come le barbe (stessa deformazione dei capelli)
+  function browsFor(body) {
+    const { L, R, T, eyeY } = body.head;
+    const sx = (R - L) / (F.R - F.L), sy = (eyeY - T) / (F.eyeY - F.T);
+    const f = (x, y) => [L + sx * (x - F.L), T + sy * (y - F.T)];
+    return brows.filter((bw) => (!bw.groups || bw.groups.includes(body.group)) && (!bw.ages || bw.ages.includes(ageOf(body.id))) && (!bw.bodies || bw.bodies.includes(body.id)))
+      .map((bw) => ({ ...bw, group: mapPaths(bw.group, f) }));
+  }
+  for (const b of bodies) b.brows = browsFor(b);
 
   // ---- riquadro comune: stessa scala e linea del suolo, spazio per i capelli ------------
-  const ext = (b) => {
-    const pts = [...coords(b.inner), ...b.hair.flatMap((h) => coords(h.group + h.back + h.skin)), ...b.beards.flatMap((bd) => coords(bd.group + bd.skin)), ...b.clothes.flatMap((g) => coords(g.content + g.under + g.back))];
+  // Un componente con `"frame": false` nel suo .json non allarga il riquadro (chi usa i personaggi, per esempio il
+  // gioco, li ritrova identici al pixel): deve starci dentro, altrimenti la build si ferma.
+  const ext = (b, all = false) => {
+    const keep = (c) => all || c.frame !== false;
+    const pts = [...coords(b.inner), ...b.hair.filter(keep).flatMap((h) => coords(h.group + h.back + h.skin)), ...b.beards.filter(keep).flatMap((bd) => coords(bd.group + bd.skin)),
+      ...b.brows.filter(keep).flatMap((bw) => coords(bw.group)), ...b.clothes.filter(keep).flatMap((g) => coords(g.content + g.under + g.back))];
     const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
     return [Math.min(...xs) - 3.5, Math.min(...ys) - 3.5, Math.max(...xs) + 3.5, Math.max(...ys) + 3.5];
   };
@@ -144,20 +171,29 @@ export async function buildHuman() {
   const W = Math.ceil(Math.max(...bodies.map((b) => b.ext[2] - b.ext[0])));
   const Y0 = Math.floor(Math.min(...bodies.map((b) => b.ext[1])));
   const H = Math.ceil(Math.max(...bodies.map((b) => b.ext[3]))) - Y0;
+  for (const b of bodies) {
+    const x0 = Math.round((b.ext[0] + b.ext[2]) / 2 - W / 2), [ax0, ay0, ax1, ay1] = ext(b, true);
+    if (ax0 < x0 || ay0 < Y0 || ax1 > x0 + W || ay1 > Y0 + H) throw new Error(`${b.id}: un componente con "frame": false esce dal riquadro (${[ax0, ay0, ax1, ay1].map(fmt)} fuori da ${x0} ${Y0} ${W}×${H})`);
+  }
 
   // ---- composizione ----------------------------------------------------------
   // colori per ruolo dei vestiti: --shirt (busto) e --pants (pantaloni) sono il colore principale, le altre
   // variabili i ruoli secondari; la visibilità si sceglie con --show-top-<id> / --show-bottom-<id>
   const ROLE_VAR = { top: { main: '--shirt', trim: '--shirt-trim', accent: '--shirt-accent', accent2: '--shirt-accent2', under: '--shirt-under' },
-                     bottom: { main: '--pants', trim: '--pants-trim', accent: '--pants-accent', under: '--pants-under' } };
+                     bottom: { main: '--pants', trim: '--pants-trim', accent: '--pants-accent', under: '--pants-under' },
+                     acc: { main: '--acc', trim: '--acc-trim', accent: '--acc-accent', accent2: '--acc-accent2' } };
+  // un accessorio prende prima il suo colore (--acc-<id>, --acc-<id>-trim…), poi quello comune agli accessori
+  const roleVar = (g, role) => (g.kind === 'acc' ? `var(--acc-${g.id}${role === 'main' ? '' : `-${role}`}, var(${ROLE_VAR.acc[role]}, ` : `var(${ROLE_VAR[g.kind][role]}, `);
   function clothesCss(body, defaults) {
     const fills = body.clothes.flatMap((g) => Object.entries(g.colors).map(([role, color]) =>
       // il gruppo del capo per ultimo: il visualizzatore legge il colore di default da "#top-<id> .c-<ruolo> {"
-      `${[...(g.under ? ['-under'] : []), '-back', ''].map((x) => `#${g.kind}-${g.id}${x} .c-${role}`).join(', ')} { fill: var(${ROLE_VAR[g.kind][role]}, ${color}) }`));
+      `${[...(g.under ? ['-under'] : []), '-back', ''].map((x) => `#${g.kind}-${g.id}${x} .c-${role}`).join(', ')} { fill: ${roleVar(g, role)}${color})${g.kind === 'acc' ? ')' : ''} }`));
     const show = [['top', '#torso, #torso-fill'], ['bottom', '#pants, #pants-under, #pants-fill']].flatMap(([kind, base]) => [
       `${base} { display: var(--show-${kind}-base, ${defaults[kind] === 'base' ? 'inline' : 'none'}) }`,
       ...body.clothes.filter((g) => g.kind === kind).map((g) =>
         `#${kind}-${g.id}${g.under ? `, #${kind}-${g.id}-under` : ''}, #${kind}-${g.id}-back { display: var(--show-${kind}-${g.id}, ${defaults[kind] === g.id ? 'inline' : 'none'}) }`)]);
+    // accessori: più di uno alla volta, nessuno di default
+    for (const g of body.clothes.filter((c) => c.kind === 'acc')) show.push(`#acc-${g.id}, #acc-${g.id}-back { display: var(--show-acc-${g.id}, none) }`);
     return { fills: fills.join('\n'), show: show.join('\n') };
   }
 
@@ -178,6 +214,8 @@ export async function buildHuman() {
       if (k === 'hair-show') return body.hair.map((h) => `${[`#hair-${h.id}`, ...(h.back ? [`#hair-${h.id}-back`] : []), ...(h.skin ? [`#hair-${h.id}-skin`] : [])].join(', ')} { display: var(--show-hair-${h.id}, ${h.id === defaultHair ? 'inline' : 'none'}) }`).join('\n');
       if (k === 'beard-fills') return body.beards.map((bd) => `.c-beard-${bd.id} { fill: var(--beard, ${bd.color}) }\n.c-bdot-${bd.id} { stroke: var(--beard, ${bd.color}) }`).join('\n');
       if (k === 'beard-show') return body.beards.map((bd) => `#beard-${bd.id}, #beard-${bd.id}-skin { display: var(--show-beard-${bd.id}, ${bd.id === preset?.beard ? 'inline' : 'none'}) }`).join('\n');
+      if (k === 'brows-fills') return body.brows.map((bw) => `.c-brows-${bw.id} { fill: var(--brows, var(--hair, ${bw.color})) }`).join('\n');
+      if (k === 'brows-show') return body.brows.map((bw) => `#brows-${bw.id} { display: var(--show-brows-${bw.id}, none) }`).join('\n');
       if (k === 'hair-default') return defaultHair;
       if (k === 'outfit-default') return `${defaults.top} + ${defaults.bottom}`;
       if (k === 'body-arms-default') return body.clothes.some((g) => defaults[g.kind] === g.id && g.replaces?.includes('arms')) ? 'none' : 'inline';
@@ -198,7 +236,7 @@ export async function buildHuman() {
     const defaults = { top: preset?.top ?? 'base', bottom: preset?.bottom ?? 'base' };
     // le maglie respirano col busto (stessa animazione della maglietta base), i pantaloni stanno fermi
     // le maglie (e le loro parti sotto e dietro) respirano col busto, attorno allo stesso punto: la base del busto
-    const breathe = (kind) => (kind === 'top' ? ` class="c-idle-torso ${originClass(body)}"` : '');
+    const breathe = (kind) => (kind === 'top' || kind === 'acc' ? ` class="c-idle-torso ${originClass(body)}"` : '');
     const group = (kind) => body.clothes.filter((g) => g.kind === kind).map((g) => `  <!-- ${g.name} -->\n  <g id="${kind}-${g.id}"${breathe(kind)}>\n${g.content}\n  </g>`).join('\n');
     const ordered = [...body.clothes.filter((g) => g.kind === 'bottom'), ...body.clothes.filter((g) => g.kind === 'top')];
     const underlay = ordered.filter((g) => g.under).map((g) => `  <!-- ${g.name}: parti sotto i pantaloni -->\n  <g id="${g.kind}-${g.id}-under"${breathe(g.kind)}>\n${g.under}\n  </g>`).join('\n');
@@ -211,6 +249,8 @@ export async function buildHuman() {
       `  <g id="pants-fill">\n${use('bottom', 'c-pants')}  </g>`, `  <g id="torso-fill"${breathe('top')}>\n${use('top', 'c-shirt')}  </g>`,
       // (un capo che disegna le braccia da sé non usa il riempimento: è sagomato sulle braccia della sagoma, che qui sono nascoste)
       ...ordered.map((g) => `  <!-- ${g.name}: sotto le braccia -->\n  <g id="${g.kind}-${g.id}-back"${breathe(g.kind)}>\n${g.replaces?.includes('arms') ? '' : use(g.kind, 'c-main')}${g.back}\n  </g>`),
+      // (gli accessori solo con la loro parte dietro, per esempio lo zaino dietro la schiena)
+      ...body.clothes.filter((g) => g.kind === 'acc' && g.back).map((g) => `  <!-- ${g.name}: dietro -->\n  <g id="acc-${g.id}-back"${breathe('acc')}>\n${g.back}\n  </g>`),
     ].join('\n');
     const x0 = Math.round((body.ext[0] + body.ext[2]) / 2 - W / 2);
     const hairXml = '\n    <!-- Capelli: nel gruppo della testa (così seguono il respiro), sotto gli occhi. Stile mostrato di default: ' + defaultHair + ' -->\n' +
@@ -228,7 +268,9 @@ export async function buildHuman() {
     // barba: sul viso, dopo il contorno della testa (e sotto i capelli); la parte `c-skinlayer` sotto il contorno
     const beardFront = body.beards.length ? `    <g id="beard">\n${body.beards.map((bd) => bd.group.split('\n').map((l) => '    ' + l).join('\n')).join('\n')}\n    </g>` : '';
     const beardSkin = body.beards.length ? `    <g id="beard-skin" clip-path="url(#${clipId})">\n${body.beards.map((bd) => `      <g id="beard-${bd.id}-skin">\n${bd.skin.split('\n').map((l) => '    ' + l).join('\n')}\n      </g>`).join('\n')}\n    </g>` : '';
-    let inner = body.inner.replace('    <!-- @hair -->', hairXml.replace(/^\n/, '\n'))
+    // sopracciglia: sopra i capelli (una frangia non le copre) e prima degli occhi
+    const browsXml = body.brows.length ? `\n    <g id="brows">\n${body.brows.map((bw) => `      <!-- ${bw.name} -->\n` + bw.group.split('\n').map((l) => '    ' + l).join('\n')).join('\n')}\n    </g>` : '';
+    let inner = body.inner.replace('    <!-- @hair -->', () => hairXml.replace(/^\n/, '\n') + browsXml)
       .replace('    <!-- @beard -->', beardFront)
       .replace('    <!-- @beard-skin -->', beardSkin)
       .replace('    <!-- @hair-back -->', layerXml('back', 'back'))
@@ -246,6 +288,8 @@ export async function buildHuman() {
     if (underlay) inner = inner.replace('  <g id="arm-right"', underlay + '\n  <g id="arm-right"');
     if (group('bottom')) inner = inner.replace('  <g id="shoes">', group('bottom') + '\n  <g id="shoes">');
     if (group('top')) inner = inner.replace(/\s*$/, '\n') + group('top') + '\n';
+    // gli accessori davanti a tutto (sulla maglia: spallacci, collane)
+    if (group('acc')) inner = inner.replace(/\s*$/, '\n') + group('acc') + '\n';
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} ${Y0} ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="t">
   <title id="t">${body.name}</title>
   <style>
@@ -262,7 +306,8 @@ ${css(body, defaultHair, defaults, preset)}
     groups: manifest.groups,
     hair: hair.map(({ id, name, color }) => ({ id, name, color })),
     beards: beards.map(({ id, name, color }) => ({ id, name, color })),
-    bodies: bodies.map(({ id, group, name, svg, hair: hs, beards: bs }) => ({ id, group, name, svg, hair: hs.map((h) => h.id), beards: bs.map((bd) => bd.id) })),
+    brows: brows.map(({ id, name, color }) => ({ id, name, color })),
+    bodies: bodies.map(({ id, group, name, svg, hair: hs, beards: bs, brows: ws }) => ({ id, group, name, svg, hair: hs.map((h) => h.id), beards: bs.map((bd) => bd.id), brows: ws.map((bw) => bw.id) })),
     clothes: Object.fromEntries(bodies.map((b) => [b.id, Object.fromEntries(Object.keys(KINDS).map((folder) =>
       [folder, b.clothes.filter((i) => i.kind === KINDS[folder]).map(({ id, name, replaces }) => ({ id, name, replaces: replaces ?? [] }))]))])),
     presets: manifest.presets,
@@ -270,6 +315,6 @@ ${css(body, defaultHair, defaults, preset)}
   return {
     files: bodies.map((b) => ({ path: `characters/${b.id}.svg`, svg: b.svg })),
     data,
-    summary: `umani: ${bodies.length} sagome, ${hair.length} stili di capelli (${Math.min(...bodies.map((b) => b.hair.length))}-${Math.max(...bodies.map((b) => b.hair.length))} per sagoma), ${beards.length} barbe (${bodies.filter((b) => b.beards.length).length} sagome), vestiti: ${Object.values(clothes).reduce((n, items) => n + items.length, 0)} capi, ognuno sulla sua sagoma (riquadro ${W}×${H})`,
+    summary: `umani: ${bodies.length} sagome, ${hair.length} stili di capelli (${Math.min(...bodies.map((b) => b.hair.length))}-${Math.max(...bodies.map((b) => b.hair.length))} per sagoma), ${beards.length} barbe (${bodies.filter((b) => b.beards.length).length} sagome), ${brows.length} sopracciglia, vestiti: ${Object.values(clothes).reduce((n, items) => n + items.length, 0)} capi, ognuno sulla sua sagoma (riquadro ${W}×${H})`,
   };
 }

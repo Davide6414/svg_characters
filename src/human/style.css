@@ -30,9 +30,17 @@
 #beard, #beard-skin { display: var(--show-beard, inline) }
 {{beard-show}}
 
+/* Sopracciglia: nessuna di default; --show-brows-NOME (inline | none), --show-brows: none le nasconde tutte.
+   Colore --brows (se manca, quello dei capelli). */
+{{brows-fills}}
+#brows { display: var(--show-brows, inline) }
+{{brows-show}}
+
 /* Vestiti: uno per tipo alla volta (default: {{outfit-default}}). Il visualizzatore sceglie con
    --show-top-NOME / --show-bottom-NOME (inline | none); "base" è la maglietta e i pantaloni della sagoma.
-   Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under. */
+   Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under.
+   Accessori: nessuno di default, anche più di uno con --show-acc-NOME (inline | none); colori --acc-NOME
+   (e -trim, -accent, -accent2), se mancano --acc (e --acc-trim…). */
 {{clothes-fills}}
 {{clothes-show}}
 /* Alcuni capi disegnano le braccia al posto di quelle della sagoma (spalle e braccia scoperte): le mettono nel gruppo

@@ -1,0 +1,9 @@
+{
+  "name": "Polo blu",
+  "colors": {
+    "main": "#26324f",
+    "trim": "#222c47",
+    "accent": "#c3c8d2"
+  },
+  "frame": false
+}

@@ -40,6 +40,7 @@
     .c-hair-lisci-frangia { fill: var(--hair, #d8b062) }
     .c-hair-lunghi-mossi { fill: var(--hair, #d8b062) }
     .c-hair-coda-laterale { fill: var(--hair, #d8b062) }
+    .c-hair-ricci-voluminosi { fill: var(--hair, #d8b062) }
     .c-bdot { fill: none; stroke-width: 2.6; stroke-linecap: round }
     .c-beard-barba-incolta { fill: var(--beard, #130f0c) }
     .c-bdot-barba-incolta { stroke: var(--beard, #130f0c) }
@@ -75,6 +76,7 @@
     #hair-lisci-frangia { display: var(--show-hair-lisci-frangia, none) }
     #hair-lunghi-mossi { display: var(--show-hair-lunghi-mossi, none) }
     #hair-coda-laterale { display: var(--show-hair-coda-laterale, none) }
+    #hair-ricci-voluminosi { display: var(--show-hair-ricci-voluminosi, none) }
 
     /* Barba: nessuna di default; --show-beard-NOME (inline | none), --show-beard: none la nasconde tutta. */
     #beard, #beard-skin { display: var(--show-beard, inline) }
@@ -84,9 +86,17 @@
     #beard-pizzetto, #beard-pizzetto-skin { display: var(--show-beard-pizzetto, none) }
     #beard-barba-lunga, #beard-barba-lunga-skin { display: var(--show-beard-barba-lunga, none) }
 
+    /* Sopracciglia: nessuna di default; --show-brows-NOME (inline | none), --show-brows: none le nasconde tutte.
+       Colore --brows (se manca, quello dei capelli). */
+    .c-brows-marcate { fill: var(--brows, var(--hair, #2a1810)) }
+    #brows { display: var(--show-brows, inline) }
+    #brows-marcate { display: var(--show-brows-marcate, none) }
+
     /* Vestiti: uno per tipo alla volta (default: camicia-risvoltata + pantaloni-kaki). Il visualizzatore sceglie con
        --show-top-NOME / --show-bottom-NOME (inline | none); "base" è la maglietta e i pantaloni della sagoma.
-       Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under. */
+       Ruoli dei colori: main = --shirt / --pants, e poi trim, accent, under.
+       Accessori: nessuno di default, anche più di uno con --show-acc-NOME (inline | none); colori --acc-NOME
+       (e -trim, -accent, -accent2), se mancano --acc (e --acc-trim…). */
     #top-camicia-risvoltata-under .c-main, #top-camicia-risvoltata-back .c-main, #top-camicia-risvoltata .c-main { fill: var(--shirt, #6e7057) }
     #top-camicia-risvoltata-under .c-under, #top-camicia-risvoltata-back .c-under, #top-camicia-risvoltata .c-under { fill: var(--shirt-under, #faf4ee) }
     #top-maglietta-verde-back .c-main, #top-maglietta-verde .c-main { fill: var(--shirt, #5d8e65) }
@@ -96,6 +106,9 @@
     #top-giacca-blu-under .c-main, #top-giacca-blu-back .c-main, #top-giacca-blu .c-main { fill: var(--shirt, #2d3345) }
     #top-giacca-blu-under .c-accent, #top-giacca-blu-back .c-accent, #top-giacca-blu .c-accent { fill: var(--shirt-accent, #24282e) }
     #top-giacca-blu-under .c-under, #top-giacca-blu-back .c-under, #top-giacca-blu .c-under { fill: var(--shirt-under, #f8f6f3) }
+    #top-polo-navy-back .c-main, #top-polo-navy .c-main { fill: var(--shirt, #26324f) }
+    #top-polo-navy-back .c-trim, #top-polo-navy .c-trim { fill: var(--shirt-trim, #222c47) }
+    #top-polo-navy-back .c-accent, #top-polo-navy .c-accent { fill: var(--shirt-accent, #c3c8d2) }
     #bottom-pantaloni-kaki-under .c-main, #bottom-pantaloni-kaki-back .c-main, #bottom-pantaloni-kaki .c-main { fill: var(--pants, #8c7e66) }
     #bottom-cargo-grigio-under .c-main, #bottom-cargo-grigio-back .c-main, #bottom-cargo-grigio .c-main { fill: var(--pants, #4a4644) }
     #bottom-cargo-grigio-under .c-trim, #bottom-cargo-grigio-back .c-trim, #bottom-cargo-grigio .c-trim { fill: var(--pants-trim, #484343) }
@@ -109,6 +122,7 @@
     #top-maglietta-verde, #top-maglietta-verde-back { display: var(--show-top-maglietta-verde, none) }
     #top-felpa-verde, #top-felpa-verde-under, #top-felpa-verde-back { display: var(--show-top-felpa-verde, none) }
     #top-giacca-blu, #top-giacca-blu-under, #top-giacca-blu-back { display: var(--show-top-giacca-blu, none) }
+    #top-polo-navy, #top-polo-navy-back { display: var(--show-top-polo-navy, none) }
     #pants, #pants-under, #pants-fill { display: var(--show-bottom-base, none) }
     #bottom-pantaloni-kaki, #bottom-pantaloni-kaki-under, #bottom-pantaloni-kaki-back { display: var(--show-bottom-pantaloni-kaki, inline) }
     #bottom-cargo-grigio, #bottom-cargo-grigio-under, #bottom-cargo-grigio-back { display: var(--show-bottom-cargo-grigio, none) }
@@ -199,6 +213,11 @@
   <g id="top-giacca-blu-back" class="c-idle-torso c-origin-maschio-slanciato">
     <use href="#fill-top-maschio-slanciato" class="c-main"/>
     <path class="c-main c-stroke" d="M652,640.4C651.6,639.8 651.2,638.9 651.2,638.3C651.2,634.8 647.3,627.6 643.2,623.5C640.3,620.7 640,620.1 641.4,620.1C642.3,620.1 647.9,625.6 649.7,628.3C651,630.2 653.1,635.2 653.6,637.9C653.8,638.9 654.2,640.2 654.4,640.7C654.9,642 652.9,641.8 652,640.4ZM759.3,637.7C759.3,637.5 760.1,636.9 761,636.5L762.8,635.6L762.6,629C762.5,622.5 762.5,622.3 763.5,622.1C764.7,622 765.1,624.1 765.1,631.1L765.1,635.6L762.9,636.8C760.6,638.1 759.3,638.4 759.3,637.7Z" fill-rule="evenodd"/>
+  </g>
+  <!-- Polo blu: sotto le braccia -->
+  <g id="top-polo-navy-back" class="c-idle-torso c-origin-maschio-slanciato">
+    <use href="#fill-top-maschio-slanciato" class="c-main"/>
+
   </g>
   <g id="head" class="c-idle-head">
     <g id="hair-back">
@@ -509,6 +528,25 @@
         <path class="c-open c-stroke c-fine" d="M764.9,254.8Q772.3,258.4 775.9,268.6"/>
         <path class="c-open c-stroke c-fine" d="M632.5,303.1Q625.8,305 617.8,313.5"/>
       </g>
+      <!-- Ricci voluminosi -->
+    <g id="hair-ricci-voluminosi">
+        <path class="c-hair-ricci-voluminosi c-stroke" d="M608.5,348.1C597.2,344.4 592.8,335.5 597,325.2C597.7,323.7 597.6,323.4 596.6,321.6C596,320.5 595.5,319.2 595.5,318.7C595.5,318.2 595,317.2 594.5,316.6L593.7,315.4L591.9,316.3C590.4,317.1 590.1,317.7 589.6,320.4L588.9,323.6L587.3,323.3C586.3,323 584.9,322 583.2,320.2C576.4,313.2 576.4,301.4 583.2,293.6C587,289.2 587,288.3 583,285.9C574.3,280.8 570.8,272 573.6,262.5C575.6,255.9 579.5,253.3 580.8,257.8C583.7,267.9 593.1,266.1 596.5,254.9C597.7,250.9 601.6,246.2 604.9,244.7C607.2,243.7 607.5,243 606.2,240.5C603.9,236.1 605.2,227.6 608.6,224.7C610.7,222.9 611.7,223.1 612.8,225.6C614.1,228.6 616.5,230 620,230C624.4,230 624.7,229.6 624.7,222.9C624.8,207.5 639.6,197.2 654.3,202.5C658.5,204.1 659,204 659.3,202.1C660.3,195.5 661.9,192.1 666,188C672.1,182 682.8,179.9 689.9,183.1C696,185.7 699,192.7 693.6,191.4C685.2,189.6 675.9,199.6 680,206.3C681.5,208.7 681.9,208.5 686.6,204.2C697.8,194 713.5,192.2 730,199.4C747.4,206.9 756.5,206 761.3,196C762.7,193.1 764.4,193.2 766.8,196.4C770,200.8 770.7,205.9 769.2,214.1L768.9,216L772.6,216C788.4,216 798.5,226.5 796.4,240.8C795,251.1 803,254.8 810,247.2C812.2,244.7 813.9,245.5 814.9,249.3C817.4,257.5 814.6,265.1 808.1,268.9C803.1,271.7 803.1,271.6 807.3,276C818.1,287.5 813.1,306.1 798.6,308.6C795.9,309 795.5,309.2 795.2,310.4C793.3,319.5 784.8,329 778.7,329C778.3,329 777.1,329.4 776,329.6L774,329.3L773.1,327.4C772.5,325.6 772.5,325 773,321.4C773.3,319.2 773.7,311.9 773.8,305.2L774,293L771,288.4C767.5,282.8 764.3,277.8 762.7,275.4C761.1,274 760.4,273.9 756.3,275.3C746.5,281.9 732.3,283.5 723.8,277.1L721.4,276L717.7,277.1C713.4,278.6 708,279.1 705.7,278.1C704.1,277.5 704.1,277.4 706.8,275.8C710.4,274.2 712,271.8 710.3,269.9C709.5,268.9 707,269.2 707,270.2C707,273.9 692.3,287.4 681.2,297.8C679.7,298 679.5,298.2 678.9,299.9C677.6,304.3 674.5,307.8 669.2,311.5C663.3,315.4 662.3,321.3 666.7,327.4C671.5,334.1 655.8,331.7 648.2,324.5C644,320.5 633.3,318.9 629.4,321.7C628.5,322.5 627,323.4 626,323.9C619.7,327.4 616.3,333.8 616.1,342.7L615.9,349L613.5,349C612.3,348.9 610,348.5 608.5,348.1Z"/>
+        <path class="c-open c-stroke c-fine" d="M623,283.5C624.3,283.2 628.7,283.3 631,282C633.2,280.7 635.5,277.5 636.5,275.5C637.5,273.5 637.4,272.5 637,270C636.6,267.5 634.5,263.5 634,260.5C633.5,257.5 633.1,255.5 634,252C634.8,248.6 637,243.2 639,240C641,236.8 643.4,234.9 645.5,233C647.6,231.1 649.7,230 651.5,229C653.3,228 654.3,227.4 656.5,227C658.8,226.6 663.6,226.6 665,226.5"/>
+        <path class="c-open c-stroke c-fine" d="M762.5,248C761.7,247 759,243.4 757.5,242C755.9,240.5 756,240.2 753,239.5C750,238.9 742,238.5 739.5,238C737,237.5 738.4,238 738,236.5C737.6,235 738.1,231.4 737,229C735.9,226.6 733.2,223.5 731.5,222C729.9,220.5 729.1,220.3 727,220C725,219.7 721.2,219.6 719,220C716.7,220.4 714.4,222.1 713.5,222.5"/>
+        <path class="c-open c-stroke c-fine" d="M626.5,290.5C628.1,290.6 632.2,291.6 636,291C639.8,290.4 645.3,289.1 649,287C652.7,284.9 656,282 658.5,278.5C660.9,275 662.7,268.1 663.5,266"/>
+        <path class="c-open c-stroke c-fine" d="M801.5,273.5C801.1,273 801,271.2 799.5,270.5C798,269.8 794.6,270.2 792.5,269.5C790.4,268.9 788.8,268 787,266.5C785.2,265 783,263 781.5,260.5C780,258 778.6,253 778,251.5"/>
+        <path class="c-open c-stroke c-fine" d="M760,273C760.5,272.8 762.3,272.7 763,272.1C763.7,271.5 764.7,270.2 764.5,268.3C764.3,266.2 763.4,262.5 762,260C760.6,257.5 757,255 756,254"/>
+        <path class="c-open c-stroke c-fine" d="M774.5,218C773,218.1 767.4,219.3 766,218.5C764.7,217.6 766.4,213.9 766.5,213"/>
+        <path class="c-open c-stroke c-fine" d="M596.5,286.5C595.4,286.7 591.3,286.8 590,287.5C588.7,288.3 588.8,290.4 588.5,291"/>
+        <path class="c-open c-stroke c-fine" d="M613,346C613.1,344.3 613.4,337.3 613.5,335.5"/>
+      </g>
+    </g>
+    <g id="brows">
+      <!-- Sopracciglia marcate -->
+    <g id="brows-marcate">
+        <path class="c-brows c-brows-marcate" d="M704.6,296.3C709,290.2 717.3,285.6 727.1,284.4C729.9,284.2 731.5,286.3 730.5,289C729.6,291.5 726.1,292.4 722.2,293.1C716.3,294.2 711.9,296.8 709,299.3C706.4,301.3 703.1,298.7 704.6,296.3Z"/>
+        <path class="c-brows c-brows-marcate" d="M748,289.7C748.4,286.4 751.1,285.1 755,285.4C759.9,285.8 764.3,288.1 766.6,291.1C768,293.1 766.4,295.7 763.8,295C760.7,294 756.5,293.3 751.9,293.3C749.4,293.3 747.8,291.8 748,289.7Z"/>
+      </g>
     </g>
     <ellipse class="c-eye c-blink" cx="717.8" cy="318" rx="6.2" ry="18.6"/>
     <ellipse class="c-eye c-blink" cx="756.2" cy="317.4" rx="5.8" ry="18.2"/>
@@ -683,5 +721,18 @@
     <path class="c-open c-stroke" d="M646.4,608.9C645.9,608.1 643.9,606.4 643.4,604C642.9,601.7 643.8,596.9 643.4,594.8C643,592.7 641.4,591.9 641,591.4"/>
     <circle class="c-dot" cx="687.3" cy="547.6" r="4.7"/>
     <circle class="c-dot" cx="685.4" cy="580.6" r="4.3"/>
+  </g>
+  <!-- Polo blu -->
+  <g id="top-polo-navy" class="c-idle-torso c-origin-maschio-slanciato">
+    <path class="c-main c-stroke" d="M689,600.7C673.3,599.6 657.7,597.6 657,596.5C656.4,595.5 656.4,593.1 657.3,576C658.5,551.2 659.1,542.6 661,521.2C661.6,514.2 661.6,508.1 661,507.8C660.8,507.6 656,506.7 650.4,505.8C644.8,504.8 639.1,503.8 637.8,503.5C636.4,503.2 634.4,503 633.4,503.1C632.4,503.1 631.3,502.9 630.9,502.6C630.5,502.3 629.4,501.9 628.5,501.7C622,500.5 621.8,495.6 627.4,476.2C628,474.3 629.5,469 630.8,464.5C637.2,441.6 644.2,427.7 653.3,419.7C656.3,417 663.3,412 664.1,412C664.3,412 665.5,410.8 666.8,409.4C672.6,403.1 673.9,402 675.9,402C678.6,402 679.4,402.8 679.2,405.2C678.9,408.8 685.8,416.2 694.6,422C697.2,423.6 699.6,425.3 700,425.7C701.8,427.4 703.6,426.7 706.8,423.2C713.6,415.6 715.4,411.5 713.5,408C712.7,406.6 713.1,406.3 715.6,406.3C717.4,406.4 717.9,406.7 721.9,410.9C724.5,413.5 726.9,415.5 727.7,415.7C732,416.8 742.5,430 746.5,439.4C750.3,448.4 758.2,473.3 760.2,483C760.6,485.1 761.3,487.7 761.7,488.9C763.1,492.7 763.3,496.4 762.2,497.6C760.6,499.4 756.2,502 755.4,501.7C754.6,501.4 743.6,504.3 742.8,505C742.6,505.2 742.7,508.5 742.9,512.3C743.6,521.6 746.7,557.8 748.2,575.2C750.1,596 750,596.6 744.5,597.1C743.3,597.3 738.5,598 733.8,598.7C721.1,600.6 701.4,601.5 689,600.7Z"/>
+    <path class="c-trim c-stroke c-fine" d="M699.5,426L710.5,426L711.5,463.5L700.5,464Z"/>
+    <path class="c-trim c-stroke" d="M668,406.5C672,416 677,426 683.5,437L698.5,428L701,421.5C692,416 683,410 675,402Z"/>
+    <path class="c-trim c-stroke" d="M701,421.5L705,428.5L717.5,435.5C720.5,429 722.5,423 723.5,417.5C721.5,412 719,406.5 716.5,402.5C712.5,410 707,416.5 701,421.5Z"/>
+    <path class="c-open c-stroke c-fine" d="M622,489C635,492 652,496 666.5,497"/>
+    <path class="c-open c-stroke c-fine" d="M670,465C670.5,475 669.5,487 667,496.5"/>
+    <path class="c-open c-stroke c-fine" d="M735.5,458C737,470 738.5,482 740,492"/>
+    <path class="c-open c-stroke c-fine" d="M740,492C746,490 752,487.5 758,485"/>
+    <circle class="c-accent" cx="705.3" cy="440.5" r="3"/>
+    <circle class="c-accent" cx="705.8" cy="454" r="3"/>
   </g>
 </svg>
