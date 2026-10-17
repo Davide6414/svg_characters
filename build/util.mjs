@@ -2,7 +2,8 @@
 import { readFile } from 'node:fs/promises';
 
 export const root = new URL('../', import.meta.url);
-export const read = (path) => readFile(new URL(path, root), 'utf8');
+// (a Windows checkout with git's autocrlf has CRLF line ends: read them as LF, the build's regexes expect \n)
+export const read = async (path) => (await readFile(new URL(path, root), 'utf8')).replace(/\r\n/g, '\n');
 export const readJson = async (path) => JSON.parse(await read(path));
 
 export const PAIR = /(-?\d+\.?\d*),(-?\d+\.?\d*)/g;     // coppie "x,y" dei percorsi (comandi sempre assoluti)

@@ -11,6 +11,7 @@
 // Uso: node build.mjs
 import { writeFile, mkdir, rm } from 'node:fs/promises';
 import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { root } from './build/util.mjs';
 import { buildHuman } from './build/human.mjs';
 import { buildAlien } from './build/alien.mjs';
@@ -23,7 +24,7 @@ const alien = await buildAlien();
 await rm(new URL('characters/', root), { recursive: true, force: true });
 for (const { path, svg } of [...human.files, ...alien.files]) {
   const out = new URL(path, root);
-  await mkdir(dirname(out.pathname), { recursive: true });
+  await mkdir(dirname(fileURLToPath(out)), { recursive: true }); // (pathname is /C:/... on Windows)
   await writeFile(out, svg);
 }
 
