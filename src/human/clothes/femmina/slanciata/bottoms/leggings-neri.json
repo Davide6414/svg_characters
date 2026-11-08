@@ -1,0 +1,17 @@
+{
+  "name": "Leggings neri",
+  "colors": {
+    "main": "#1f1d22"
+  },
+  "landmarks": {
+    "pants-bl": [
+      602.5,
+      864.3
+    ],
+    "pants-br": [
+      766.5,
+      864.3
+    ]
+  },
+  "frame": false
+}
